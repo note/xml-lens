@@ -1,69 +1,64 @@
 package net.michalsitko
 
+import scala.collection.immutable.Seq
 import scala.xml._
 
 object Hello extends AnyRef with XmlFragments with XmlSupport {
   def main(args: Array[String]): Unit = {
-    println("Hello, world!")
 
-    val xml: Elem = XML.loadString(asString)
+    // let's start with simpleAsString
+    val simpleXml: Elem = XML.loadString(simpleAsString)
 
-    val res = transformNaive(xml)
-    println(s"transformNaive: $res")
-  }
-
-  def transformNaive(root: Elem): NodeSeq = {
-    def replace: PartialFunction[Node, Node] = {
-      case el: Elem =>
-        println("bazinga 1")
-        el.copy(child = List(Text("f replaced")))
-      case el =>
-        println("bazinga 2")
-        el
+    // let's do it naively:
+    val res1 = simpleXml.map {
+      case aElem: Elem if (aElem.label == "a") =>
+        aElem.copy(child = aElem.child.flatMap {
+          case c1Elem: Elem if (c1Elem.label == "c1") =>
+            c1Elem.copy(child = c1Elem.child.flatMap {
+              case fElem: Elem if (fElem.label == "f") =>
+                fElem.copy(child = List(Text("f replaced")))
+              case el => el
+            })
+          case el => el
+        })
+      case el => el
     }
+    println(res1)
 
-    root.map {
-      deeper("a")(deeper("b")(deeper("c")(deeper("d")(deeper("e1")(update("f")(replace))))))
-    }.head.map {
-      deeper("a")(deeper("b")(deeper("c")(deeper("d")(deeper("e2")(update("f")(replace))))))
+    // as we see it does not scales well
+    // also some pattern emerges
+    // let rewrite it with XmlSupport trait:
+    val res2 = simpleXml.map {
+      deeper("a")(deeper("c1")(update("f"){
+        case elem: Elem => elem.copy(child = List(Text("f replaced")))
+      }))
     }.head
+    println(res2)
 
-//    val res = for {
-//      elemB <- (root \ "b")
-//      elemC <- (elemB \ "c")
-//      elemD <- (elemC \ "d")
-//    } yield {
-////      (elemB, elemC, elemD) match {
-////        case (b: Elem, c: Elem, d: Elem) =>
-//          val dChanged = (elemD.child).flatMap {
-//            // we are lucky that we can treat e1 and e2 the same
-//            case e: Elem if (e.label == "e1" || e.label == "e2") =>
-//              println("bazinga e: " + e)
-//              (e \ "_").map(replaceElem("f")(e => e.copy(child = {println("ss: " + e); List(Text("f replaced")) })))
-//            case e =>
-//              println("othwerise: " + e)
-//              e
-//          }
-//          println("koniec")
-//          val cChanged = (elemC.child).flatMap {
-//            case e: Elem if(e.label == "d") => dChanged
-//            case e =>
-//              println("bazingaaa: " + e)
-//              e
-//          }
-//          elemB.map(_.copy(child = cChanged.head))
-////      }
-//    }
-//    res
+    // more complicated XML:
+    val anotherXml = XML.loadString(asString)
+
+    // this one scales nicer:
+    val res3 = anotherXml.map {
+      deeper("a")(deeper("b")(deeper("c")(deeper("d")(deeper("e1")(update("f"){
+        case elem: Elem => elem.copy(child = List(Text("f replaced")))
+      })))))
+    }.head
+    println(res3)
+
+    // let's change `f` node also inside node `e2`:
+    def replaceF: PartialFunction[Node, Node] = {
+      case elem: Elem => elem.copy(child = List(Text("f replaced")))
+    }
+    val res4 = anotherXml.map {
+      deeper("a")(deeper("b")(deeper("c")(deeper("d")(deeper("e1")(update("f")(replaceF))))))
+    }.head.map {
+      deeper("a")(deeper("b")(deeper("c")(deeper("d")(deeper("e2")(update("f")(replaceF))))))
+    }
+    println(res4)
   }
 
-  private def replaceElem(label: String)(fn: Elem => NodeSeq): PartialFunction[Node, NodeSeq] = {
-    case e: Elem if (e.label == label) =>
-      fn(e)
-    case e =>
-      println("bazinga zle: " + e)
-      e
-  }
+
 }
 
 trait XmlSupport {
@@ -109,6 +104,22 @@ trait XmlFragments {
       |      <s>summary</s>
       |    </c>
       |  </b>
+      |</a>
+    """.stripMargin
+
+  val simpleAsString =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c2>
+      |      <f>item1</f>
+      |      <g>item2</g>
+      |      <h>item3</h>
+      |   </c2>
+      |   <s>summary</s>
       |</a>
     """.stripMargin
 
