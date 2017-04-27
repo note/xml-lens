@@ -9,7 +9,23 @@ class XmlOpticsSpec extends FlatSpec with Matchers with XmlFragments {
   "naive solution" should "works for text replacement" in {
     val simpleXml = XML.loadString(simpleAsString)
 
-    val res = simpleXml.map {
+    val res = naive(simpleXml)
+
+    val expectedXml = XML.loadString(ExpectedValues.simpleAsStringAfterTextReplacement)
+    res.head should equal(expectedXml)
+  }
+
+  "naiveXmlSupport" should "works for text replacement" in {
+    val simpleXml = XML.loadString(simpleAsString)
+
+    val res = naiveXmlSupport(simpleXml)
+
+    val expectedXml = XML.loadString(ExpectedValues.simpleAsStringAfterTextReplacement)
+    res.head should equal(expectedXml)
+  }
+
+  def naive(elem: Elem): NodeSeq = {
+    elem.map {
       case aElem: Elem if (aElem.label == "a") =>
         aElem.copy(child = aElem.child.flatMap {
           case c1Elem: Elem if (c1Elem.label == "c1") =>
@@ -22,17 +38,15 @@ class XmlOpticsSpec extends FlatSpec with Matchers with XmlFragments {
         })
       case el => el
     }
+  }
 
-    val expectedXml = XML.loadString(ExpectedValues.simpleAsStringAfterTextReplacement)
-
-    println("bazinga1: " + (res \ "c1").size + ", " + (expectedXml \ "c1").size)
-    println("bazinga1e: " + ((res \ "c1") == (expectedXml \ "c1")))
-    println("bazinga2: " + (res \ "c2").size + ", " + (expectedXml \ "c2").size)
-    println("bazinga2e: " + ((res \ "c2") == (expectedXml \ "c2")))
-    println("bazinga3: " + (res \ "s").size + ", " + (expectedXml \ "s").size)
-    println("bazinga3e: " + ((res \ "s") == (expectedXml \ "s")))
-
-    res.head should equal(expectedXml)
+  def naiveXmlSupport(elem: Elem): NodeSeq = {
+    import net.michalsitko.utils.XmlSupport._
+    elem.map {
+      deeper("a")(deeper("c1")(update("f"){
+        case elem: Elem => elem.copy(child = List(Text("f replaced")))
+      }))
+    }.head
   }
 }
 

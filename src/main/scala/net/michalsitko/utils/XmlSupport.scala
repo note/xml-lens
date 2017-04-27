@@ -24,3 +24,5 @@ trait XmlSupport {
     parent.headOption.flatMap(_.headOption).flatMap(_.attribute(attrName)).map(_.text)
   }
 }
+
+object XmlSupport extends XmlSupport
