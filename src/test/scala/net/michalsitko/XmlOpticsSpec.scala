@@ -1,11 +1,12 @@
 package net.michalsitko
 
+import monocle.{PTraversal, Traversal}
 import net.michalsitko.utils.XmlFragments
 import org.scalatest._
 
-import scala.xml.{Elem, NodeSeq, Text, XML}
+import scala.xml._
 
-class XmlOpticsSpec extends FlatSpec with Matchers with XmlFragments {
+class XmlOpticsSpec extends FlatSpec with Matchers with XmlFragments with Solutions {
   "naive solution" should "works for text replacement" in {
     val simpleXml = XML.loadString(simpleAsString)
 
@@ -24,6 +25,19 @@ class XmlOpticsSpec extends FlatSpec with Matchers with XmlFragments {
     res.head should equal(expectedXml)
   }
 
+  "with Optics" should "works for text replacement" in {
+    val simpleXml = XML.loadString(simpleAsString)
+
+    val res = withOptics(simpleXml)
+
+    val expectedXml = XML.loadString(ExpectedValues.simpleAsStringAfterTextReplacement)
+    res.head should equal(expectedXml)
+  }
+
+
+}
+
+trait Solutions {
   def naive(elem: Elem): NodeSeq = {
     elem.map {
       case aElem: Elem if (aElem.label == "a") =>
@@ -47,6 +61,22 @@ class XmlOpticsSpec extends FlatSpec with Matchers with XmlFragments {
         case elem: Elem => elem.copy(child = List(Text("f replaced")))
       }))
     }.head
+  }
+
+  def withOptics(elem: Elem): NodeSeq = {
+    import net.michalsitko.optics.Optics2._
+
+    def traversal(name: String): Traversal[NodeSeq, Node] = nodeSeqTraversal(name)
+    def traversal2(name: String) = nodeSeqTraversal2(name)
+
+    val focused = traversal("a").composeTraversal(traversal2("c1").composeTraversal(traversal2("f")))
+    focused.modify { e => e match {
+        case el: Elem => el.copy(child = List(Text("f replaced")))
+        case el => el
+      }
+    }(elem)
+
+//    traversal("a").composeTraversal(traversal("c1").composeTraversal(traversal("f")))
   }
 }
 

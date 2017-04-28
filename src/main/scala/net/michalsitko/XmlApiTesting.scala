@@ -10,6 +10,7 @@ object XmlApiTesting extends AnyRef with XmlFragments {
 
     val xml: Elem = XML.loadString(xmlAsString)
     val res: NodeSeq = (xml \ "xyz")
+    val res2: NodeSeq = res \ "abc"
     val first: Node = res.head
   }
 
