@@ -31,7 +31,7 @@ class XmlOpticsSpec extends FlatSpec with Matchers with XmlFragments with Soluti
     val res = withOptics(simpleXml)
 
     val expectedXml = XML.loadString(ExpectedValues.simpleAsStringAfterTextReplacement)
-    res.head should equal(expectedXml)
+    res should equal(expectedXml)
   }
 
 
@@ -64,17 +64,42 @@ trait Solutions {
   }
 
   def withOptics(elem: Elem): NodeSeq = {
+    /**
+      * WSZYSTKO ZLE ROBILEM!
+      * musze miec nodeSeqLens = Lens[Element, NodeSeq] - ten lens zawsze sie powiedzie w sensie
+      * nawet jesli nie ma elementu "EL" to nodeSeqLens("EL") zwroci po prostu pusty NodeSeq
+      * I teraz jesli chce dokonwyac jakis operacji na wyniku tego lensa to musze zdecydowac o semantyce wolajac
+      * np. metode "each", ktora zwroci Traversala
+      *
+      *
+      */
+
+
     import net.michalsitko.optics.Optics2._
 
     def traversal(name: String): Traversal[NodeSeq, Node] = nodeSeqTraversal(name)
     def traversal2(name: String) = nodeSeqTraversal2(name)
 
-    val focused = traversal("a").composeTraversal(traversal2("c1").composeTraversal(traversal2("f")))
-    focused.modify { e => e match {
-        case el: Elem => el.copy(child = List(Text("f replaced")))
-        case el => el
+//    val focused = traversal("a").composeTraversal(traversal2("c1").composeTraversal(traversal2("f")))
+//    val focused = traversal("a").composeTraversal(traversal2("c1"))
+
+    val focused = nodeLens("c1").composeLens(nodeLens2("f"))
+    val res = focused.modify { s =>
+      println("bazinga modify: " + s)
+      s.map {
+        case el: Elem =>
+          println("bazinga hello")
+          el.copy(child = List(Text("f replaced")))
+        case el       => el
       }
     }(elem)
+    println("bazinga test: " + res)
+    res
+//    focused.modify { e => e match {
+//        case el: Elem => el.copy(child = List(Text("f replaced")))
+//        case el => el
+//      }
+//    }(elem)
 
 //    traversal("a").composeTraversal(traversal("c1").composeTraversal(traversal("f")))
   }
