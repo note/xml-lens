@@ -64,15 +64,6 @@ trait Solutions {
   }
 
   def withOptics(elem: Elem): NodeSeq = {
-    /**
-      * WSZYSTKO ZLE ROBILEM!
-      * musze miec nodeSeqLens = Lens[Element, NodeSeq] - ten lens zawsze sie powiedzie w sensie
-      * nawet jesli nie ma elementu "EL" to nodeSeqLens("EL") zwroci po prostu pusty NodeSeq
-      * I teraz jesli chce dokonwyac jakis operacji na wyniku tego lensa to musze zdecydowac o semantyce wolajac
-      * np. metode "each", ktora zwroci Traversala
-      *
-      *
-      */
     import net.michalsitko.optics.Optics2._
 
     val focused = (nodeLens("c1").composeLens(nodeLens2("f"))).composeTraversal(each.composePrism(elemPrism))
