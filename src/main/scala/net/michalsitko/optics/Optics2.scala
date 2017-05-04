@@ -1,10 +1,11 @@
 package net.michalsitko.optics
 
-import monocle.{Lens, Traversal}
+import monocle.{Lens, Prism, Traversal}
 
 import scala.xml.{Elem, Node, NodeSeq}
 import scalaz.{Applicative, Traverse}
 import scala.collection.immutable.Seq
+import scala.util.Try
 import scalaz.std.list._
 import scalaz.std.iterable._
 
@@ -46,6 +47,18 @@ trait Optics2 {
       case e => e
     }
     NodeSeq.fromSeq(r)
+  }
+
+  val elemPrism: Prism[Node, Elem] = Prism[Node, Elem](node => node match {
+    case e: Elem => Some(e)
+    case _ => None
+  })(el => el)
+
+  val each = new Traversal[NodeSeq, Node]{
+    final def modifyF[F[_]](f: Node => F[Node])(from: NodeSeq)(implicit F: Applicative[F]): F[NodeSeq] = {
+      val mapped = from.theSeq.map(f).toList
+      F.map(F.sequence(mapped))(nodes => NodeSeq.fromSeq(nodes))
+    }
   }
 
 //  def elementLens(fieldName: String): Lens[Elem, NodeSeq] = Lens.apply[Elem, NodeSeq](

@@ -73,35 +73,10 @@ trait Solutions {
       *
       *
       */
-
-
     import net.michalsitko.optics.Optics2._
 
-    def traversal(name: String): Traversal[NodeSeq, Node] = nodeSeqTraversal(name)
-    def traversal2(name: String) = nodeSeqTraversal2(name)
-
-//    val focused = traversal("a").composeTraversal(traversal2("c1").composeTraversal(traversal2("f")))
-//    val focused = traversal("a").composeTraversal(traversal2("c1"))
-
-    val focused = nodeLens("c1").composeLens(nodeLens2("f"))
-    val res = focused.modify { s =>
-      println("bazinga modify: " + s)
-      s.map {
-        case el: Elem =>
-          println("bazinga hello")
-          el.copy(child = List(Text("f replaced")))
-        case el       => el
-      }
-    }(elem)
-    println("bazinga test: " + res)
-    res
-//    focused.modify { e => e match {
-//        case el: Elem => el.copy(child = List(Text("f replaced")))
-//        case el => el
-//      }
-//    }(elem)
-
-//    traversal("a").composeTraversal(traversal("c1").composeTraversal(traversal("f")))
+    val focused = (nodeLens("c1").composeLens(nodeLens2("f"))).composeTraversal(each.composePrism(elemPrism))
+    focused.modify(_.copy(child = List(Text("f replaced"))))(elem)
   }
 }
 
