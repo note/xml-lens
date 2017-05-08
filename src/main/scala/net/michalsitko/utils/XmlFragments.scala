@@ -86,3 +86,5 @@ trait XmlFragments {
       </b>
     </a>
 }
+
+object XmlFragments extends XmlFragments

@@ -2,12 +2,10 @@ package net.michalsitko.optics
 
 import monocle.{Lens, Prism, Traversal}
 
-import scala.xml.{Elem, Node, NodeSeq}
-import scalaz.{Applicative, Traverse}
 import scala.collection.immutable.Seq
-import scala.util.Try
+import scala.xml.{Elem, Node, NodeSeq}
+import scalaz.Applicative
 import scalaz.std.list._
-import scalaz.std.iterable._
 
 
 trait Optics2 {
@@ -16,14 +14,18 @@ trait Optics2 {
   ){newNodeSeq => rootNode =>
     println("bazinga 200: " + newNodeSeq)
     val it = newNodeSeq.toIterator
-    val children = rootNode.child.map {
+    val children = rootNode.child.flatMap {
       case el: Elem if el.label == fieldName =>
-        val r = it.next()
-        println(s"bazinga in lens1 [$fieldName]: " + r)
-        r
+        if(it.hasNext){
+          val r = it.next()
+          println(s"bazinga in lens1 [$fieldName]: " + r)
+          Some(r)
+        } else {
+          None
+        }
       case el =>
         println(s"bazinga in lens1 [$fieldName] miss: " + el)
-        el
+        Some(el)
     }
     rootNode.asInstanceOf[Elem].copy(child = children)
   }
