@@ -78,7 +78,7 @@ trait Solutions {
   }
 
   def naiveXmlSupport(elem: Elem): NodeSeq = {
-    import net.michalsitko.utils.XmlSupport._
+    import net.michalsitko.naive.XmlSupport._
     elem.map {
       deeper("a")(deeper("c1")(update("f"){
         case elem: Elem => elem.copy(child = List(Text("f replaced")))
@@ -87,7 +87,7 @@ trait Solutions {
   }
 
   def naiveXmlSupport2(elem: Elem): NodeSeq = {
-    import net.michalsitko.utils.XmlSupport._
+    import net.michalsitko.naive.XmlSupport._
     elem.map {
       deeper("a")(deeper("b")(deeper("c")(deeper("d")(deeper("e2")(update("f"){
         case elem: Elem => elem.copy(child = List(Text("f replaced")))
@@ -96,14 +96,14 @@ trait Solutions {
   }
 
   def withOptics(elem: Elem): NodeSeq = {
-    import net.michalsitko.optics.Optics2._
+    import net.michalsitko.optics.Optics._
 
     val focused = (nodeLens("c1").composeLens(nodeLens2("f"))).composeTraversal(each.composePrism(elemPrism))
     focused.modify(_.copy(child = List(Text("f replaced"))))(elem)
   }
 
   def withOptics2(elem: Elem): NodeSeq = {
-    import net.michalsitko.optics.Optics2._
+    import net.michalsitko.optics.Optics._
 
     val composed =
       nodeLens("b").composeLens(nodeLens2("c")).composeLens(nodeLens2("d")).composeLens(nodeLens2("e2")).composeLens(nodeLens2("f"))

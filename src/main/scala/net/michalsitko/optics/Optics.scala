@@ -2,13 +2,12 @@ package net.michalsitko.optics
 
 import monocle.{Lens, Prism, Traversal}
 
-import scala.collection.immutable.Seq
 import scala.xml.{Elem, Node, NodeSeq}
 import scalaz.Applicative
 import scalaz.std.list._
 
 
-trait Optics2 {
+trait Optics {
   def nodeLens(fieldName: String): Lens[Node, NodeSeq] = Lens.apply[Node, NodeSeq](
     elem => elem \ fieldName
   ){newNodeSeq => rootNode =>
@@ -62,4 +61,4 @@ trait Optics2 {
 
 }
 
-object Optics2 extends Optics2
+object Optics extends Optics

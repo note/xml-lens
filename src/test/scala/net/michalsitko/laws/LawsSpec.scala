@@ -2,7 +2,7 @@ package net.michalsitko.laws
 
 import monocle.internal.IsEq
 import monocle.law.{LensLaws, PrismLaws}
-import net.michalsitko.optics.Optics2
+import net.michalsitko.optics.{Optics, Optics$$}
 import net.michalsitko.utils.XmlFragments
 import org.scalatest.matchers.{MatchResult, Matcher}
 import org.scalatest.{Matchers, WordSpec}
@@ -14,7 +14,7 @@ class LawsSpec extends WordSpec with Matchers with IsEqMatchers {
 
   "elemPrism" should {
     "work" in {
-      val prismLaws = PrismLaws(Optics2.elemPrism)
+      val prismLaws = PrismLaws(Optics.elemPrism)
 
       check(prismLaws.partialRoundTripOneWay(new Text("abc")))
       check(prismLaws.roundTripOtherWay(elem))
@@ -30,7 +30,7 @@ class LawsSpec extends WordSpec with Matchers with IsEqMatchers {
 
   "lens" should {
     "work" in {
-      val lensLaws = LensLaws(Optics2.nodeLens("c1"))
+      val lensLaws = LensLaws(Optics.nodeLens("c1"))
 
       check(lensLaws.getSet(elem))
 

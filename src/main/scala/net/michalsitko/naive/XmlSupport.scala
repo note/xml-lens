@@ -1,7 +1,9 @@
-package net.michalsitko.utils
+package net.michalsitko.naive
 
 import scala.xml.{Elem, Node, NodeSeq}
 
+// whole "naive" packages should be eventually abandoned
+// it may be useful just for documentary purposes - to show motivation behind the project
 trait XmlSupport {
   def deeper(toReplace: String)(fn: PartialFunction[Node, NodeSeq]): PartialFunction[Node, NodeSeq] = {
     case elem: Elem if (elem.label == toReplace) =>
