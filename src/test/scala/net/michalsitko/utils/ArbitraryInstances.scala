@@ -27,24 +27,26 @@ trait ArbitraryInstances {
     }
   }
 
-  val leafElem: Gen[Elem] = for {
+  def leafElem(children: List[Node]): Gen[Elem] = for {
     label <- alphanumGen
     attrs <- linkedAttrs
-  } yield newElem(label, attrs, List.empty)
+  } yield newElem(label, attrs, children)
+
+  private val maxDirectChilden = 5
 
   def elemOfDepth(depth: Int): Gen[Elem] = {
-    def loop(inside: Gen[Elem], depth: Int): Gen[Elem] = {
+    def loop(inside: Gen[Elem], depth: Int): Gen[List[Elem]] = {
       if(depth == 0) {
-        inside
+        Gen.choose(1, maxDirectChilden).flatMap(n => Gen.listOfN(n, inside))
       } else {
         for {
           label <- alphanumGen
           attrs <- linkedAttrs
           inner <- loop(inside, depth - 1)
-        } yield newElem(label, attrs, List(inner))
+        } yield List(newElem(label, attrs, inner))
       }
     }
-    loop(leafElem, depth)
+    loop(leafElem(List(Text("Hello XML"))), depth).map(_.head)
   }
 
   def elem(depth: Int) = elemOfDepth(depth)
