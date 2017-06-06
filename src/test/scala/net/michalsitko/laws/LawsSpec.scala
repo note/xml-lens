@@ -1,61 +1,45 @@
 package net.michalsitko.laws
 
 import monocle.internal.IsEq
+import monocle.law.discipline.LensTests
 import monocle.law.{LensLaws, PrismLaws}
-import net.michalsitko.optics.{Optics, Optics$$}
-import net.michalsitko.utils.XmlFragments
+import net.michalsitko.optics.Optics
+import net.michalsitko.utils.{ArbitraryInstances, CogenInstances, XmlFragments}
+import org.scalacheck.Arbitrary
+import org.scalactic.anyvals.PosZInt
 import org.scalatest.matchers.{MatchResult, Matcher}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.prop.Checkers
+import org.scalatest.{FlatSpec, Matchers, WordSpec}
+import org.typelevel.discipline.Laws
 
 import scala.xml._
+import scalaz.Equal
 
-class LawsSpec extends WordSpec with Matchers with IsEqMatchers {
+class LawsSpec extends OpticsSpec with Matchers with ArbitraryInstances with CogenInstances {
+  implicit val nodeEqualInstance: Equal[Node] = (n1: Node, n2: Node) => n1 == n2
+  implicit val nodeSeqEqualInstance: Equal[NodeSeq] = (n1: NodeSeq, n2: NodeSeq) => n1 == n2
+
+
   val elem: Elem = XML.loadString(XmlFragments.simpleAsString)
 
-  "elemPrism" should {
-    "work" in {
-      val prismLaws = PrismLaws(Optics.elemPrism)
+  implicit val arbNode = Arbitrary[Node](elemWithLabelOccurance(4, "abc"))
+  implicit val arbNodeSeq = Arbitrary(nodeSeq(2))
 
-      check(prismLaws.partialRoundTripOneWay(new Text("abc")))
-      check(prismLaws.roundTripOtherWay(elem))
+  val nodeLens = LensTests(Optics.nodeLens("abc"))
 
-      check(prismLaws.modifyIdentity(new Text("abc")))
-      check(prismLaws.composeModify(new Text("abc"), identity, identity))
 
-      check(prismLaws.consistentSetModify(new Text("abc"), elem))
-      check(prismLaws.consistentModifyModifyId(new Text("abc"), identity))
-      check(prismLaws.consistentGetOptionModifyId(new Text("abc")))
-    }
-  }
 
-  "lens" should {
-    "work" in {
-      val lensLaws = LensLaws(Optics.nodeLens("c1"))
+  checkLaws("nodeLens", nodeLens)
 
-      check(lensLaws.getSet(elem))
-
-      // TODO: generally, the most interesting cases are those we are setting back lens with NodeSeq of size different than earlier (before setting)
-      check(lensLaws.setGet(elem, NodeSeq.Empty))
-      check(lensLaws.setIdempotent(elem, NodeSeq.Empty))
-      check(lensLaws.modifyIdentity(elem))
-      check(lensLaws.composeModify(elem, identity, identity))
-      check(lensLaws.consistentSetModify(elem, NodeSeq.Empty))
-      check(lensLaws.consistentModifyModifyId(elem, identity))
-      check(lensLaws.consistentGetModifyId(elem))
-    }
-  }
-
-  private def check[T](isEq: IsEq[T]): Unit = {
-    assert(isEq.lhs == isEq.rhs)
-  }
 }
 
-trait IsEqMatchers {
-  class Work[T] extends Matcher[IsEq[T]] {
-    override def apply(isEq: IsEq[T]): MatchResult = {
-      MatchResult(isEq.lhs == isEq.rhs, s"${isEq.lhs} does not equal ${isEq.rhs}", "s\"${isEq.lhs} equals ${isEq.rhs}\"")
+trait OpticsSpec extends FlatSpec {
+  def checkLaws(name: String, ruleSet: Laws#RuleSet, maxSize: Int = 100): Unit = {
+    val configParams = List(Checkers.MinSuccessful(15), Checkers.SizeRange(PosZInt.from(maxSize).get))
+
+    ruleSet.all.properties.zipWithIndex.foreach {
+      case ((id, prop), 0) => name should s"obey $id" in Checkers.check(prop, configParams:_*)
+      case ((id, prop), _) => it should s"obey $id" in Checkers.check(prop, configParams:_*)
     }
   }
-
-  def work = new Work
 }
