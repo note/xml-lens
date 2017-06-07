@@ -56,6 +56,66 @@ class XmlOpticsSpec extends WordSpec with Matchers with XmlFragments with Soluti
       val expectedXml = XML.loadString(ExpectedValues.xmlAsStringAfterTextReplacement)
       res should equal(expectedXml)
     }
+
+    // TODO: to remove
+    "tmp1" in {
+      import net.michalsitko.optics.Optics._
+
+      val simpleXml = XML.loadString(xmlString1)
+
+      val focused = nodeLens("c1").composeLens(nodeLens2("f")).set(NodeSeq.fromSeq(Seq.empty))
+      val res = focused(simpleXml)
+
+      val expectedXml = XML.loadString("""<?xml version="1.0" encoding="UTF-8"?>
+                                         |<a>
+                                         |   <c1>
+                                         |
+                                         |   </c1>
+                                         |</a>
+                                       """.stripMargin)
+
+      val trimmedEqual = scala.xml.Utility.trim(res) == scala.xml.Utility.trim(expectedXml)
+      println("trimmed equal: " + trimmedEqual)
+
+      trimmedEqual should equal(true)
+    }
+
+    "tmp2" in {
+      import net.michalsitko.optics.Optics._
+
+      val simpleXml = XML.loadString(xmlString1)
+
+      val newElem = <d>txt</d>
+      val focused = nodeLens("c1").composeLens(nodeLens2("f")).set(NodeSeq.fromSeq(List(newElem)))
+      val res = focused(simpleXml)
+
+      val expectedXml = XML.loadString("""<?xml version="1.0" encoding="UTF-8"?>
+                                         |<a>
+                                         |   <c1>
+                                         |   <d>txt</d>
+                                         |   </c1>
+                                         |</a>
+                                       """.stripMargin)
+
+      val trimmedEqual = scala.xml.Utility.trim(res) == scala.xml.Utility.trim(expectedXml)
+      println("trimmed equal: " + trimmedEqual)
+
+      trimmedEqual should equal(true)
+    }
+
+    "tmp3" in {
+      import net.michalsitko.optics.Optics._
+
+      val simpleXml = XML.loadString(xmlString2)
+
+      val newElem = NodeSeq.fromSeq(List(<d>txt</d>))
+      val focused = nodeLens("c1").composeLens(nodeLens2("f"))
+      val res = focused.set(newElem)(simpleXml)
+
+      val newF = focused.get(simpleXml)
+
+      newF should equal(newElem)
+    }
   }
 
 }
@@ -95,20 +155,20 @@ trait Solutions {
     }.head
   }
 
-  def withOptics(elem: Elem): NodeSeq = {
+  def withOptics(element: Elem): NodeSeq = {
     import net.michalsitko.optics.Optics._
 
     val focused = (nodeLens("c1").composeLens(nodeLens2("f"))).composeTraversal(each.composePrism(elemPrism))
-    focused.modify(_.copy(child = List(Text("f replaced"))))(elem)
+    focused.modify(_.copy(child = List(Text("f replaced"))))(element)
   }
 
-  def withOptics2(elem: Elem): NodeSeq = {
+  def withOptics2(element: Elem): NodeSeq = {
     import net.michalsitko.optics.Optics._
 
     val composed =
       nodeLens("b").composeLens(nodeLens2("c")).composeLens(nodeLens2("d")).composeLens(nodeLens2("e2")).composeLens(nodeLens2("f"))
     val focused = composed.composeTraversal(each.composePrism(elemPrism))
-    focused.modify(_.copy(child = List(Text("f replaced"))))(elem)
+    focused.modify(_.copy(child = List(Text("f replaced"))))(element)
   }
 }
 

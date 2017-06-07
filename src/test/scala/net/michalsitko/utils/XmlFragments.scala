@@ -66,6 +66,25 @@ trait XmlFragments {
       |</a>
     """.stripMargin
 
+  // TODO: to remove
+  val xmlString1 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item1</f>
+      |   </c1>
+      |</a>
+    """.stripMargin
+
+  val xmlString2 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <y>item1</y>
+      |   </c1>
+      |</a>
+    """.stripMargin
+
   val asLiteral =
     <a>
       <b>

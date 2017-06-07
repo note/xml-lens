@@ -1,6 +1,7 @@
 package net.michalsitko.optics
 
-import monocle.{Lens, Prism, Traversal}
+import cats.data.NonEmptyList
+import monocle.{Lens, Optional, Prism, Traversal}
 
 import scala.xml.{Elem, Node, NodeSeq}
 import scalaz.Applicative
@@ -8,6 +9,34 @@ import scalaz.std.list._
 
 
 trait Optics {
+//  def elemOptional(fieldName: String): Optional[Node, NodeSeq] = Optional[Node, NodeSeq](
+//
+//  )
+
+  def elem(label: String): Optional[Elem, NonEmptyList[Elem]] = Optional[Elem, NonEmptyList[Elem]]{
+    parent =>
+      val nodes = parent \ label
+      val elems = nodes.foldRight(List.empty[Elem]) { (current, acc) =>
+        current match {
+          case elem: Elem => elem :: acc
+        }
+      }
+      NonEmptyList.fromList(elems)
+  }{ newElems => parent =>
+    val it = newElems.toList.toIterator
+    val children = parent.child.flatMap {
+      case el: Elem if el.label == label =>
+        if(it.hasNext){
+          Some(it.next())
+        } else {
+          None
+        }
+      case el =>
+        Some(el)
+    }
+    parent.copy(child = children)
+  }
+
   def nodeLens(fieldName: String): Lens[Node, NodeSeq] = Lens.apply[Node, NodeSeq](
     elem => elem \ fieldName
   ){newNodeSeq => rootNode =>
