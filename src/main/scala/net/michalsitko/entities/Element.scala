@@ -15,10 +15,45 @@ sealed trait Node
   * To restrict user not to modify label of "zoomed-in" element we need to create our own Element
   *
   */
-case class Element(attributes: Seq[Attribute], children: Seq[Node]) extends Node {
-
-}
+case class Element(label: String, elementDetails: Details) extends Node
 
 case class Text(text: String) extends Node
 
+case class Details(attributes: Seq[Attribute], children: Seq[Node], namespaceDeclarations: Seq[NamespaceDeclaration])
+object Details {
+  def empty: Details = Details(Seq.empty, Seq.empty, Seq.empty)
+}
+
 case class Attribute(prefix: Option[String], key: String, values: Seq[String])
+
+// should prefix and/or uri be optional?
+case class ResolvedName(prefix: String, uri: Option[String], localName: String)
+
+
+case class NamespaceDeclaration(prefix: String, uri: String)
+
+object SomeExample {
+  // try to define following examplary XML
+  """<?xml version="1.0" encoding="UTF-8"?>
+    |<a>
+    |   <c1>
+    |      <f>item1</f>
+    |      <g>item2</g>
+    |   </c1>
+    |   <c1>
+    |      <f>item1</f>
+    |      <h>item2</h>
+    |   </c1>
+    |   <c2>
+    |      <f>item1</f>
+    |      <g>item2</g>
+    |      <h>item3</h>
+    |   </c2>
+    |   <s>summary</s>
+    |</a>
+  """.stripMargin
+
+  // with our AST:
+//  def details(children: Seq[Node]) = Details(Seq.empty, children)
+
+}
