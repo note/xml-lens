@@ -25,7 +25,8 @@ object XmlParser {
 
     firstElement(reader) match {
       case Some(resolvedName) =>
-        readNext(Element(resolvedName, Details.empty), reader)
+        val nsDeclarations = getNamespaceDeclarations(reader)
+        readNext(Element(resolvedName, Details(Seq.empty, Seq.empty, nsDeclarations)), reader)
       case None =>
         // TODO: think about it
         throw new IOException("no root element")
@@ -89,7 +90,7 @@ object XmlParser {
       i <- 0 until reader.getNamespaceCount
       prefix = reader.getNamespacePrefix(i)
       uri = reader.getNamespaceURI(i)
-    } yield NamespaceDeclaration(prefix, uri)
+    } yield NamespaceDeclaration(Option(prefix), uri)
 
 //  private def getAttributes(reader: XMLStreamReader){
 //    for {

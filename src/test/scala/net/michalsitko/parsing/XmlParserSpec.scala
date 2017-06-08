@@ -53,7 +53,7 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
       def defaultNs = "http://www.develop.com/student"
       def anotherNs = "http://www.example.com"
 
-      val expectedTree = Element(ResolvedName("", Some(defaultNs), "a"), details(List(
+      val expectedTree = Element(ResolvedName("", Some(defaultNs), "a"), Details(Seq.empty, List(
         indent(1),
         Element(ResolvedName("", Some(defaultNs), "c1"), details(List(
           indent(2),
@@ -71,7 +71,7 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
           indent(1)
         ))),
         Text(lineBreak)
-      )))
+      ), List(NamespaceDeclaration(None, "http://www.develop.com/student"), NamespaceDeclaration(Some("xyz"), "http://www.example.com"))))
       res should equal(Right(expectedTree))
     }
 

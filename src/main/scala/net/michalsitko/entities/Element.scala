@@ -29,7 +29,7 @@ case class Attribute(prefix: Option[String], key: String, values: Seq[String])
 // should prefix and/or uri be optional?
 case class ResolvedName(prefix: String, uri: Option[String], localName: String)
 
-case class NamespaceDeclaration(prefix: String, uri: String)
+case class NamespaceDeclaration(prefix: Option[String], uri: String)
 
 object SomeExample {
   // try to define following examplary XML
