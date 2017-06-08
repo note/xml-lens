@@ -1,6 +1,6 @@
 package net.michalsitko.parsing
 
-import net.michalsitko.entities._
+import net.michalsitko.entities.{Element, _}
 import net.michalsitko.parsing.utils.ExampleInputs
 import org.scalatest.{Matchers, WordSpec}
 
@@ -76,7 +76,7 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "parse attributes" in {
-      val res = XmlParser.parse(attributesXmlSting)
+      val res = XmlParser.parse(attributesXmlString)
 
       val fAttributes = List(Attribute("", None, "name", "abc"), Attribute("", None, "name2", "something else"))
       val c1Attributes = List(Attribute("", None, "name", ""))
@@ -90,6 +90,26 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
           Element(resolvedName("h"), details(List(Text("item2"))))
         ), Seq.empty))
       )))
+      res should equal(Right(expectedTree))
+    }
+
+    "parse attributes with namespaces" in {
+      val res = XmlParser.parse(attributesWithNsXmlString)
+
+      val defaultNs = "http://www.a.com"
+      val bNs = "http://www.b.com"
+
+      // https://stackoverflow.com/questions/41561/xml-namespaces-and-attributes
+      val fAttributes = List(Attribute("", None, "name", "abc"), Attribute("b", Some(bNs), "attr", "attr1"))
+      val gAttributes = List(Attribute("b", Some(bNs), "name", "def"))
+      val hAttributes = List(Attribute("", None, "name", "ghi"))
+      val expectedTree = Element(ResolvedName("", Some(defaultNs), "a"), Details(Seq.empty, List(
+        Element(ResolvedName("", Some(defaultNs), "c1"), details(List(
+          Element(ResolvedName("", Some(defaultNs), "f"), Details(fAttributes, List(Text("item1")), Seq.empty)),
+          Element(ResolvedName("", Some(defaultNs), "g"), Details(gAttributes, List(Text("item2")), Seq.empty)),
+          Element(ResolvedName("b", Some(bNs), "h"), Details(hAttributes, List(Text("item3")), Seq.empty))
+        )))
+      ), List(NamespaceDeclaration(None, "http://www.a.com"), NamespaceDeclaration(Some("b"), "http://www.b.com"))))
       res should equal(Right(expectedTree))
     }
 

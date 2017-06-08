@@ -26,7 +26,8 @@ object XmlParser {
     firstElement(reader) match {
       case Some(resolvedName) =>
         val nsDeclarations = getNamespaceDeclarations(reader)
-        readNext(Element(resolvedName, Details(Seq.empty, Seq.empty, nsDeclarations)), reader)
+        val attrs = getAttributes(reader)
+        readNext(Element(resolvedName, Details(attrs, Seq.empty, nsDeclarations)), reader)
       case None =>
         // TODO: think about it
         throw new IOException("no root element")
