@@ -1,6 +1,6 @@
 package net.michalsitko.utils
 
-import net.michalsitko.entities._
+import net.michalsitko.xml.entities._
 
 case class Example(stringRepr: String, tree: Element)
 

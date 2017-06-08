@@ -1,10 +1,10 @@
-package net.michalsitko.parsing
+package net.michalsitko.xml.parsing
 
 import java.io.{IOException, StringReader}
 import javax.xml.stream.{XMLInputFactory, XMLStreamException, XMLStreamReader}
 import javax.xml.stream.XMLStreamConstants._
 
-import net.michalsitko.entities._
+import net.michalsitko.xml.entities._
 
 import scala.annotation.tailrec
 import scala.util.Try

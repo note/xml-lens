@@ -1,4 +1,4 @@
-package net.michalsitko.parsing
+package net.michalsitko.xml.parsing
 
 import net.michalsitko.utils.{Example, ExampleInputs}
 import org.scalatest.{Matchers, WordSpec}

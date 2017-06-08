@@ -1,4 +1,4 @@
-package net.michalsitko.entities
+package net.michalsitko.xml.entities
 
 sealed trait Node
 

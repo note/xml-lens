@@ -1,9 +1,9 @@
-package net.michalsitko.printing
+package net.michalsitko.xml.printing
 
 import java.io.StringWriter
 import javax.xml.stream.{XMLOutputFactory, XMLStreamWriter}
 
-import net.michalsitko.entities._
+import net.michalsitko.xml.entities._
 
 // TODO: whole XmlPrinter needs rethinking
 // current version is very naive. It assumes that input for `print` is basically a result of XmlParser.parse

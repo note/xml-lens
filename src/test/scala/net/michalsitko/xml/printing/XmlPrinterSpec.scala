@@ -1,7 +1,5 @@
-package net.michalsitko.printing
+package net.michalsitko.xml.printing
 
-import net.michalsitko.entities._
-import net.michalsitko.parsing.XmlParser
 import net.michalsitko.utils.{Example, ExampleInputs}
 import org.scalatest.{Matchers, WordSpec}
 

@@ -1,4 +1,4 @@
-package net.michalsitko.entities
+package net.michalsitko.xml.entities
 
 import cats.data.NonEmptyList
 import monocle.Optional
