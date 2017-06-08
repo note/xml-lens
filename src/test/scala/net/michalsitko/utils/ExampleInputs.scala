@@ -1,4 +1,4 @@
-package net.michalsitko.parsing.utils
+package net.michalsitko.utils
 
 trait ExampleInputs {
   val noNamespaceXmlString =
@@ -52,6 +52,16 @@ trait ExampleInputs {
       |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
       |   <c1>
       |      <f>item1</f>
+      |   </c1>
+      |</a>
+    """.stripMargin
+
+  val malformedNamespaces =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |</a>
+      |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
+      |   <c1>
+      |      <yy:f>item1</yy:f>
       |   </c1>
       |</a>
     """.stripMargin

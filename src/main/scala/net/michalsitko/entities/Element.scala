@@ -30,7 +30,9 @@ object Details {
 case class Attribute(prefix: String, uri: Option[String], key: String, value: String)
 
 // should prefix and/or uri be optional?
-case class ResolvedName(prefix: String, uri: Option[String], localName: String)
+case class ResolvedName(prefix: String, uri: Option[String], localName: String) {
+  def hasPrefix: Boolean = prefix.nonEmpty
+}
 
 case class NamespaceDeclaration(prefix: Option[String], uri: String)
 

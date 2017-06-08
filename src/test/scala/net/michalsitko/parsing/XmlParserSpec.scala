@@ -1,7 +1,7 @@
 package net.michalsitko.parsing
 
 import net.michalsitko.entities.{Element, _}
-import net.michalsitko.parsing.utils.ExampleInputs
+import net.michalsitko.utils.ExampleInputs
 import org.scalatest.{Matchers, WordSpec}
 
 class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
@@ -117,6 +117,7 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
     "fail for malformed inputs" in {
       XmlParser.parse(malformedXmlString).isLeft should equal(true)
       XmlParser.parse(malformedXmlString2).isLeft should equal(true)
+      XmlParser.parse(malformedNamespaces).isLeft should equal(true)
     }
   }
 
