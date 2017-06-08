@@ -81,13 +81,7 @@ trait Example {
       |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
       |   <c1>
       |      <f>item1</f>
-      |      <g>item2</g>
       |   </c1>
-      |   <c1>
-      |      <f>item1</f>
-      |      <xyz:h>item2</xyz:h>
-      |   </c1>
-      |   <s>summary</s>
       |</a>
     """.stripMargin
 }

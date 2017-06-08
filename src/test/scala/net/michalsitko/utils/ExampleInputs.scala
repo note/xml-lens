@@ -6,7 +6,8 @@ case class Example(stringRepr: String, tree: Element)
 
 trait ExampleInputs {
   val noNamespaceExample = Example(
-    """<?xml version="1.0" encoding="UTF-8"?><a><c1><f>item1</f><g>item2</g></c1><c1><f>item1</f><h>item2</h></c1></a>""",
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a><c1><f>item1</f><g>item2</g></c1><c1><f>item1</f><h>item2</h></c1></a>""".stripMargin,
     Element(resolvedName("a"), details(List(
       Element(resolvedName("c1"), details(List(
         Element(resolvedName("f"), details(List(Text("item1")))),
@@ -96,7 +97,8 @@ trait ExampleInputs {
     val c1Attributes = List(Attribute("", None, "name", ""))
 
     Example(
-      """<?xml version="1.0" encoding="UTF-8"?><a><c1><f name="abc" name2="something else">item1</f><g>item2</g></c1><c1 name = ""><f>item1</f><h>item2</h></c1></a>""",
+      """<?xml version="1.0" encoding="UTF-8"?>
+        |<a><c1><f name="abc" name2="something else">item1</f><g>item2</g></c1><c1 name=""><f>item1</f><h>item2</h></c1></a>""".stripMargin,
       Element(resolvedName("a"), details(List(
         Element(resolvedName("c1"), details(List(
           Element(resolvedName("f"), Details(fAttributes, List(Text("item1")), Seq.empty)),
@@ -120,7 +122,8 @@ trait ExampleInputs {
     val hAttributes = List(Attribute("", None, "name", "ghi"))
 
     Example(
-      """<?xml version="1.0" encoding="UTF-8"?><a xmlns="http://www.a.com" xmlns:b="http://www.b.com"><c1><f name="abc" b:attr="attr1">item1</f><g b:name="def">item2</g><b:h name="ghi">item3</b:h></c1></a>""",
+      """<?xml version="1.0" encoding="UTF-8"?>
+        |<a xmlns="http://www.a.com" xmlns:b="http://www.b.com"><c1><f name="abc" b:attr="attr1">item1</f><g b:name="def">item2</g><b:h name="ghi">item3</b:h></c1></a>""".stripMargin,
       Element(ResolvedName("", Some(defaultNs), "a"), Details(Seq.empty, List(
         Element(ResolvedName("", Some(defaultNs), "c1"), details(List(
           Element(ResolvedName("", Some(defaultNs), "f"), Details(fAttributes, List(Text("item1")), Seq.empty)),

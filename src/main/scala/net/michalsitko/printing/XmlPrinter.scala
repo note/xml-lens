@@ -17,6 +17,9 @@ object XmlPrinter {
 
     // TODO: assumes XML version 1.0 and utf-8, make it works with different values (change in XmlParser required)
     writer.writeStartDocument("UTF-8", "1.0")
+    // it's arbitrary but AFAIK it's the most popular convention
+    writer.writeCharacters(System.getProperty("line.separator"))
+
     loop(elem, writer)
 
     writer.flush()
@@ -25,6 +28,9 @@ object XmlPrinter {
 
   def loop(node: Node, writer: XMLStreamWriter): Unit = node match {
     case elem: Element =>
+      val default = elem.elementDetails.namespaceDeclarations.filter(_.prefix.isEmpty)
+      default.headOption.foreach(defaultNs => writer.setDefaultNamespace(defaultNs.uri))
+
       writeElementLabel(elem.label, writer)
       writeNamespaces(elem.elementDetails.namespaceDeclarations, writer)
       writeAttributes(elem.elementDetails.attributes, writer)
@@ -45,6 +51,8 @@ object XmlPrinter {
     } else {
       resolvedName.uri match {
         case Some(uri) =>
+          println(s"bazinga uri: $uri")
+          println(s"bazinga localName: ${resolvedName.localName}")
           writer.writeStartElement(uri, resolvedName.localName)
         case None =>
           writer.writeStartElement(resolvedName.localName)
@@ -52,10 +60,26 @@ object XmlPrinter {
     }
 
   def writeNamespaces(namespaces: Seq[NamespaceDeclaration], writer: XMLStreamWriter): Unit = {
-    namespaces.map(ns => writer.writeNamespace(ns.prefix.getOrElse(null), ns.uri))
+    namespaces.map { ns =>
+      ns.prefix match {
+        case Some(prefix) =>
+          writer.writeNamespace(prefix, ns.uri)
+        case None =>
+          println("write DefaultNamespace: " + ns.uri)
+          writer.writeDefaultNamespace(ns.uri)
+      }
+    }
   }
 
   def writeAttributes(attributes: Seq[Attribute], writer: XMLStreamWriter): Unit = {
-    attributes.map(attr => writer.writeAttribute(attr.prefix, attr.uri.getOrElse(null), attr.key, attr.value))
+    attributes.map { attr =>
+      attr.uri match {
+        case Some(uri) =>
+          writer.writeAttribute(attr.prefix, uri, attr.key, attr.value)
+        case None =>
+          writer.writeAttribute(attr.key, attr.value)
+      }
+
+    }
   }
 }
