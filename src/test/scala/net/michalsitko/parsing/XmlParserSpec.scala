@@ -1,6 +1,6 @@
 package net.michalsitko.parsing
 
-import net.michalsitko.entities.{Details, Element, Node, Text}
+import net.michalsitko.entities._
 import net.michalsitko.parsing.utils.ExampleInputs
 import org.scalatest.{Matchers, WordSpec}
 
@@ -9,14 +9,14 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
     "return proper Element for XML without any namespaces declared and with no whitespaces" in {
       val res = XmlParser.parse(noNamespaceXmlString)
 
-      val expectedTree = Element("a", details(List(
-        Element("c1", details(List(
-          Element("f", details(List(Text("item1")))),
-          Element("g", details(List(Text("item2"))))
+      val expectedTree = Element(resolvedName("a"), details(List(
+        Element(resolvedName("c1"), details(List(
+          Element(resolvedName("f"), details(List(Text("item1")))),
+          Element(resolvedName("g"), details(List(Text("item2"))))
         ))),
-        Element("c1", details(List(
-          Element("f", details(List(Text("item1")))),
-          Element("h", details(List(Text("item2"))))
+        Element(resolvedName("c1"), details(List(
+          Element(resolvedName("f"), details(List(Text("item1")))),
+          Element(resolvedName("h"), details(List(Text("item2"))))
         )))
       )))
       res should equal(Right(expectedTree))
@@ -25,21 +25,21 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
     "return proper Element for XML without any namespace and some whitespaces" in {
       val res = XmlParser.parse(noNamespaceXmlStringWithWs)
 
-      val expectedTree = Element("a", details(List(
+      val expectedTree = Element(resolvedName("a"), details(List(
         indent(1),
-        Element("c1", details(List(
+        Element(resolvedName("c1"), details(List(
           indent(2),
-          Element("f", details(List(Text("item1")))),
+          Element(resolvedName("f"), details(List(Text("item1")))),
           indent(2),
-          Element("g", details(List(Text("item2")))),
+          Element(resolvedName("g"), details(List(Text("item2")))),
           indent(1)
         ))),
         indent(1),
-        Element("c1", details(List(
+        Element(resolvedName("c1"), details(List(
           indent(2),
-          Element("f", details(List(Text("item1")))),
+          Element(resolvedName("f"), details(List(Text("item1")))),
           indent(2),
-          Element("h", details(List(Text("item2")))),
+          Element(resolvedName("h"), details(List(Text("item2")))),
           indent(1)
         ))),
         Text(lineBreak)
@@ -48,7 +48,31 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "return proper Element for XML with some namespaces declared" in {
-      XmlParser.parse(xmlString).isRight should equal(true)
+      val res = XmlParser.parse(namespaceXmlString)
+
+      def defaultNs = "http://www.develop.com/student"
+      def anotherNs = "http://www.example.com"
+
+      val expectedTree = Element(ResolvedName("", Some(defaultNs), "a"), details(List(
+        indent(1),
+        Element(ResolvedName("", Some(defaultNs), "c1"), details(List(
+          indent(2),
+          Element(ResolvedName("", Some(defaultNs), "f"), details(List(Text("item1")))),
+          indent(2),
+          Element(ResolvedName("", Some(defaultNs), "g"), details(List(Text("item2")))),
+          indent(1)
+        ))),
+        indent(1),
+        Element(ResolvedName("", Some(defaultNs), "c1"), details(List(
+          indent(2),
+          Element(ResolvedName("", Some(defaultNs), "f"), details(List(Text("item1")))),
+          indent(2),
+          Element(ResolvedName("xyz", Some(anotherNs), "h"), details(List(Text("item2")))),
+          indent(1)
+        ))),
+        Text(lineBreak)
+      )))
+      res should equal(Right(expectedTree))
     }
 
     "fail for malformed inputs" in {
@@ -66,4 +90,6 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
   }
 
   def indent(level: Int): Text = Text(lineBreak + (indent * level))
+
+  def resolvedName(name: String) = ResolvedName("", None, name)
 }

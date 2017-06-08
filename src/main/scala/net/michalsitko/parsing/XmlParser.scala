@@ -4,7 +4,7 @@ import java.io.{IOException, StringReader}
 import javax.xml.stream.{XMLInputFactory, XMLStreamException, XMLStreamReader}
 import javax.xml.stream.XMLStreamConstants._
 
-import net.michalsitko.entities.{Details, Element, ResolvedName, Text}
+import net.michalsitko.entities._
 
 import scala.annotation.tailrec
 import scala.util.Try
@@ -25,7 +25,7 @@ object XmlParser {
 
     firstElement(reader) match {
       case Some(resolvedName) =>
-        readNext(Element(resolvedName.localName, Details.empty), reader)
+        readNext(Element(resolvedName, Details.empty), reader)
       case None =>
         // TODO: think about it
         throw new IOException("no root element")
@@ -46,11 +46,14 @@ object XmlParser {
   }
 
   // TODO: this is slow - check it with JMH after optimizations
+  // TODO: non-tail recursion
   def readNext(parent: Element, reader: XMLStreamReader): Element = {
     if(reader.hasNext) {
       reader.next() match {
         case START_ELEMENT =>
-          val initialChild = Element(getName(reader).localName, Details.empty)
+          val nsDeclarations = getNamespaceDeclarations(reader)
+          val label = getName(reader)
+          val initialChild = Element(label, Details(Seq.empty, Seq.empty, nsDeclarations))
           val child = readNext(initialChild, reader)
           val newChildren = parent.elementDetails.children :+ child
           val newParent = parent.copy(elementDetails = parent.elementDetails.copy(children = newChildren))
@@ -81,18 +84,29 @@ object XmlParser {
     ResolvedName(prefix, Option(uri), localName)
   }
 
-  private def printAttributes(reader: XMLStreamReader){
-    for (i <- 0 until reader.getAttributeCount) {
-      printAttribute(reader, i)
-    }
-  }
-  private def printAttribute(reader: XMLStreamReader, index: Int) {
-    val prefix = reader.getAttributePrefix(index)
-    val namespace = reader.getAttributeNamespace(index)
-    val localName = reader.getAttributeLocalName(index)
-    val value = reader.getAttributeValue(index)
-    println("printAttribute")
-    println(s"prefix: $prefix, namespace: $namespace, localName: $localName, value: $value")
-    println()
-  }
+  private def getNamespaceDeclarations(reader: XMLStreamReader): Seq[NamespaceDeclaration] =
+    for {
+      i <- 0 until reader.getNamespaceCount
+      prefix = reader.getNamespacePrefix(i)
+      uri = reader.getNamespaceURI(i)
+    } yield NamespaceDeclaration(prefix, uri)
+
+//  private def getAttributes(reader: XMLStreamReader){
+//    for {
+//      i <- 0 until reader.getAttributeCount
+//      prefix = reader.getAttributePrefix(i)
+//      namespace = reader.getAttributeNamespace(i)
+//      localName = reader.getAttributeLocalName(i)
+//      value = reader.getAttributeValue(i)
+//    } yield ()
+//  }
+//  private def printAttribute(reader: XMLStreamReader, index: Int) {
+//    val prefix = reader.getAttributePrefix(index)
+//    val namespace = reader.getAttributeNamespace(index)
+//    val localName = reader.getAttributeLocalName(index)
+//    val value = reader.getAttributeValue(index)
+//    println("printAttribute")
+//    println(s"prefix: $prefix, namespace: $namespace, localName: $localName, value: $value")
+//    println()
+//  }
 }

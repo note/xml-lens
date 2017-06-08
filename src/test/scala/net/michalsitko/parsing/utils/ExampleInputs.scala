@@ -17,7 +17,7 @@ trait ExampleInputs {
       |   </c1>
       |</a>""".stripMargin
 
-  val xmlString =
+  val namespaceXmlString =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
       |   <c1>

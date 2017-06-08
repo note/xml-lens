@@ -15,7 +15,7 @@ sealed trait Node
   * To restrict user not to modify label of "zoomed-in" element we need to create our own Element
   *
   */
-case class Element(label: String, elementDetails: Details) extends Node
+case class Element(label: ResolvedName, elementDetails: Details) extends Node
 
 case class Text(text: String) extends Node
 
@@ -28,7 +28,6 @@ case class Attribute(prefix: Option[String], key: String, values: Seq[String])
 
 // should prefix and/or uri be optional?
 case class ResolvedName(prefix: String, uri: Option[String], localName: String)
-
 
 case class NamespaceDeclaration(prefix: String, uri: String)
 
