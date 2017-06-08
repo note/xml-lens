@@ -75,6 +75,25 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
       res should equal(Right(expectedTree))
     }
 
+    "parse attributes" in {
+      val res = XmlParser.parse(attributesXmlSting)
+
+      val fAttributes = List(Attribute("", None, "name", "abc"), Attribute("", None, "name2", "something else"))
+      val c1Attributes = List(Attribute("", None, "name", ""))
+      val expectedTree = Element(resolvedName("a"), details(List(
+        Element(resolvedName("c1"), details(List(
+          Element(resolvedName("f"), Details(fAttributes, List(Text("item1")), Seq.empty)),
+          Element(resolvedName("g"), details(List(Text("item2"))))
+        ))),
+        Element(resolvedName("c1"), Details(c1Attributes, List(
+          Element(resolvedName("f"), details(List(Text("item1")))),
+          Element(resolvedName("h"), details(List(Text("item2"))))
+        ), Seq.empty))
+      )))
+      res should equal(Right(expectedTree))
+    }
+
+
     "fail for malformed inputs" in {
       XmlParser.parse(malformedXmlString).isLeft should equal(true)
       XmlParser.parse(malformedXmlString2).isLeft should equal(true)

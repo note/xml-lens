@@ -24,12 +24,17 @@ object Details {
   def empty: Details = Details(Seq.empty, Seq.empty, Seq.empty)
 }
 
-case class Attribute(prefix: Option[String], key: String, values: Seq[String])
+// when no prefix in XML - prefix == ""
+// investigate why in scala-xml Attribute value is defined as `value: Seq[Node]`
+// also, take a look at: https://www.w3.org/TR/xml/#NT-AttValue
+case class Attribute(prefix: String, uri: Option[String], key: String, value: String)
 
 // should prefix and/or uri be optional?
 case class ResolvedName(prefix: String, uri: Option[String], localName: String)
 
 case class NamespaceDeclaration(prefix: Option[String], uri: String)
+
+// TODO: hierarchy is not comprehensive - it misses PCDATA, Entity References, Comments among the others
 
 object SomeExample {
   // try to define following examplary XML

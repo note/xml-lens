@@ -53,8 +53,9 @@ object XmlParser {
       reader.next() match {
         case START_ELEMENT =>
           val nsDeclarations = getNamespaceDeclarations(reader)
+          val attrs = getAttributes(reader)
           val label = getName(reader)
-          val initialChild = Element(label, Details(Seq.empty, Seq.empty, nsDeclarations))
+          val initialChild = Element(label, Details(attrs, Seq.empty, nsDeclarations))
           val child = readNext(initialChild, reader)
           val newChildren = parent.elementDetails.children :+ child
           val newParent = parent.copy(elementDetails = parent.elementDetails.copy(children = newChildren))
@@ -92,22 +93,13 @@ object XmlParser {
       uri = reader.getNamespaceURI(i)
     } yield NamespaceDeclaration(Option(prefix), uri)
 
-//  private def getAttributes(reader: XMLStreamReader){
-//    for {
-//      i <- 0 until reader.getAttributeCount
-//      prefix = reader.getAttributePrefix(i)
-//      namespace = reader.getAttributeNamespace(i)
-//      localName = reader.getAttributeLocalName(i)
-//      value = reader.getAttributeValue(i)
-//    } yield ()
-//  }
-//  private def printAttribute(reader: XMLStreamReader, index: Int) {
-//    val prefix = reader.getAttributePrefix(index)
-//    val namespace = reader.getAttributeNamespace(index)
-//    val localName = reader.getAttributeLocalName(index)
-//    val value = reader.getAttributeValue(index)
-//    println("printAttribute")
-//    println(s"prefix: $prefix, namespace: $namespace, localName: $localName, value: $value")
-//    println()
-//  }
+  private def getAttributes(reader: XMLStreamReader): Seq[Attribute] = {
+    for {
+      i <- 0 until reader.getAttributeCount
+      prefix = reader.getAttributePrefix(i)
+      namespace = reader.getAttributeNamespace(i)
+      localName = reader.getAttributeLocalName(i)
+      value = reader.getAttributeValue(i)
+    } yield Attribute(prefix, Option(namespace), localName, value)
+  }
 }

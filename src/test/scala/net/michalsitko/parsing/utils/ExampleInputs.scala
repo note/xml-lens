@@ -31,6 +31,9 @@ trait ExampleInputs {
       |</a>
     """.stripMargin
 
+  val attributesXmlSting =
+    """<?xml version="1.0" encoding="UTF-8"?><a><c1><f name="abc" name2="something else">item1</f><g>item2</g></c1><c1 name = ""><f>item1</f><h>item2</h></c1></a>"""
+
   val malformedXmlString =
     """<?xml version="1.0" encoding="UTF-8"?>
       |a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
