@@ -34,6 +34,11 @@ case class ResolvedName(prefix: String, uri: Option[String], localName: String) 
   def hasPrefix: Boolean = prefix.nonEmpty
 }
 
+object ResolvedName {
+  def unprefixed(localName: String): ResolvedName =
+    ResolvedName("", None, localName)
+}
+
 case class NamespaceDeclaration(prefix: Option[String], uri: String)
 
 // TODO: hierarchy is not comprehensive - it misses PCDATA, Entity References, Comments among the others
