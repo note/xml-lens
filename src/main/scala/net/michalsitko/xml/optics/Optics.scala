@@ -1,6 +1,6 @@
 package net.michalsitko.xml.optics
 
-import monocle.{Optional, Traversal}
+import monocle.{Lens, Optional, Prism, Traversal}
 import net.michalsitko.xml.entities._
 
 import scalaz.Applicative
@@ -32,6 +32,8 @@ object Optics {
     }
   }
 
+  def deeper(label: String): Traversal[Element, Element] = deeper(ResolvedName.unprefixed(label))
+
   def deeper(label: ResolvedName): Traversal[Element, Element] = new Traversal[Element, Element] {
     override final def modifyF[F[_]](f: (Element) => F[Element])(from: Element)(implicit F: Applicative[F]): F[Element] = {
       val tmp = from.children.collect {
@@ -48,5 +50,18 @@ object Optics {
       }
     }
   }
+
+  val hasTextOnly: Optional[Element, String] = Optional[Element, String] { el =>
+    if(el.children.size == 1) {
+      el.children.head match {
+        case Text(txt) => Some(txt)
+        case _ => None
+      }
+    } else {
+      None
+    }
+  }(newText => from => from.copy(children = List(Text(newText))))
+
+//  val firstText: Lens[Element, String] =
 
 }

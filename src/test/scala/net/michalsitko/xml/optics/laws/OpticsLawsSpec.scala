@@ -1,6 +1,6 @@
 package net.michalsitko.xml.optics.laws
 
-import monocle.law.discipline.TraversalTests
+import monocle.law.discipline.{OptionalTests, TraversalTests}
 import net.michalsitko.xml.optics.Optics
 import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.utils.{ArbitraryInstances, CogenInstances}
@@ -12,17 +12,18 @@ import org.typelevel.discipline.Laws
 
 class OpticsLawsSpec extends OpticsSpec with Matchers with ArbitraryInstances with CogenInstances {
   import net.michalsitko.xml.entities.Instances._
+  import scalaz.std.string._
 
   implicit val arbLabeledElem = Arbitrary(labeledElementGen(4, Some("abc")))
   implicit val arbElem = Arbitrary(labeledElementGen(2, None).map(_.element))
 
-//  val samples = for {
-//    i <- 0 until 10
-//  } yield gen.sample.get
-//  samples.foreach(s => println(XmlPrinter.print(s)))
+  val deepTest    = TraversalTests(Optics.deep("abc"))
+  val deeperTest  = TraversalTests(Optics.deeper("abc"))
+  val hasTextOnlyTest = OptionalTests(Optics.hasTextOnly)
 
-  val deepTest = TraversalTests(Optics.deep("abc"))
   checkLaws("deep Traversal", deepTest)
+  checkLaws("deeper Traversal", deeperTest)
+  checkLaws("hasTextOnly Optional", deeperTest)
 
 }
 
