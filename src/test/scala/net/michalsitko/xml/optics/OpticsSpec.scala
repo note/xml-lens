@@ -49,7 +49,6 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
     // TODO: think about extracting operation implemented here to library itself
     "modifyExistingOrAdd" in {
       def replaceExistingAttrOrAdd(traversal: Traversal[LabeledElement, Element])(key: ResolvedName, newValue: String): (LabeledElement) => LabeledElement = {
-        // TODO: try to implement this with choice
         val replaceIfExists = traversal.composeOptional((Optics.attribute(key)))
         val f1 = replaceIfExists.modify(_ => newValue)
         val addOtherwise = traversal.composeLens(Optics.attributes)
@@ -70,6 +69,25 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       val res = replaceExistingAttrOrAdd(traversal)(ResolvedName.unprefixed("someKey"), "newValue")(parsed)
       XmlPrinter.print(res) should equal(expectedRes4)
     }
+
+    "delete all attributes" in {
+      val parsed = XmlParser.parse(input5).right.get
+
+      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(Optics.attributes)
+
+      val res = traversal.modify(_ => List.empty)(parsed)
+      XmlPrinter.print(res) should equal(expectedRes5)
+    }
+
+    "delete single attribute" in {
+      val parsed = XmlParser.parse(input5).right.get
+
+      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(Optics.attributes)
+
+      val res = traversal.modify(attrs => attrs.filter(_.key != ResolvedName.unprefixed("someKey")))(parsed)
+      XmlPrinter.print(res) should equal(expectedRes6)
+    }
+
   }
 
   def deep(label: String) = Optics.deep(ResolvedName.unprefixed(label))
@@ -149,6 +167,45 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |   </c1>
       |   <c1>
       |      <f someKey="newValue">item1</f>
+      |      <h>item2</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val input5 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f someKey="oldValue" anotherKey="value">item1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c1>
+      |      <f someKey="oldValue">item1</f>
+      |      <h>item2</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val expectedRes5 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c1>
+      |      <f>item1</f>
+      |      <h>item2</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val expectedRes6 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f anotherKey="value">item1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c1>
+      |      <f>item1</f>
       |      <h>item2</h>
       |   </c1>
       |</a>""".stripMargin
