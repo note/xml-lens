@@ -101,6 +101,7 @@ object XmlParser {
       namespace = reader.getAttributeNamespace(i)
       localName = reader.getAttributeLocalName(i)
       value = reader.getAttributeValue(i)
-    } yield Attribute(prefix, Option(namespace), localName, value)
+      resolved = ResolvedName(prefix, Option(namespace), localName)
+    } yield Attribute(resolved, value)
   }
 }

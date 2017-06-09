@@ -1,8 +1,8 @@
 package net.michalsitko.xml.optics
 
-import monocle.PTraversal
+import monocle.{PTraversal, Traversal}
 import net.michalsitko.utils.ExampleInputs
-import net.michalsitko.xml.entities.{LabeledElement, ResolvedName, Text}
+import net.michalsitko.xml.entities._
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter
 import org.scalatest.{Matchers, WordSpec}
@@ -25,6 +25,50 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
 
       val res = traversal.modify(_.toUpperCase)(parsed)
       XmlPrinter.print(res) should equal(expectedRes2)
+    }
+
+    "modify existing attribute value" in {
+      val parsed = XmlParser.parse(input3).right.get
+
+      val traversal = deep("c1").composeTraversal(deeper("f")).composeOptional(Optics.attribute("someKey"))
+
+      val res = traversal.set("newValue")(parsed)
+      XmlPrinter.print(res) should equal(expectedRes3)
+    }
+
+    "add attribute" in {
+      val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
+
+      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(Optics.attributes)
+
+      val res = traversal.modify(attrs => attrs :+ Attribute.unprefixed("someKey", "newValue"))(parsed)
+      val expectedRes = expectedRes3 // we expect the same result as in test above
+      XmlPrinter.print(res) should equal(expectedRes)
+    }
+
+    // TODO: think about extracting operation implemented here to library itself
+    "modifyExistingOrAdd" in {
+      def replaceExistingAttrOrAdd(traversal: Traversal[LabeledElement, Element])(key: ResolvedName, newValue: String): (LabeledElement) => LabeledElement = {
+        // TODO: try to implement this with choice
+        val replaceIfExists = traversal.composeOptional((Optics.attribute(key)))
+        val f1 = replaceIfExists.modify(_ => newValue)
+        val addOtherwise = traversal.composeLens(Optics.attributes)
+        val f2 = addOtherwise.modify { attrs =>
+          if(attrs.exists(_.key == key)) {
+            attrs
+          } else {
+            attrs :+ Attribute(key, newValue)
+          }
+        }
+        f1 andThen f2
+      }
+
+      val parsed = XmlParser.parse(input4).right.get
+
+      val traversal = deep("c1").composeTraversal(deeper("f"))
+
+      val res = replaceExistingAttrOrAdd(traversal)(ResolvedName.unprefixed("someKey"), "newValue")(parsed)
+      XmlPrinter.print(res) should equal(expectedRes4)
     }
   }
 
@@ -53,6 +97,58 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |   </c1>
       |   <c1>
       |      <f>ITEM1</f>
+      |      <h>item2</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val input3 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f someKey="oldValue">item1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c1>
+      |      <f someKey="oldValue">item1</f>
+      |      <h>item2</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val expectedRes3 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f someKey="newValue">item1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c1>
+      |      <f someKey="newValue">item1</f>
+      |      <h>item2</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val input4 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f someKey="oldValue">item1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c1>
+      |      <f>item1</f>
+      |      <h>item2</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val expectedRes4 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f someKey="newValue">item1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c1>
+      |      <f someKey="newValue">item1</f>
       |      <h>item2</h>
       |   </c1>
       |</a>""".stripMargin

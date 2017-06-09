@@ -62,6 +62,33 @@ object Optics {
     }
   }(newText => from => from.copy(children = List(Text(newText))))
 
+  def attribute(key: String): Optional[Element, String] = attribute(ResolvedName.unprefixed(key))
+
+  def attribute(key: ResolvedName) = Optional[Element, String] { el =>
+    val r = el.attributes.find(_.key == key).map(_.value)
+    println("bazinga r: " + r)
+    r
+  }{newValue => from =>
+    println("bazinga set: " + newValue)
+    val (newAttributes, included) = from.attributes.foldLeft((Vector.empty[Attribute], false)){ (accTuple, current) =>
+      val acc = accTuple._1
+      if(current.key == key) {
+        (acc :+ current.copy(value = newValue), true)
+      } else {
+        (acc :+ current, accTuple._2)
+      }
+    }
+    val newAttrs = if(included) {
+      newAttributes
+    } else {
+      newAttributes :+ Attribute(key, newValue)
+    }
+    from.copy(attributes = newAttrs)
+  }
+
+  val attributes: Lens[Element, Seq[Attribute]] =
+    Lens[Element, Seq[Attribute]](_.attributes)(newAttrs => from => from.copy(attributes = newAttrs))
+
 //  val firstText: Lens[Element, String] =
 
 }

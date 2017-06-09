@@ -19,6 +19,8 @@ case class LabeledElement(label: ResolvedName, element: Element) extends Node
 
 case class Text(text: String) extends Node
 
+// TODO: think if Seq[Attribute] is a good choice taking into account that attribute names have to be unique within
+// single element and printing with XmlStreamWriter a non-unique Attribute will throw an exception
 case class Element(attributes: Seq[Attribute], children: Seq[Node], namespaceDeclarations: Seq[NamespaceDeclaration])
 object Element {
   def empty: Element = Element(Seq.empty, Seq.empty, Seq.empty)
@@ -27,11 +29,13 @@ object Element {
 // when no prefix in XML then: prefix == ""
 // TODO: investigate why in scala-xml Attribute value is defined as `value: Seq[Node]`
 // also, take a look at: https://www.w3.org/TR/xml/#NT-AttValue
-case class Attribute(prefix: String, uri: Option[String], key: String, value: String)
+case class Attribute(key: ResolvedName, value: String)
+// TODO: maybe should be changed to:
+// Attribute(ResolvedName, String)
 
 object Attribute {
   def unprefixed(key: String, value: String): Attribute =
-    Attribute("", None, key, value)
+    Attribute(ResolvedName.unprefixed(key), value)
 }
 
 // should prefix and/or uri be optional?

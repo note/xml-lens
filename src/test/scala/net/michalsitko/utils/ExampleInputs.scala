@@ -93,8 +93,8 @@ trait ExampleInputs {
   }
 
   val attributesXmlStringExample = {
-    val fAttributes = List(Attribute("", None, "name", "abc"), Attribute("", None, "name2", "something else"))
-    val c1Attributes = List(Attribute("", None, "name", ""))
+    val fAttributes = List(Attribute.unprefixed("name", "abc"), Attribute.unprefixed("name2", "something else"))
+    val c1Attributes = List(Attribute.unprefixed("name", ""))
 
     Example(
       """<?xml version="1.0" encoding="UTF-8"?>
@@ -117,9 +117,9 @@ trait ExampleInputs {
     val bNs = "http://www.b.com"
 
     // https://stackoverflow.com/questions/41561/xml-namespaces-and-attributes
-    val fAttributes = List(Attribute("", None, "name", "abc"), Attribute("b", Some(bNs), "attr", "attr1"))
-    val gAttributes = List(Attribute("b", Some(bNs), "name", "def"))
-    val hAttributes = List(Attribute("", None, "name", "ghi"))
+    val fAttributes = List(Attribute.unprefixed("name", "abc"), Attribute(ResolvedName("b", Some(bNs), "attr"), "attr1"))
+    val gAttributes = List(Attribute(ResolvedName("b", Some(bNs), "name"), "def"))
+    val hAttributes = List(Attribute.unprefixed("name", "ghi"))
 
     Example(
       """<?xml version="1.0" encoding="UTF-8"?>

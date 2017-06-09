@@ -73,11 +73,11 @@ object XmlPrinter {
 
   def writeAttributes(attributes: Seq[Attribute], writer: XMLStreamWriter): Unit = {
     attributes.map { attr =>
-      attr.uri match {
+      attr.key.uri match {
         case Some(uri) =>
-          writer.writeAttribute(attr.prefix, uri, attr.key, attr.value)
+          writer.writeAttribute(attr.key.prefix, uri, attr.key.localName, attr.value)
         case None =>
-          writer.writeAttribute(attr.key, attr.value)
+          writer.writeAttribute(attr.key.localName, attr.value)
       }
 
     }
