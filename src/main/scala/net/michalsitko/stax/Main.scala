@@ -6,9 +6,7 @@ import javax.xml.stream.XMLStreamConstants._
 
 object Main extends AnyRef with Example {
   def main(args: Array[String]): Unit = {
-    println("bazinga 1")
     read(xmlString)
-    println("bazinga 2")
   }
 
   // TODO:

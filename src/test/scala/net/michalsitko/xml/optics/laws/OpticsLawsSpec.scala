@@ -2,16 +2,15 @@ package net.michalsitko.xml.optics.laws
 
 import monocle.law.discipline.{OptionalTests, TraversalTests}
 import net.michalsitko.xml.optics.Optics
-import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.utils.{ArbitraryInstances, CogenInstances}
 import org.scalacheck.Arbitrary
-import org.scalactic.anyvals.PosZInt
-import org.scalatest.{FlatSpec, Matchers}
 import org.scalatest.prop.Checkers
+import org.scalatest.{FlatSpec, Matchers}
 import org.typelevel.discipline.Laws
 
 class OpticsLawsSpec extends OpticsSpec with Matchers with ArbitraryInstances with CogenInstances {
   import net.michalsitko.xml.entities.Instances._
+
   import scalaz.std.string._
 
   implicit val arbLabeledElem = Arbitrary(labeledElementGen(4, Some("abc")))
@@ -19,11 +18,15 @@ class OpticsLawsSpec extends OpticsSpec with Matchers with ArbitraryInstances wi
 
   val deepTest    = TraversalTests(Optics.deep("abc"))
   val deeperTest  = TraversalTests(Optics.deeper("abc"))
+  // TODO: does it test any positive situation?
   val hasTextOnlyTest = OptionalTests(Optics.hasTextOnly)
+  // TODO: does it test anything (there are not "abc" attributes ...)
+  val attributeTest = OptionalTests(Optics.attribute("abc"))
 
   checkLaws("deep Traversal", deepTest)
   checkLaws("deeper Traversal", deeperTest)
-  checkLaws("hasTextOnly Optional", deeperTest)
+  checkLaws("hasTextOnly Optional", hasTextOnlyTest)
+  checkLaws("attribute Optional", deeperTest)
 
 }
 

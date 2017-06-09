@@ -1,6 +1,6 @@
 package net.michalsitko.xml.optics
 
-import monocle.{Lens, Optional, Prism, Traversal}
+import monocle._
 import net.michalsitko.xml.entities._
 
 import scalaz.Applicative
@@ -51,25 +51,35 @@ object Optics {
     }
   }
 
-  val hasTextOnly: Optional[Element, String] = Optional[Element, String] { el =>
-    if(el.children.size == 1) {
-      el.children.head match {
-        case Text(txt) => Some(txt)
-        case _ => None
-      }
+  val hasOneChild: Optional[Element, Node] = Optional[Element, Node]{ el =>
+    onlyChild(el)
+  }{ newNode => from =>
+    onlyChild(from).fold(from)(_ => from.copy(children = Vector(newNode)))
+  }
+
+  val isText: Prism[Node, Text] = Prism.partial[Node, Text]{
+    case text: Text => text
+  }(identity)
+
+  val textIso: Iso[Text, String] = Iso[Text, String](_.text)(Text(_))
+
+  val isTextS = isText.composeIso(textIso)
+
+  private def onlyChild(element: Element): Option[Node] = {
+    if (element.children.size == 1) {
+      Some(element.children.head)
     } else {
       None
     }
-  }(newText => from => from.copy(children = List(Text(newText))))
+  }
+
+  val hasTextOnly: Optional[Element, String] = hasOneChild.composePrism(isTextS)
 
   def attribute(key: String): Optional[Element, String] = attribute(ResolvedName.unprefixed(key))
 
   def attribute(key: ResolvedName) = Optional[Element, String] { el =>
-    val r = el.attributes.find(_.key == key).map(_.value)
-    println("bazinga r: " + r)
-    r
-  }{newValue => from =>
-    println("bazinga set: " + newValue)
+    el.attributes.find(_.key == key).map(_.value)
+  }{ newValue => from =>
     val (newAttributes, included) = from.attributes.foldLeft((Vector.empty[Attribute], false)){ (accTuple, current) =>
       val acc = accTuple._1
       if(current.key == key) {

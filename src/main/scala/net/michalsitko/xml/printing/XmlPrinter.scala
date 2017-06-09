@@ -51,8 +51,6 @@ object XmlPrinter {
     } else {
       resolvedName.uri match {
         case Some(uri) =>
-          println(s"bazinga uri: $uri")
-          println(s"bazinga localName: ${resolvedName.localName}")
           writer.writeStartElement(uri, resolvedName.localName)
         case None =>
           writer.writeStartElement(resolvedName.localName)
