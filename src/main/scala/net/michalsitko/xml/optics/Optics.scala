@@ -11,6 +11,8 @@ object Optics {
   import scalaz.syntax.applicative._
 
 
+  def deep(label: String): Traversal[LabeledElement, Element] = deep(ResolvedName.unprefixed(label))
+
   // TODO: test laws (20 min)
   // TODO: implement other lenses and check if most popular use cases case covered (3 h)
   def deep(label: ResolvedName): Traversal[LabeledElement, Element] = new Traversal[LabeledElement, Element] {
