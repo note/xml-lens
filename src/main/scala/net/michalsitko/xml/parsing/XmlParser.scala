@@ -14,12 +14,12 @@ sealed trait ParsingError
 case object SomeParsingError extends ParsingError
 
 object XmlParser {
-  def parse(input: String): Either[ParsingError, Element] = {
+  def parse(input: String): Either[ParsingError, LabeledElement] = {
     // IOException and XMLStreamException
     Try(read(input)).toEither.left.map(_ => SomeParsingError)
   }
 
-  private def read(input: String): Element = {
+  private def read(input: String): LabeledElement = {
     val xmlInFact = XMLInputFactory.newInstance()
     val reader = xmlInFact.createXMLStreamReader(new StringReader(input))
 
@@ -27,7 +27,7 @@ object XmlParser {
       case Some(resolvedName) =>
         val nsDeclarations = getNamespaceDeclarations(reader)
         val attrs = getAttributes(reader)
-        readNext(Element(resolvedName, Details(attrs, Seq.empty, nsDeclarations)), reader)
+        readNext(LabeledElement(resolvedName, Element(attrs, Seq.empty, nsDeclarations)), reader)
       case None =>
         // TODO: think about it
         throw new IOException("no root element")
@@ -49,25 +49,25 @@ object XmlParser {
 
   // TODO: this is slow - check it with JMH after optimizations
   // TODO: non-tail recursion
-  def readNext(parent: Element, reader: XMLStreamReader): Element = {
+  def readNext(parent: LabeledElement, reader: XMLStreamReader): LabeledElement = {
     if(reader.hasNext) {
       reader.next() match {
         case START_ELEMENT =>
           val nsDeclarations = getNamespaceDeclarations(reader)
           val attrs = getAttributes(reader)
           val label = getName(reader)
-          val initialChild = Element(label, Details(attrs, Seq.empty, nsDeclarations))
+          val initialChild = LabeledElement(label, Element(attrs, Seq.empty, nsDeclarations))
           val child = readNext(initialChild, reader)
-          val newChildren = parent.elementDetails.children :+ child
-          val newParent = parent.copy(elementDetails = parent.elementDetails.copy(children = newChildren))
+          val newChildren = parent.element.children :+ child
+          val newParent = parent.copy(element = parent.element.copy(children = newChildren))
           readNext(newParent, reader)
 
         case CHARACTERS =>
           val start = reader.getTextStart
           val length = reader.getTextLength
           val text = new String(reader.getTextCharacters(), start, length)
-          val newChildren = parent.elementDetails.children :+ Text(text)
-          val newParent = parent.copy(elementDetails = parent.elementDetails.copy(children = newChildren))
+          val newChildren = parent.element.children :+ Text(text)
+          val newParent = parent.copy(element = parent.element.copy(children = newChildren))
           readNext(newParent, reader)
 
         case END_ELEMENT =>

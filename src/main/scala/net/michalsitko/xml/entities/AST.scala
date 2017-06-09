@@ -15,17 +15,17 @@ sealed trait Node
   * To restrict user not to modify label of "zoomed-in" element we need to create our own Element
   *
   */
-case class Element(label: ResolvedName, elementDetails: Details) extends Node
+case class LabeledElement(label: ResolvedName, element: Element) extends Node
 
 case class Text(text: String) extends Node
 
-case class Details(attributes: Seq[Attribute], children: Seq[Node], namespaceDeclarations: Seq[NamespaceDeclaration])
-object Details {
-  def empty: Details = Details(Seq.empty, Seq.empty, Seq.empty)
+case class Element(attributes: Seq[Attribute], children: Seq[Node], namespaceDeclarations: Seq[NamespaceDeclaration])
+object Element {
+  def empty: Element = Element(Seq.empty, Seq.empty, Seq.empty)
 }
 
-// when no prefix in XML - prefix == ""
-// investigate why in scala-xml Attribute value is defined as `value: Seq[Node]`
+// when no prefix in XML then: prefix == ""
+// TODO: investigate why in scala-xml Attribute value is defined as `value: Seq[Node]`
 // also, take a look at: https://www.w3.org/TR/xml/#NT-AttValue
 case class Attribute(prefix: String, uri: Option[String], key: String, value: String)
 
@@ -63,8 +63,5 @@ object SomeExample {
     |   <s>summary</s>
     |</a>
   """.stripMargin
-
-  // with our AST:
-//  def details(children: Seq[Node]) = Details(Seq.empty, children)
 
 }

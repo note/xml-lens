@@ -10,7 +10,7 @@ import net.michalsitko.xml.entities._
 // which is not true in general. User can manipulate AST in any way, so we should take care of undefined namespaces' prefixes,
 // isRepairingNamespaces, escaping special characters
 object XmlPrinter {
-  def print(elem: Element): String = {
+  def print(elem: LabeledElement): String = {
     val stringWriter = new StringWriter()
     val xmlOutFact = XMLOutputFactory.newInstance()
     val writer = xmlOutFact.createXMLStreamWriter(stringWriter)
@@ -27,14 +27,14 @@ object XmlPrinter {
   }
 
   def loop(node: Node, writer: XMLStreamWriter): Unit = node match {
-    case elem: Element =>
-      val default = elem.elementDetails.namespaceDeclarations.filter(_.prefix.isEmpty)
+    case elem: LabeledElement =>
+      val default = elem.element.namespaceDeclarations.filter(_.prefix.isEmpty)
       default.headOption.foreach(defaultNs => writer.setDefaultNamespace(defaultNs.uri))
 
       writeElementLabel(elem.label, writer)
-      writeNamespaces(elem.elementDetails.namespaceDeclarations, writer)
-      writeAttributes(elem.elementDetails.attributes, writer)
-      elem.elementDetails.children.foreach(loop(_, writer))
+      writeNamespaces(elem.element.namespaceDeclarations, writer)
+      writeAttributes(elem.element.attributes, writer)
+      elem.element.children.foreach(loop(_, writer))
       writer.writeEndElement()
 
     case text: Text =>
