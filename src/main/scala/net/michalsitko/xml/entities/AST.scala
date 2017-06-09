@@ -29,6 +29,11 @@ object Element {
 // also, take a look at: https://www.w3.org/TR/xml/#NT-AttValue
 case class Attribute(prefix: String, uri: Option[String], key: String, value: String)
 
+object Attribute {
+  def unprefixed(key: String, value: String): Attribute =
+    Attribute("", None, key, value)
+}
+
 // should prefix and/or uri be optional?
 case class ResolvedName(prefix: String, uri: Option[String], localName: String) {
   def hasPrefix: Boolean = prefix.nonEmpty
