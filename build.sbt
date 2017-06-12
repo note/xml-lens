@@ -22,5 +22,7 @@ lazy val root = (project in file(".")).settings(
     "-Ywarn-unused-import",
     "-Xfatal-warnings",
     "-Xlint"
-  )
+  ),
+  coverageHighlighting := true,
+  coverageScalacPluginVersion := "1.3.0"
 )
