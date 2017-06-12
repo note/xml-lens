@@ -75,7 +75,6 @@ class XmlOpticsSpec extends WordSpec with Matchers with XmlFragments with Soluti
                                        """.stripMargin)
 
       val trimmedEqual = scala.xml.Utility.trim(res) == scala.xml.Utility.trim(expectedXml)
-      println("trimmed equal: " + trimmedEqual)
 
       trimmedEqual should equal(true)
     }
@@ -98,7 +97,6 @@ class XmlOpticsSpec extends WordSpec with Matchers with XmlFragments with Soluti
                                        """.stripMargin)
 
       val trimmedEqual = scala.xml.Utility.trim(res) == scala.xml.Utility.trim(expectedXml)
-      println("trimmed equal: " + trimmedEqual)
 
       trimmedEqual should equal(true)
     }

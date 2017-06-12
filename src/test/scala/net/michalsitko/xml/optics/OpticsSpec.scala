@@ -42,8 +42,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(Optics.attributes)
 
       val res = traversal.modify(attrs => attrs :+ Attribute.unprefixed("someKey", "newValue"))(parsed)
-      val expectedRes = expectedRes3 // we expect the same result as in test above
-      XmlPrinter.print(res) should equal(expectedRes)
+      XmlPrinter.print(res) should equal(expectedRes4)
     }
 
     // TODO: think about extracting operation implemented here to library itself
@@ -67,7 +66,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       val traversal = deep("c1").composeTraversal(deeper("f"))
 
       val res = replaceExistingAttrOrAdd(traversal)(ResolvedName.unprefixed("someKey"), "newValue")(parsed)
-      XmlPrinter.print(res) should equal(expectedRes4)
+      XmlPrinter.print(res) should equal(expectedRes5)
     }
 
     "delete all attributes" in {
@@ -76,7 +75,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(Optics.attributes)
 
       val res = traversal.modify(_ => List.empty)(parsed)
-      XmlPrinter.print(res) should equal(expectedRes5)
+      XmlPrinter.print(res) should equal(expectedRes6)
     }
 
     "delete single attribute" in {
@@ -85,7 +84,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(Optics.attributes)
 
       val res = traversal.modify(attrs => attrs.filter(_.key != ResolvedName.unprefixed("someKey")))(parsed)
-      XmlPrinter.print(res) should equal(expectedRes6)
+      XmlPrinter.print(res) should equal(expectedRes7)
     }
 
     "delete children" in {
@@ -94,7 +93,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       val traversal = deep("c1")
 
       val res = traversal.modify(el => el.copy(children = List.empty))(parsed)
-      XmlPrinter.print(res) should equal(expectedRes7)
+      XmlPrinter.print(res) should equal(expectedRes8)
     }
 
     "delete specific child" in {
@@ -115,7 +114,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       }
 
       val res = traversal.modify(removeF)(parsed)
-      XmlPrinter.print(res) should equal(expectedRes8)
+      XmlPrinter.print(res) should equal(expectedRes9)
     }
 
     "rename element label" in {
@@ -134,7 +133,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       val traversal = deep("c1")
 
       val res = traversal.modify(renameLabel)(parsed)
-      XmlPrinter.print(res) should equal(expectedRes9)
+      XmlPrinter.print(res) should equal(expectedRes10)
     }
 
 
@@ -177,12 +176,25 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |      <g>item2</g>
       |   </c1>
       |   <c1>
-      |      <f someKey="oldValue">item1</f>
+      |      <f someKey="oldValue" anotherKey="someValue">item1</f>
       |      <h>item2</h>
       |   </c1>
       |</a>""".stripMargin
 
   val expectedRes3 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f someKey="newValue">item1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c1>
+      |      <f someKey="newValue" anotherKey="someValue">item1</f>
+      |      <h>item2</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val expectedRes4 =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1>
@@ -208,7 +220,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |   </c1>
       |</a>""".stripMargin
 
-  val expectedRes4 =
+  val expectedRes5 =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1>
@@ -234,7 +246,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |   </c1>
       |</a>""".stripMargin
 
-  val expectedRes5 =
+  val expectedRes6 =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1>
@@ -247,7 +259,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |   </c1>
       |</a>""".stripMargin
 
-  val expectedRes6 =
+  val expectedRes7 =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1>
@@ -260,14 +272,14 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |   </c1>
       |</a>""".stripMargin
 
-  val expectedRes7 =
+  val expectedRes8 =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1></c1>
       |   <c1></c1>
       |</a>""".stripMargin
 
-  val expectedRes8 =
+  val expectedRes9 =
     // it's not very readable - we want to have exactly the same whitespaces as before removal
     // TODO: rewrite all those tests so they don't rely on whitespaces treatment
     StringContext.treatEscapes("""<?xml version="1.0" encoding="UTF-8"?>
@@ -296,7 +308,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |   </c2>
       |</a>""".stripMargin
 
-  val expectedRes9 =
+  val expectedRes10 =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1>

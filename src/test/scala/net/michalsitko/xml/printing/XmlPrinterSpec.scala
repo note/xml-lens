@@ -28,7 +28,6 @@ class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs {
 
   def check(specificExample: Example): Unit = {
     val res = XmlPrinter.print(specificExample.tree)
-    println(s"out: $res")
 
     // TODO: we don't guarantee preserving whitespace outside of root element
     // decide if it's a good decision

@@ -29,7 +29,11 @@ object Element {
 // when no prefix in XML then: prefix == ""
 // TODO: investigate why in scala-xml Attribute value is defined as `value: Seq[Node]`
 // also, take a look at: https://www.w3.org/TR/xml/#NT-AttValue
-case class Attribute(key: ResolvedName, value: String)
+case class Attribute(key: ResolvedName, value: String) {
+  def sameKey(anotherKey: ResolvedName): Boolean = {
+    (key.prefix == anotherKey.prefix) && (key.localName == anotherKey.localName)
+  }
+}
 // TODO: maybe should be changed to:
 // Attribute(ResolvedName, String)
 

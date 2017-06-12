@@ -63,7 +63,6 @@ object XmlPrinter {
         case Some(prefix) =>
           writer.writeNamespace(prefix, ns.uri)
         case None =>
-          println("write DefaultNamespace: " + ns.uri)
           writer.writeDefaultNamespace(ns.uri)
       }
     }

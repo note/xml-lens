@@ -78,20 +78,14 @@ object Optics {
   def attribute(key: ResolvedName) = Optional[Element, String] { el =>
     el.attributes.find(_.key == key).map(_.value)
   }{ newValue => from =>
-    val (newAttributes, included) = from.attributes.foldLeft((Vector.empty[Attribute], false)){ (accTuple, current) =>
-      val acc = accTuple._1
-      if(current.key == key) {
-        (acc :+ current.copy(value = newValue), true)
-      } else {
-        (acc :+ current, accTuple._2)
-      }
+    val newAttributes = from.attributes.collect {
+      case attr@Attribute(`key`, _) =>
+        attr.copy(value = newValue)
+      case attr =>
+        attr
     }
-    val newAttrs = if(included) {
-      newAttributes
-    } else {
-      newAttributes :+ Attribute(key, newValue)
-    }
-    from.copy(attributes = newAttrs)
+
+    from.copy(attributes = newAttributes)
   }
 
   val attributes: Lens[Element, Seq[Attribute]] =
