@@ -1,6 +1,8 @@
 XML Optics library for Scala
 
 [![Build Status](https://api.travis-ci.org/note/xml-lens.svg)](https://travis-ci.org/note/xml-lens)
+[![codecov](https://codecov.io/gh/note/xml-lens/branch/master/graph/badge.svg)](https://codecov.io/gh/note/xml-lens)
+
 
 ## Motivation
 
