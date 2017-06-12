@@ -1,6 +1,6 @@
 package net.michalsitko.xml.optics
 
-import monocle.{PTraversal, Traversal}
+import monocle.Traversal
 import net.michalsitko.xml.entities._
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter

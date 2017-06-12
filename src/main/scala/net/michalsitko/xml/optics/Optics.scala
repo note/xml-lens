@@ -7,8 +7,6 @@ import scalaz.Applicative
 
 object Optics {
   import scalaz.std.list._
-  import scalaz.syntax.traverse._
-  import scalaz.syntax.applicative._
 
 
   def deep(label: String): Traversal[LabeledElement, Element] = deep(ResolvedName.unprefixed(label))

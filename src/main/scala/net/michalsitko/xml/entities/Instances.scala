@@ -1,6 +1,6 @@
 package net.michalsitko.xml.entities
 
-import scalaz.{Applicative, Equal}
+import scalaz.Equal
 
 object Instances {
   implicit val labeledElementEq: Equal[LabeledElement] =

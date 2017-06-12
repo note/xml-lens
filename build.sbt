@@ -1,15 +1,26 @@
-name := """xml-lens"""
+import sbt.Keys.version
+import Dependencies._
 
-version := "1.0"
-
-scalaVersion := "2.12.2"
-
-lazy val monocleVersion = "1.4.0"
-
-libraryDependencies ++= Seq(
-//  "org.scalaz"                  %% "scalaz-core"    % "7.2.10",
-  "com.github.julien-truffaut"  %% "monocle-core"   % monocleVersion,
-  "com.github.julien-truffaut"  %% "monocle-law"    % monocleVersion % "test",
-  "org.scalatest"               %% "scalatest"      % "3.0.1" % "test"
+lazy val root = (project in file(".")).settings(
+  name := """xml-lens""",
+  version := "0.1.0",
+  scalaVersion := "2.12.2",
+  crossScalaVersions := Seq("2.12.2", "2.11.11"),
+  libraryDependencies ++= deps,
+  scalacOptions ++= Seq(
+    "-target:jvm-1.8",
+    "-encoding", "UTF-8",
+    "-unchecked",
+    "-deprecation",
+    "-feature",
+    "-language:existentials",
+    "-language:higherKinds",
+    "-language:implicitConversions",
+    "-Yno-adapted-args",
+    "-Ywarn-dead-code",
+    "-Ywarn-infer-any",
+    "-Ywarn-unused-import",
+    "-Xfatal-warnings",
+    "-Xlint"
+  )
 )
-

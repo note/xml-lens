@@ -2,7 +2,6 @@ package net.michalsitko.xml.optics.laws
 
 import monocle.law.discipline.{OptionalTests, TraversalTests}
 import net.michalsitko.xml.optics.Optics
-import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.utils.{ArbitraryElementConfig, ArbitraryInstances, CogenInstances}
 import org.scalacheck.Arbitrary
 import org.scalactic.anyvals.PosZInt
