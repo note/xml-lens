@@ -13,8 +13,6 @@ object Optics {
 
   def deep(label: String): Traversal[LabeledElement, Element] = deep(ResolvedName.unprefixed(label))
 
-  // TODO: test laws (20 min)
-  // TODO: implement other lenses and check if most popular use cases case covered (3 h)
   def deep(label: ResolvedName): Traversal[LabeledElement, Element] = new Traversal[LabeledElement, Element] {
     override final def modifyF[F[_]](f: (Element) => F[Element])(from: LabeledElement)(implicit F: Applicative[F]): F[LabeledElement] = {
       val tmp = from.element.children.collect {
@@ -98,7 +96,5 @@ object Optics {
 
   val attributes: Lens[Element, Seq[Attribute]] =
     Lens[Element, Seq[Attribute]](_.attributes)(newAttrs => from => from.copy(attributes = newAttrs))
-
-//  val firstText: Lens[Element, String] =
 
 }
