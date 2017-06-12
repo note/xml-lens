@@ -1,6 +1,6 @@
 package net.michalsitko.xml.printing
 
-import net.michalsitko.utils.{Example, ExampleInputs}
+import net.michalsitko.xml.utils.{Example, ExampleInputs}
 import org.scalatest.{Matchers, WordSpec}
 
 class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs {

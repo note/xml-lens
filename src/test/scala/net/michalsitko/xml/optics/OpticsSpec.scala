@@ -1,10 +1,10 @@
 package net.michalsitko.xml.optics
 
 import monocle.{PTraversal, Traversal}
-import net.michalsitko.utils.ExampleInputs
 import net.michalsitko.xml.entities._
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter
+import net.michalsitko.xml.utils.ExampleInputs
 import org.scalatest.{Matchers, WordSpec}
 
 class OpticsSpec extends WordSpec with Matchers with ExampleInputs {

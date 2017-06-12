@@ -1,6 +1,6 @@
 package net.michalsitko.xml.parsing
 
-import net.michalsitko.utils.{Example, ExampleInputs}
+import net.michalsitko.xml.utils.{Example, ExampleInputs}
 import org.scalatest.{Matchers, WordSpec}
 
 class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {

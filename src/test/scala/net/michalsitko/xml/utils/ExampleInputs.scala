@@ -1,4 +1,4 @@
-package net.michalsitko.utils
+package net.michalsitko.xml.utils
 
 import net.michalsitko.xml.entities._
 
