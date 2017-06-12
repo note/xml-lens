@@ -15,8 +15,10 @@ case object SomeParsingError extends ParsingError
 
 object XmlParser {
   def parse(input: String): Either[ParsingError, LabeledElement] = {
+    import net.michalsitko.xml.parsing.utils.TryOps._
+
     // IOException and XMLStreamException
-    Try(read(input)).toEither.left.map(_ => SomeParsingError)
+    Try(read(input)).asEither.left.map(_ => SomeParsingError)
   }
 
   private def read(input: String): LabeledElement = {
