@@ -22,7 +22,6 @@ class OpticsLawsSpec extends OpticsSpec with Matchers with ArbitraryInstances wi
   val deepTest    = TraversalTests(Optics.deep("abc"))
   val deeperTest  = TraversalTests(Optics.deeper("abc"))
   val hasTextOnlyTest = OptionalTests(Optics.hasTextOnly)
-  // TODO: does it test anything (there are not "abc" attributes ...)
   val attributeTest = OptionalTests(Optics.attribute("someAttr"))
 
   checkLaws("deep Traversal", deepTest)

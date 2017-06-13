@@ -1,6 +1,7 @@
 package net.michalsitko.xml.parsing
 
-import java.io.{IOException, StringReader}
+import java.io.{ByteArrayInputStream, IOException, InputStream}
+import java.nio.charset.StandardCharsets
 import javax.xml.stream.XMLStreamConstants._
 import javax.xml.stream.{XMLInputFactory, XMLStreamReader}
 
@@ -18,12 +19,20 @@ object XmlParser {
     import net.michalsitko.xml.parsing.utils.TryOps._
 
     // IOException and XMLStreamException
-    Try(read(input)).asEither.left.map(_ => SomeParsingError)
+    val stream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
+    Try(read(stream)).asEither.left.map(_ => SomeParsingError)
   }
 
-  private def read(input: String): LabeledElement = {
+  def parse(inputStream: InputStream): Either[ParsingError, LabeledElement] = {
+    import net.michalsitko.xml.parsing.utils.TryOps._
+
+    // IOException and XMLStreamException
+    Try(read(inputStream)).asEither.left.map(_ => SomeParsingError)
+  }
+
+  private def read(inputStream: InputStream): LabeledElement = {
     val xmlInFact = XMLInputFactory.newInstance()
-    val reader = xmlInFact.createXMLStreamReader(new StringReader(input))
+    val reader = xmlInFact.createXMLStreamReader(inputStream)
 
     firstElement(reader) match {
       case Some(resolvedName) =>

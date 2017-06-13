@@ -5,6 +5,12 @@ import javax.xml.stream.{XMLOutputFactory, XMLStreamWriter}
 
 import net.michalsitko.xml.entities._
 
+import scala.annotation.tailrec
+
+sealed trait WriteOperation
+case class WriteElement(el: LabeledElement) extends WriteOperation
+case object EndElement extends WriteOperation
+
 // TODO: whole XmlPrinter needs rethinking
 // current version is very naive. It assumes that input for `print` is basically a result of XmlParser.parse
 // which is not true in general. User can manipulate AST in any way, so we should take care of undefined namespaces' prefixes,
@@ -20,25 +26,71 @@ object XmlPrinter {
     // it's arbitrary but AFAIK it's the most popular convention
     writer.writeCharacters(System.getProperty("line.separator"))
 
-    loop(elem, writer)
+    newLoop(elem, writer, List.empty[Vector[Node]])
 
     writer.flush()
     stringWriter.toString
   }
 
+  @tailrec
+  def newLoop(node: Node, writer: XMLStreamWriter, acc: List[Vector[Node]]): Unit = node match {
+    case elem: LabeledElement =>
+      writeLabeled(elem, writer)
+
+      if (elem.element.children.isEmpty) {
+        writer.writeEndElement()
+
+        val empty = acc.takeWhile(_.isEmpty)
+        empty.foreach(_ => writer.writeEndElement())
+        val newAcc = acc.drop(empty.size)
+
+        newAcc match {
+          case firstNodes :: otherNodes =>
+            // we can call head because we already filtered out empty Vectors
+            newLoop(firstNodes.head, writer, firstNodes.tail :: newAcc.tail)
+          case Nil =>
+            ()
+        }
+      } else {
+        // TODO: investigate toVector - element.children are of type Seq[Node] - is there a way to ensure they're vector
+        // without changing interface?
+        newLoop(elem.element.children.head, writer, elem.element.children.tail.toVector :: acc)
+      }
+
+    case text: Text =>
+      writer.writeCharacters(text.text)
+
+      val empty = acc.takeWhile(_.isEmpty)
+      empty.foreach(_ => writer.writeEndElement())
+      val newAcc = acc.drop(empty.size)
+
+      newAcc match {
+        case firstNodes :: otherNodes =>
+          // we can call head because we already filtered out empty Vectors
+          newLoop(firstNodes.head, writer, firstNodes.tail :: newAcc.tail)
+        case Nil =>
+          ()
+      }
+  }
+
+
   def loop(node: Node, writer: XMLStreamWriter): Unit = node match {
     case elem: LabeledElement =>
-      val default = elem.element.namespaceDeclarations.filter(_.prefix.isEmpty)
-      default.headOption.foreach(defaultNs => writer.setDefaultNamespace(defaultNs.uri))
-
-      writeElementLabel(elem.label, writer)
-      writeNamespaces(elem.element.namespaceDeclarations, writer)
-      writeAttributes(elem.element.attributes, writer)
+      writeLabeled(elem, writer)
       elem.element.children.foreach(loop(_, writer))
       writer.writeEndElement()
 
     case text: Text =>
       writer.writeCharacters(text.text)
+  }
+
+  def writeLabeled(elem: LabeledElement, writer: XMLStreamWriter): Unit = {
+    val default = elem.element.namespaceDeclarations.filter(_.prefix.isEmpty)
+    default.headOption.foreach(defaultNs => writer.setDefaultNamespace(defaultNs.uri))
+
+    writeElementLabel(elem.label, writer)
+    writeNamespaces(elem.element.namespaceDeclarations, writer)
+    writeAttributes(elem.element.attributes, writer)
   }
 
   def writeElement(resolvedName: ResolvedName, writer: XMLStreamWriter): Unit = {
