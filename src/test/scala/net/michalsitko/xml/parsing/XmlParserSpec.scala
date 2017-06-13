@@ -31,9 +31,7 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
     }
 
     "fail for malformed inputs" in {
-      XmlParser.parse(malformedXmlString).isLeft should equal(true)
-      XmlParser.parse(malformedXmlString2).isLeft should equal(true)
-      XmlParser.parse(malformedNamespaces).isLeft should equal(true)
+      malformedXmlStrings.foreach(checkCorrectInput)
     }
 
     "deal with very deep XML" in {
@@ -45,7 +43,7 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
 
   def checkCorrectInput(specificExample: Example): Unit = {
     val res = XmlParser.parse(specificExample.stringRepr)
-    res should equal(Right(specificExample.tree))
+    res should equal(specificExample.expectedRes)
   }
 
 }

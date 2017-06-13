@@ -1,26 +1,34 @@
 package net.michalsitko.xml.utils
 
-import net.michalsitko.xml.entities._
+import net.michalsitko.xml.entities.{LabeledElement, _}
+import net.michalsitko.xml.parsing.ParsingError
 
-case class Example(stringRepr: String, tree: LabeledElement)
+case class Example(stringRepr: String, expectedRes: Either[ParsingError, LabeledElement])
+object Example {
+  def left(stringRepr: String, err: ParsingError) =
+    Example(stringRepr, Left(err))
+
+  def right(stringRepr: String, element: LabeledElement) =
+    Example(stringRepr, Right(element))
+}
 
 trait ExampleInputs {
-  val noNamespaceExample = Example(
+  val noNamespaceExample = Example.right(
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a><c1><f>item1</f><g>item2</g></c1><c1><f>item1</f><h>item2</h></c1></a>""".stripMargin,
-    labeledElement("a", List(
-      labeledElement("c1", List(
-        labeledElement("f", List(Text("item1"))),
-        labeledElement("g", List(Text("item2")))
-      )),
-      labeledElement("c1", List(
-        labeledElement("f", List(Text("item1"))),
-        labeledElement("h", List(Text("item2")))
-      ))
-    ))
+    labeledElement("a",
+      labeledElement("c1",
+        labeledElement("f", Text("item1")),
+        labeledElement("g", Text("item2"))
+      ),
+      labeledElement("c1",
+        labeledElement("f", Text("item1")),
+        labeledElement("h", Text("item2"))
+      )
+    )
   )
 
-  val noNamespaceXmlStringWithWsExample = Example(
+  val noNamespaceXmlStringWithWsExample = Example.right(
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1>
@@ -32,32 +40,32 @@ trait ExampleInputs {
       |      <h>item2</h>
       |   </c1>
       |</a>""".stripMargin,
-    labeledElement("a", List(
+    labeledElement("a",
       indent(1),
-      labeledElement("c1", List(
+      labeledElement("c1",
         indent(2),
-        labeledElement("f", List(Text("item1"))),
+        labeledElement("f", Text("item1")),
         indent(2),
-        labeledElement("g", List(Text("item2"))),
+        labeledElement("g", Text("item2")),
         indent(1)
-      )),
+      ),
       indent(1),
-      labeledElement("c1", List(
+      labeledElement("c1",
         indent(2),
-        labeledElement("f", List(Text("item1"))),
+        labeledElement("f", Text("item1")),
         indent(2),
-        labeledElement("h", List(Text("item2"))),
+        labeledElement("h", Text("item2")),
         indent(1)
-      )),
+      ),
       Text(lineBreak)
-    ))
+    )
   )
 
   val namespaceXmlStringExample = {
     val defaultNs = "http://www.develop.com/student"
     val anotherNs = "http://www.example.com"
 
-    Example(
+    Example.right(
       """<?xml version="1.0" encoding="UTF-8"?>
         |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
         |   <c1>
@@ -72,21 +80,21 @@ trait ExampleInputs {
       """.stripMargin,
       LabeledElement(ResolvedName("", Some(defaultNs), "a"), Element(Seq.empty, List(
         indent(1),
-        LabeledElement(ResolvedName("", Some(defaultNs), "c1"), element(List(
+        LabeledElement(ResolvedName("", Some(defaultNs), "c1"), element(
           indent(2),
-          LabeledElement(ResolvedName("", Some(defaultNs), "f"), element(List(Text("item1")))),
+          LabeledElement(ResolvedName("", Some(defaultNs), "f"), element(Text("item1"))),
           indent(2),
-          LabeledElement(ResolvedName("", Some(defaultNs), "g"), element(List(Text("item2")))),
+          LabeledElement(ResolvedName("", Some(defaultNs), "g"), element(Text("item2"))),
           indent(1)
-        ))),
+        )),
         indent(1),
-        LabeledElement(ResolvedName("", Some(defaultNs), "c1"), element(List(
+        LabeledElement(ResolvedName("", Some(defaultNs), "c1"), element(
           indent(2),
-          LabeledElement(ResolvedName("", Some(defaultNs), "f"), element(List(Text("item1")))),
+          LabeledElement(ResolvedName("", Some(defaultNs), "f"), element(Text("item1"))),
           indent(2),
-          LabeledElement(ResolvedName("xyz", Some(anotherNs), "h"), element(List(Text("item2")))),
+          LabeledElement(ResolvedName("xyz", Some(anotherNs), "h"), element(Text("item2"))),
           indent(1)
-        ))),
+        )),
         Text(lineBreak)
       ), List(NamespaceDeclaration(None, "http://www.develop.com/student"), NamespaceDeclaration(Some("xyz"), "http://www.example.com"))))
     )
@@ -96,19 +104,19 @@ trait ExampleInputs {
     val fAttributes = List(Attribute.unprefixed("name", "abc"), Attribute.unprefixed("name2", "something else"))
     val c1Attributes = List(Attribute.unprefixed("name", ""))
 
-    Example(
+    Example.right(
       """<?xml version="1.0" encoding="UTF-8"?>
         |<a><c1><f name="abc" name2="something else">item1</f><g>item2</g></c1><c1 name=""><f>item1</f><h>item2</h></c1></a>""".stripMargin,
-      labeledElement("a", List(
-        labeledElement("c1", List(
+      labeledElement("a",
+        labeledElement("c1",
           LabeledElement(resolvedName("f"), Element(fAttributes, List(Text("item1")), Seq.empty)),
-          labeledElement("g", List(Text("item2")))
-        )),
+          labeledElement("g", Text("item2"))
+        ),
         LabeledElement(resolvedName("c1"), Element(c1Attributes, List(
-          labeledElement("f", List(Text("item1"))),
-          labeledElement("h", List(Text("item2")))
+          labeledElement("f", Text("item1")),
+          labeledElement("h", Text("item2"))
         ), Seq.empty))
-      ))
+      )
     )
   }
 
@@ -121,71 +129,70 @@ trait ExampleInputs {
     val gAttributes = List(Attribute(ResolvedName("b", Some(bNs), "name"), "def"))
     val hAttributes = List(Attribute.unprefixed("name", "ghi"))
 
-    Example(
+    Example.right(
       """<?xml version="1.0" encoding="UTF-8"?>
         |<a xmlns="http://www.a.com" xmlns:b="http://www.b.com"><c1><f name="abc" b:attr="attr1">item1</f><g b:name="def">item2</g><b:h name="ghi">item3</b:h></c1></a>""".stripMargin,
       LabeledElement(ResolvedName("", Some(defaultNs), "a"), Element(Seq.empty, List(
-        LabeledElement(ResolvedName("", Some(defaultNs), "c1"), element(List(
+        LabeledElement(ResolvedName("", Some(defaultNs), "c1"), element(
           LabeledElement(ResolvedName("", Some(defaultNs), "f"), Element(fAttributes, List(Text("item1")), Seq.empty)),
           LabeledElement(ResolvedName("", Some(defaultNs), "g"), Element(gAttributes, List(Text("item2")), Seq.empty)),
           LabeledElement(ResolvedName("b", Some(bNs), "h"), Element(hAttributes, List(Text("item3")), Seq.empty))
-        )))
+        ))
       ), List(NamespaceDeclaration(None, "http://www.a.com"), NamespaceDeclaration(Some("b"), "http://www.b.com"))))
     )
   }
 
   val commentsExamples = List(
-    Example(
+    Example.right(
       """<?xml version="1.0" encoding="UTF-8"?><a><!--something --><c1></c1></a>""",
-      labeledElement("a", List(
+      labeledElement("a",
         Comment("something "),
-        labeledElement("c1", List.empty)
-      ))
+        labeledElement("c1")
+      )
     ),
-    Example(
+    Example.right(
       """<?xml version="1.0" encoding="UTF-8"?><a><!--<c0></c0>--><c1></c1></a>""",
-      labeledElement("a", List(
+      labeledElement("a",
         Comment("<c0></c0>"),
-        labeledElement("c1", List.empty)
-      ))
+        labeledElement("c1")
+      )
     )
   )
 
-  val malformedXmlString =
-    """<?xml version="1.0" encoding="UTF-8"?>
+  val malformedXmlStrings = List(
+    Example.left(
+      """<?xml version="1.0" encoding="UTF-8"?>
       |a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
       |   <c1>
       |      <f>item1</f>
       |   </c1>
       |</a>
-    """.stripMargin
-
-  val malformedXmlString2 =
-    """<?xml version="1.0" encoding="UTF-8"?>
+      """.stripMargin, ParsingError(new RuntimeException("change me"))),
+    Example.left(
+      """<?xml version="1.0" encoding="UTF-8"?>
       |</a>
       |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
       |   <c1>
       |      <f>item1</f>
       |   </c1>
       |</a>
-    """.stripMargin
-
-  val malformedNamespaces =
-    """<?xml version="1.0" encoding="UTF-8"?>
+      """.stripMargin, ParsingError(new RuntimeException("change me"))),
+    Example.left(
+      """<?xml version="1.0" encoding="UTF-8"?>
       |</a>
       |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
       |   <c1>
       |      <yy:f>item1</yy:f>
       |   </c1>
       |</a>
-    """.stripMargin
-
+      """.stripMargin, ParsingError(new RuntimeException("change me")))
+  )
 
   lazy val lineBreak = System.getProperty("line.separator")
   lazy val indent = " " * 3
   lazy val lineBreakWithIndent = s"$lineBreak$indent"
 
-  def element(children: Seq[Node]): Element = {
+  def element(children: Node*): Element = {
     Element(Seq.empty, children, Seq.empty)
   }
 
@@ -193,6 +200,6 @@ trait ExampleInputs {
 
   def resolvedName(name: String) = ResolvedName("", None, name)
 
-  def labeledElement(name: String, children: Seq[Node]) =
-    LabeledElement(resolvedName(name), element(children))
+  def labeledElement(name: String, children: Node*) =
+    LabeledElement(resolvedName(name), element(children:_*))
 }
