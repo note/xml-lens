@@ -1,9 +1,10 @@
 package net.michalsitko.xml.parsing
 
-import net.michalsitko.xml.utils.{Example, ExampleInputs}
+import net.michalsitko.xml.printing.XmlPrinter
+import net.michalsitko.xml.utils.{Example, ExampleInputs, XmlGenerator}
 import org.scalatest.{Matchers, WordSpec}
 
-class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
+class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGenerator {
   "XmlParser" should {
     "return proper Element for XML without any namespaces declared and with no whitespaces" in {
       checkCorrectInput(noNamespaceExample)
@@ -29,6 +30,12 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs {
       XmlParser.parse(malformedXmlString).isLeft should equal(true)
       XmlParser.parse(malformedXmlString2).isLeft should equal(true)
       XmlParser.parse(malformedNamespaces).isLeft should equal(true)
+    }
+
+    "deal with very deep XML" in {
+      val input = XmlPrinter.print(elementOfDepth(4000))
+
+      XmlParser.parse(input).isRight should equal(true)
     }
   }
 

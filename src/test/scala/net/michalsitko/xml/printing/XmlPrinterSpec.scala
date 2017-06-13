@@ -1,12 +1,9 @@
 package net.michalsitko.xml.printing
 
-import net.michalsitko.xml.entities.{Element, LabeledElement, ResolvedName, Text}
-import net.michalsitko.xml.utils.{Example, ExampleInputs}
+import net.michalsitko.xml.utils.{Example, ExampleInputs, XmlGenerator}
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.annotation.tailrec
-
-class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs {
+class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs with XmlGenerator {
   "XmlPrinter" should {
     "work for basic example" in {
       check(noNamespaceExample)
@@ -41,20 +38,6 @@ class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs {
     // TODO: we don't guarantee preserving whitespace outside of root element
     // decide if it's a good decision
     res.trim should equal(specificExample.stringRepr.trim)
-  }
-
-  def elementOfDepth(depth: Int): LabeledElement = {
-    @tailrec
-    def loop(n: Int, child: LabeledElement): LabeledElement = {
-      if (n == 0) {
-        child
-      } else {
-        val current = LabeledElement(ResolvedName.unprefixed("abcd"), Element(List.empty, List(child), List.empty))
-        loop(n - 1, current)
-      }
-    }
-
-    loop(depth - 1, LabeledElement(ResolvedName.unprefixed("abcd"), Element(List.empty, List(Text("some text")), List.empty)))
   }
 
 }
