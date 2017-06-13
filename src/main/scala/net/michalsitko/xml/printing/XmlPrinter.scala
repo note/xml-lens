@@ -71,17 +71,21 @@ object XmlPrinter {
         case Nil =>
           ()
       }
-  }
 
+    case comment: Comment =>
+      writer.writeComment(comment.comment)
 
-  def loop(node: Node, writer: XMLStreamWriter): Unit = node match {
-    case elem: LabeledElement =>
-      writeLabeled(elem, writer)
-      elem.element.children.foreach(loop(_, writer))
-      writer.writeEndElement()
+      val empty = acc.takeWhile(_.isEmpty)
+      empty.foreach(_ => writer.writeEndElement())
+      val newAcc = acc.drop(empty.size)
 
-    case text: Text =>
-      writer.writeCharacters(text.text)
+      newAcc match {
+        case firstNodes :: otherNodes =>
+          // we can call head because we already filtered out empty Vectors
+          newLoop(firstNodes.head, writer, firstNodes.tail :: newAcc.tail)
+        case Nil =>
+          ()
+      }
   }
 
   def writeLabeled(elem: LabeledElement, writer: XMLStreamWriter): Unit = {

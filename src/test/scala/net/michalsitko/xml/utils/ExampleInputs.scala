@@ -134,6 +134,23 @@ trait ExampleInputs {
     )
   }
 
+  val commentsExamples = List(
+    Example(
+      """<?xml version="1.0" encoding="UTF-8"?><a><!--something --><c1></c1></a>""",
+      labeledElement("a", List(
+        Comment("something "),
+        labeledElement("c1", List.empty)
+      ))
+    ),
+    Example(
+      """<?xml version="1.0" encoding="UTF-8"?><a><!--<c0></c0>--><c1></c1></a>""",
+      labeledElement("a", List(
+        Comment("<c0></c0>"),
+        labeledElement("c1", List.empty)
+      ))
+    )
+  )
+
   val malformedXmlString =
     """<?xml version="1.0" encoding="UTF-8"?>
       |a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
@@ -175,4 +192,7 @@ trait ExampleInputs {
   def indent(level: Int): Text = Text(lineBreak + (indent * level))
 
   def resolvedName(name: String) = ResolvedName("", None, name)
+
+  def labeledElement(name: String, children: Seq[Node]) =
+    LabeledElement(resolvedName(name), Element(Seq.empty, children, Seq.empty))
 }

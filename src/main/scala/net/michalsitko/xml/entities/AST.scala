@@ -19,6 +19,8 @@ case class LabeledElement(label: ResolvedName, element: Element) extends Node
 
 case class Text(text: String) extends Node
 
+case class Comment(comment: String) extends Node
+
 // TODO: think if Seq[Attribute] is a good choice taking into account that attribute names have to be unique within
 // single element and printing with XmlStreamWriter a non-unique Attribute will throw an exception
 case class Element(attributes: Seq[Attribute], children: Seq[Node], namespaceDeclarations: Seq[NamespaceDeclaration])

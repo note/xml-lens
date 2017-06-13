@@ -26,6 +26,10 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
       checkCorrectInput(attributesWithNsXmlStringExample)
     }
 
+    "parse comments" in {
+      commentsExamples.foreach(checkCorrectInput)
+    }
+
     "fail for malformed inputs" in {
       XmlParser.parse(malformedXmlString).isLeft should equal(true)
       XmlParser.parse(malformedXmlString2).isLeft should equal(true)

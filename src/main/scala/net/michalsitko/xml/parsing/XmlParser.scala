@@ -13,23 +13,21 @@ import scalaz.Free.Trampoline
 import scalaz.Trampoline
 
 // TODO: create proper hierarchy of errors
-sealed trait ParsingError
-case object SomeParsingError extends ParsingError
+case class ParsingError(exception: Throwable)
+//case object SomeParsingError extends ParsingError
 
 object XmlParser {
   def parse(input: String): Either[ParsingError, LabeledElement] = {
-    import net.michalsitko.xml.parsing.utils.TryOps._
-
-    // IOException and XMLStreamException
+    // TODO: is it ok to hardcode UTF 8?
     val stream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-    Try(read(stream)).asEither.left.map(_ => SomeParsingError)
+    parse(stream)
   }
 
   def parse(inputStream: InputStream): Either[ParsingError, LabeledElement] = {
     import net.michalsitko.xml.parsing.utils.TryOps._
 
     // IOException and XMLStreamException
-    Try(read(inputStream)).asEither.left.map(_ => SomeParsingError)
+    Try(read(inputStream)).asEither.left.map(e => ParsingError(e))
   }
 
   private def read(inputStream: InputStream): LabeledElement = {
@@ -43,7 +41,7 @@ object XmlParser {
         readNext(LabeledElement(resolvedName, Element(attrs, Seq.empty, nsDeclarations)), reader).run
       case None =>
         // TODO: think about it
-        throw new IOException("no root element")
+        throw new IOException("bazinga: no root element")
     }
   }
 
@@ -60,8 +58,7 @@ object XmlParser {
     }
   }
 
-  // TODO: this is slow - check it with JMH after optimizations
-  // TODO: non-tail recursion
+  // TODO: this may be slow - check it with JMH after optimizations
   def readNext(parent: LabeledElement, reader: XMLStreamReader): Trampoline[LabeledElement] = {
     if(reader.hasNext) {
       reader.next() match {
@@ -87,10 +84,16 @@ object XmlParser {
 
         case END_ELEMENT =>
           Trampoline.done(parent)
+
+        case COMMENT =>
+          val commentText = reader.getText()
+          val newChildren = parent.element.children :+ Comment(commentText)
+          val newParent = parent.copy(element = parent.element.copy(children = newChildren))
+          Trampoline.suspend(readNext(newParent, reader))
       }
     } else {
       // TODO: think about sth else
-      throw new IOException("missing END_ELEMENT")
+      throw new IOException("bazinga: missing END_ELEMENT")
     }
   }
   private def getName(reader: XMLStreamReader): ResolvedName = {
