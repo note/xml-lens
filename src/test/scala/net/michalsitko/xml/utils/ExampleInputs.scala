@@ -8,16 +8,16 @@ trait ExampleInputs {
   val noNamespaceExample = Example(
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a><c1><f>item1</f><g>item2</g></c1><c1><f>item1</f><h>item2</h></c1></a>""".stripMargin,
-    LabeledElement(resolvedName("a"), element(List(
-      LabeledElement(resolvedName("c1"), element(List(
-        LabeledElement(resolvedName("f"), element(List(Text("item1")))),
-        LabeledElement(resolvedName("g"), element(List(Text("item2"))))
-      ))),
-      LabeledElement(resolvedName("c1"), element(List(
-        LabeledElement(resolvedName("f"), element(List(Text("item1")))),
-        LabeledElement(resolvedName("h"), element(List(Text("item2"))))
-      )))
-    )))
+    labeledElement("a", List(
+      labeledElement("c1", List(
+        labeledElement("f", List(Text("item1"))),
+        labeledElement("g", List(Text("item2")))
+      )),
+      labeledElement("c1", List(
+        labeledElement("f", List(Text("item1"))),
+        labeledElement("h", List(Text("item2")))
+      ))
+    ))
   )
 
   val noNamespaceXmlStringWithWsExample = Example(
@@ -32,25 +32,25 @@ trait ExampleInputs {
       |      <h>item2</h>
       |   </c1>
       |</a>""".stripMargin,
-    LabeledElement(resolvedName("a"), element(List(
+    labeledElement("a", List(
       indent(1),
-      LabeledElement(resolvedName("c1"), element(List(
+      labeledElement("c1", List(
         indent(2),
-        LabeledElement(resolvedName("f"), element(List(Text("item1")))),
+        labeledElement("f", List(Text("item1"))),
         indent(2),
-        LabeledElement(resolvedName("g"), element(List(Text("item2")))),
+        labeledElement("g", List(Text("item2"))),
         indent(1)
-      ))),
+      )),
       indent(1),
-      LabeledElement(resolvedName("c1"), element(List(
+      labeledElement("c1", List(
         indent(2),
-        LabeledElement(resolvedName("f"), element(List(Text("item1")))),
+        labeledElement("f", List(Text("item1"))),
         indent(2),
-        LabeledElement(resolvedName("h"), element(List(Text("item2")))),
+        labeledElement("h", List(Text("item2"))),
         indent(1)
-      ))),
+      )),
       Text(lineBreak)
-    )))
+    ))
   )
 
   val namespaceXmlStringExample = {
@@ -99,16 +99,16 @@ trait ExampleInputs {
     Example(
       """<?xml version="1.0" encoding="UTF-8"?>
         |<a><c1><f name="abc" name2="something else">item1</f><g>item2</g></c1><c1 name=""><f>item1</f><h>item2</h></c1></a>""".stripMargin,
-      LabeledElement(resolvedName("a"), element(List(
-        LabeledElement(resolvedName("c1"), element(List(
+      labeledElement("a", List(
+        labeledElement("c1", List(
           LabeledElement(resolvedName("f"), Element(fAttributes, List(Text("item1")), Seq.empty)),
-          LabeledElement(resolvedName("g"), element(List(Text("item2"))))
-        ))),
+          labeledElement("g", List(Text("item2")))
+        )),
         LabeledElement(resolvedName("c1"), Element(c1Attributes, List(
-          LabeledElement(resolvedName("f"), element(List(Text("item1")))),
-          LabeledElement(resolvedName("h"), element(List(Text("item2"))))
+          labeledElement("f", List(Text("item1"))),
+          labeledElement("h", List(Text("item2")))
         ), Seq.empty))
-      )))
+      ))
     )
   }
 
@@ -194,5 +194,5 @@ trait ExampleInputs {
   def resolvedName(name: String) = ResolvedName("", None, name)
 
   def labeledElement(name: String, children: Seq[Node]) =
-    LabeledElement(resolvedName(name), Element(Seq.empty, children, Seq.empty))
+    LabeledElement(resolvedName(name), element(children))
 }
