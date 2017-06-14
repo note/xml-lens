@@ -1,9 +1,10 @@
 package net.michalsitko.xml.optics.laws
 
-import monocle.law.discipline.{OptionalTests, TraversalTests}
+import monocle.law.discipline.{LensTests, OptionalTests, TraversalTests}
+import net.michalsitko.xml.entities.Node
 import net.michalsitko.xml.optics.Optics
 import net.michalsitko.xml.utils.{ArbitraryElementConfig, ArbitraryInstances, CogenInstances}
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalactic.anyvals.PosZInt
 import org.scalatest.prop.Checkers
 import org.scalatest.{FlatSpec, Matchers}
@@ -16,18 +17,22 @@ class OpticsLawsSpec extends LawsSpec with Matchers with ArbitraryInstances with
 
   implicit val arbLabeledElem =
     Arbitrary(labeledElementGen(ArbitraryElementConfig(4, 4, Some("abc"), None)))
+  implicit val arbNode = Arbitrary(arbLabeledElem.arbitrary.map(_.asInstanceOf[Node]))
+  implicit val arbNodes = Arbitrary(Gen.listOf(arbNode.arbitrary).map(_.toSeq))
   implicit val arbElem =
     Arbitrary(labeledElementGen(ArbitraryElementConfig(1, 2, None, Some("someAttr"))).map(_.element))
 
-  val deepTest    = TraversalTests(Optics.deep("abc"))
-  val deeperTest  = TraversalTests(Optics.deeper("abc"))
+  val deepTest        = TraversalTests(Optics.deep("abc"))
+  val deeperTest      = TraversalTests(Optics.deeper("abc"))
   val hasTextOnlyTest = OptionalTests(Optics.hasTextOnly)
-  val attributeTest = OptionalTests(Optics.attribute("someAttr"))
+  val attributeTest   = OptionalTests(Optics.attribute("someAttr"))
+  val childrenTest    = LensTests(Optics.children)
 
   checkLaws("deep Traversal", deepTest)
   checkLaws("deeper Traversal", deeperTest)
   checkLaws("hasTextOnly Optional", hasTextOnlyTest)
   checkLaws("attribute Optional", attributeTest)
+  checkLaws("children Lens", childrenTest, 6)
 
 }
 

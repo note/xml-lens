@@ -4,9 +4,10 @@ import monocle.function.Plated
 import net.michalsitko.xml.entities.{LabeledElement, Node, Text}
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter
+import net.michalsitko.xml.utils.ExampleBuilderHelper
 import org.scalatest.{Matchers, WordSpec}
 
-class PlatedSpec extends WordSpec with Matchers {
+class PlatedSpec extends WordSpec with Matchers with ExampleBuilderHelper {
   import OpticsInstances._
 
   "nodePlated" should {
@@ -14,29 +15,12 @@ class PlatedSpec extends WordSpec with Matchers {
       val xml = XmlParser.parse(input).right.get
 
       val res = Plated.transform[Node] {
-        case Text(txt) =>
-          Text(txt.toUpperCase)
-        case node =>
-          println("bazinga 888: " + node)
-          node
+        case Text(txt) => Text(txt.toUpperCase)
+        case node => node
       }(xml)
 
       // TODO: get rid of instanceOf
       XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal (output)
-    }
-
-    "universe" in {
-      val xml = XmlParser.parse(input).right.get
-
-      val res = Plated.universe[Node](xml)
-
-
-
-      res.collect {
-        case LabeledElement(label, _) =>
-          label
-
-      }
     }
 
   }
