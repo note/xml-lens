@@ -85,6 +85,29 @@ object Optics {
     from.copy(element = from.element.copy(children = newChildren))
   }
 
+  val nodeToNodeTraversal = new Traversal[Node, Node] {
+    import scalaz.Applicative
+    import scalaz.std.list._
+    import scalaz.syntax.traverse._
+
+    def modifyF[F[_]: Applicative](fun: Node => F[Node])(from: Node): F[Node] = {
+      from match {
+        case LabeledElement(label, element) =>
+          val appOfList = element.children.toList.traverse(fun)
+          appOfList.map { ch =>
+            LabeledElement(label, element.copy(children = ch))
+          }
+
+        case t @ Text(_) =>
+          Applicative[F].pure(t)
+
+        case comment: Comment =>
+          Applicative[F].pure(comment)
+      }
+    }
+  }
+
+
   private def onlyChild(element: Element): Option[Node] = {
     if (element.children.size == 1) {
       Some(element.children.head)

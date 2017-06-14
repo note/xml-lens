@@ -22,14 +22,16 @@ class OpticsLawsSpec extends LawsSpec with Matchers with ArbitraryInstances with
   implicit val arbElem =
     Arbitrary(labeledElementGen(ArbitraryElementConfig(1, 2, None, Some("someAttr"))).map(_.element))
 
-  val deepTest        = TraversalTests(Optics.deep("abc"))
-  val deeperTest      = TraversalTests(Optics.deeper("abc"))
-  val hasTextOnlyTest = OptionalTests(Optics.hasTextOnly)
-  val attributeTest   = OptionalTests(Optics.attribute("someAttr"))
-  val childrenTest    = LensTests(Optics.children)
+  val deepTest          = TraversalTests(Optics.deep("abc"))
+  val deeperTest        = TraversalTests(Optics.deeper("abc"))
+  val nodeTraversalTest = TraversalTests(Optics.nodeToNodeTraversal)
+  val hasTextOnlyTest   = OptionalTests(Optics.hasTextOnly)
+  val attributeTest     = OptionalTests(Optics.attribute("someAttr"))
+  val childrenTest      = LensTests(Optics.children)
 
   checkLaws("deep Traversal", deepTest)
   checkLaws("deeper Traversal", deeperTest)
+  checkLaws("nodeTraversalTest Traversal", nodeTraversalTest)
   checkLaws("hasTextOnly Optional", hasTextOnlyTest)
   checkLaws("attribute Optional", attributeTest)
   checkLaws("children Lens", childrenTest, 6)
