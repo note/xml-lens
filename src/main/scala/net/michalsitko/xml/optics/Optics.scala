@@ -80,6 +80,11 @@ object Optics {
   val attributes: Lens[Element, Seq[Attribute]] =
     Lens[Element, Seq[Attribute]](_.attributes)(newAttrs => from => from.copy(attributes = newAttrs))
 
+  // TODO: test if lawful
+  val children = Lens[LabeledElement, Seq[Node]](_.element.children){ newChildren => from =>
+    from.copy(element = from.element.copy(children = newChildren))
+  }
+
   private def onlyChild(element: Element): Option[Node] = {
     if (element.children.size == 1) {
       Some(element.children.head)

@@ -9,7 +9,7 @@ object Example {
     Example(stringRepr, Right(element))
 }
 
-trait ExampleInputs {
+trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
   val noNamespaceExample = Example.right(
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a><c1><f>item1</f><g>item2</g></c1><c1><f>item1</f><h>item2</h></c1></a>""".stripMargin,
@@ -198,19 +198,4 @@ trait ExampleInputs {
     "".stripMargin,
     "<></>".stripMargin
   )
-
-  lazy val lineBreak = System.getProperty("line.separator")
-  lazy val indent = " " * 3
-  lazy val lineBreakWithIndent = s"$lineBreak$indent"
-
-  def element(children: Node*): Element = {
-    Element(Seq.empty, children, Seq.empty)
-  }
-
-  def indent(level: Int): Text = Text(lineBreak + (indent * level))
-
-  def resolvedName(name: String) = ResolvedName("", None, name)
-
-  def labeledElement(name: String, children: Node*) =
-    LabeledElement(resolvedName(name), element(children:_*))
 }

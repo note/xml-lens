@@ -17,7 +17,11 @@ sealed trait Node
   */
 case class LabeledElement(label: ResolvedName, element: Element) extends Node
 
-case class Text(text: String) extends Node
+case class Text(text: String) extends Node {
+  def whiteSpaceOnly: Boolean = {
+    text.forall(_.isWhitespace)
+  }
+}
 
 case class Comment(comment: String) extends Node
 
