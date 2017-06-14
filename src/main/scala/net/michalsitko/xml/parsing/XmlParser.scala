@@ -13,21 +13,19 @@ import scalaz.Free.Trampoline
 import scalaz.Trampoline
 
 // TODO: create proper hierarchy of errors
-case class ParsingError(exception: Throwable)
-//case object SomeParsingError extends ParsingError
+case class ParsingException(message: String, cause: Throwable) extends Exception(message, cause)
 
 object XmlParser {
-  def parse(input: String): Either[ParsingError, LabeledElement] = {
+  def parse(input: String): Either[ParsingException, LabeledElement] = {
     // TODO: is it ok to hardcode UTF 8?
     val stream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     parse(stream)
   }
 
-  def parse(inputStream: InputStream): Either[ParsingError, LabeledElement] = {
+  def parse(inputStream: InputStream): Either[ParsingException, LabeledElement] = {
     import net.michalsitko.xml.parsing.utils.TryOps._
 
-    // IOException and XMLStreamException
-    Try(read(inputStream)).asEither.left.map(e => ParsingError(e))
+    Try(read(inputStream)).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
   }
 
   private def read(inputStream: InputStream): LabeledElement = {
@@ -39,9 +37,8 @@ object XmlParser {
         val nsDeclarations = getNamespaceDeclarations(reader)
         val attrs = getAttributes(reader)
         readNext(LabeledElement(resolvedName, Element(attrs, Seq.empty, nsDeclarations)), reader).run
-      case None =>
-        // TODO: think about it
-        throw new IOException("bazinga: no root element")
+      case None => // should not really happen - XMLStreamReader takes care of it
+        throw new IOException("No root element in XML document")
     }
   }
 
@@ -75,9 +72,7 @@ object XmlParser {
           } yield next
 
         case CHARACTERS =>
-          val start = reader.getTextStart
-          val length = reader.getTextLength
-          val text = new String(reader.getTextCharacters(), start, length)
+          val text = reader.getText
           val newChildren = parent.element.children :+ Text(text)
           val newParent = parent.copy(element = parent.element.copy(children = newChildren))
           Trampoline.suspend(readNext(newParent, reader))
@@ -92,8 +87,7 @@ object XmlParser {
           Trampoline.suspend(readNext(newParent, reader))
       }
     } else {
-      // TODO: think about sth else
-      throw new IOException("bazinga: missing END_ELEMENT")
+      Trampoline.done(parent)
     }
   }
   private def getName(reader: XMLStreamReader): ResolvedName = {
@@ -106,19 +100,19 @@ object XmlParser {
 
   private def getNamespaceDeclarations(reader: XMLStreamReader): Seq[NamespaceDeclaration] =
     for {
-      i <- 0 until reader.getNamespaceCount
-      prefix = reader.getNamespacePrefix(i)
-      uri = reader.getNamespaceURI(i)
+      i       <- 0 until reader.getNamespaceCount
+      prefix  = reader.getNamespacePrefix(i)
+      uri     = reader.getNamespaceURI(i)
     } yield NamespaceDeclaration(Option(prefix), uri)
 
   private def getAttributes(reader: XMLStreamReader): Seq[Attribute] = {
     for {
-      i <- 0 until reader.getAttributeCount
-      prefix = reader.getAttributePrefix(i)
+      i         <- 0 until reader.getAttributeCount
+      prefix    = reader.getAttributePrefix(i)
       namespace = reader.getAttributeNamespace(i)
       localName = reader.getAttributeLocalName(i)
-      value = reader.getAttributeValue(i)
-      resolved = ResolvedName(prefix, Option(namespace), localName)
+      value     = reader.getAttributeValue(i)
+      resolved  = ResolvedName(prefix, Option(namespace), localName)
     } yield Attribute(resolved, value)
   }
 }

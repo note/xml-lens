@@ -31,7 +31,9 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
     }
 
     "fail for malformed inputs" in {
-      malformedXmlStrings.foreach(checkCorrectInput)
+      malformedXmlStrings.foreach { example =>
+        XmlParser.parse(example).isLeft should equal(true)
+      }
     }
 
     "deal with very deep XML" in {

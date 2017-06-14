@@ -1,13 +1,10 @@
 package net.michalsitko.xml.utils
 
 import net.michalsitko.xml.entities.{LabeledElement, _}
-import net.michalsitko.xml.parsing.ParsingError
+import net.michalsitko.xml.parsing.ParsingException
 
-case class Example(stringRepr: String, expectedRes: Either[ParsingError, LabeledElement])
+case class Example(stringRepr: String, expectedRes: Either[ParsingException, LabeledElement])
 object Example {
-  def left(stringRepr: String, err: ParsingError) =
-    Example(stringRepr, Left(err))
-
   def right(stringRepr: String, element: LabeledElement) =
     Example(stringRepr, Right(element))
 }
@@ -160,32 +157,46 @@ trait ExampleInputs {
   )
 
   val malformedXmlStrings = List(
-    Example.left(
-      """<?xml version="1.0" encoding="UTF-8"?>
+    """<?xml version="1.0" encoding="UTF-8"?>
       |a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
       |   <c1>
       |      <f>item1</f>
       |   </c1>
       |</a>
-      """.stripMargin, ParsingError(new RuntimeException("change me"))),
-    Example.left(
-      """<?xml version="1.0" encoding="UTF-8"?>
+      """.stripMargin,
+    """<?xml version="1.0" encoding="UTF-8"?>
       |</a>
       |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
       |   <c1>
       |      <f>item1</f>
       |   </c1>
       |</a>
-      """.stripMargin, ParsingError(new RuntimeException("change me"))),
-    Example.left(
-      """<?xml version="1.0" encoding="UTF-8"?>
+      """.stripMargin,
+    """<?xml version="1.0" encoding="UTF-8"?>
       |</a>
       |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
       |   <c1>
       |      <yy:f>item1</yy:f>
       |   </c1>
       |</a>
-      """.stripMargin, ParsingError(new RuntimeException("change me")))
+      """.stripMargin,
+    // unbound prefix:
+    """<?xml version="1.0" encoding="UTF-8"?>
+        |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
+        |   <c1>
+        |      <yy:f>item1</yy:f>
+        |   </c1>
+        |</a>
+      """.stripMargin,
+    """<?xml version="1.0" encoding="UTF-8"?>
+        |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
+        |   <c1>
+        |      <xyz:f>item1</xyz:f>
+        |   </a>
+        |</a>
+      """.stripMargin,
+    "".stripMargin,
+    "<></>".stripMargin
   )
 
   lazy val lineBreak = System.getProperty("line.separator")
