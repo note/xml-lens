@@ -8,9 +8,6 @@ import scalaz.Applicative
 object Optics {
   import scalaz.std.list._
 
-
-  def deep(label: String): Traversal[LabeledElement, Element] = deep(ResolvedName.unprefixed(label))
-
   def deep(label: ResolvedName): Traversal[LabeledElement, Element] = new Traversal[LabeledElement, Element] {
     override final def modifyF[F[_]](f: (Element) => F[Element])(from: LabeledElement)(implicit F: Applicative[F]): F[LabeledElement] = {
       val tmp = from.element.children.collect {
@@ -28,7 +25,7 @@ object Optics {
     }
   }
 
-  def deeper(label: String): Traversal[Element, Element] = deeper(ResolvedName.unprefixed(label))
+  def deep(label: String): Traversal[LabeledElement, Element] = deep(ResolvedName.unprefixed(label))
 
   def deeper(label: ResolvedName): Traversal[Element, Element] = new Traversal[Element, Element] {
     override final def modifyF[F[_]](f: (Element) => F[Element])(from: Element)(implicit F: Applicative[F]): F[Element] = {
@@ -47,6 +44,8 @@ object Optics {
     }
   }
 
+  def deeper(label: String): Traversal[Element, Element] = deeper(ResolvedName.unprefixed(label))
+
   val hasOneChild: Optional[Element, Node] = Optional[Element, Node]{ el =>
     onlyChild(el)
   }{ newNode => from =>
@@ -61,17 +60,7 @@ object Optics {
 
   val isTextS = isText.composeIso(textIso)
 
-  private def onlyChild(element: Element): Option[Node] = {
-    if (element.children.size == 1) {
-      Some(element.children.head)
-    } else {
-      None
-    }
-  }
-
   val hasTextOnly: Optional[Element, String] = hasOneChild.composePrism(isTextS)
-
-  def attribute(key: String): Optional[Element, String] = attribute(ResolvedName.unprefixed(key))
 
   def attribute(key: ResolvedName) = Optional[Element, String] { el =>
     el.attributes.find(_.key == key).map(_.value)
@@ -86,7 +75,17 @@ object Optics {
     from.copy(attributes = newAttributes)
   }
 
+  def attribute(key: String): Optional[Element, String] = attribute(ResolvedName.unprefixed(key))
+
   val attributes: Lens[Element, Seq[Attribute]] =
     Lens[Element, Seq[Attribute]](_.attributes)(newAttrs => from => from.copy(attributes = newAttrs))
+
+  private def onlyChild(element: Element): Option[Node] = {
+    if (element.children.size == 1) {
+      Some(element.children.head)
+    } else {
+      None
+    }
+  }
 
 }

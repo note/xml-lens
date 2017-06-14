@@ -9,7 +9,7 @@ import org.scalatest.prop.Checkers
 import org.scalatest.{FlatSpec, Matchers}
 import org.typelevel.discipline.Laws
 
-class OpticsLawsSpec extends OpticsSpec with Matchers with ArbitraryInstances with CogenInstances {
+class OpticsLawsSpec extends LawsSpec with Matchers with ArbitraryInstances with CogenInstances {
   import net.michalsitko.xml.entities.Instances._
 
   import scalaz.std.string._
@@ -31,7 +31,7 @@ class OpticsLawsSpec extends OpticsSpec with Matchers with ArbitraryInstances wi
 
 }
 
-trait OpticsSpec extends FlatSpec {
+trait LawsSpec extends FlatSpec {
   def checkLaws(name: String, ruleSet: Laws#RuleSet, maxSize: Int = 100): Unit = {
     val configParams = List(Checkers.MinSuccessful(20), Checkers.SizeRange(PosZInt.from(maxSize).get))
 
