@@ -34,7 +34,8 @@ class OpticsLawsSpec extends LawsSpec with Matchers with ArbitraryInstances with
   checkLaws("nodeTraversalTest Traversal", nodeTraversalTest)
   checkLaws("hasTextOnly Optional", hasTextOnlyTest)
   checkLaws("attribute Optional", attributeTest)
-  checkLaws("children Lens", childrenTest, 6)
+  // TODO: investigate why tests are slow with default value for maxSize
+  checkLaws("children Lens", childrenTest, 8)
 
 }
 
