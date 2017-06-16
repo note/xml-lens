@@ -2,49 +2,39 @@ package net.michalsitko.xml.optics
 
 import monocle._
 import net.michalsitko.xml.entities._
+import scalaz.Applicative
+import scalaz.syntax.traverse._
 
 import scalaz.Applicative
 
 object Optics {
   import scalaz.std.list._
 
-  def deep(label: ResolvedName): Traversal[LabeledElement, Element] = new Traversal[LabeledElement, Element] {
-    override final def modifyF[F[_]](f: (Element) => F[Element])(from: LabeledElement)(implicit F: Applicative[F]): F[LabeledElement] = {
-      val tmp = from.element.children.collect {
-        // TODO: equals for ResolvedName should return true for different prefixes but same fields otherwise
-        case el: LabeledElement if el.label == label =>
-          val mapped = f(el.element)
-          F.map(mapped)(mappedDetail => LabeledElement(label, mappedDetail).asInstanceOf[Node])
-        case anythingElse: Node =>
-          F.pure(anythingElse)
-      }.toList
+  def deep(elementMatcher: NameMatcher): Traversal[LabeledElement, Element] = new Traversal[LabeledElement, Element] {
+    override final def modifyF[F[_]: Applicative](f: (Element) => F[Element])(from: LabeledElement): F[LabeledElement] = {
+      val modified = from.element.children.collect(modifyOnlyMatching(elementMatcher, f)).toList
 
-      F.map(F.sequence(tmp)){ elements =>
+      Applicative[F].sequence(modified).map { elements =>
         from.copy(element = from.element.copy(children = elements))
       }
     }
   }
 
-  def deep(label: String): Traversal[LabeledElement, Element] = deep(ResolvedName.unprefixed(label))
+  def deep(label: String): Traversal[LabeledElement, Element] =
+    deep(NameMatcher.fromString(label))
 
-  def deeper(label: ResolvedName): Traversal[Element, Element] = new Traversal[Element, Element] {
-    override final def modifyF[F[_]](f: (Element) => F[Element])(from: Element)(implicit F: Applicative[F]): F[Element] = {
-      val tmp = from.children.collect {
-        // TODO: equals for ResolvedName should return true for different prefixes but same fields otherwise
-        case el: LabeledElement if el.label == label =>
-          val mapped = f(el.element)
-          F.map(mapped)(mappedDetail => LabeledElement(label, mappedDetail).asInstanceOf[Node])
-        case anythingElse =>
-          F.pure(anythingElse)
-      }.toList
+  def deeper(elementMatcher: NameMatcher): Traversal[Element, Element] = new Traversal[Element, Element] {
+    override final def modifyF[F[_]: Applicative](f: (Element) => F[Element])(from: Element): F[Element] = {
+      val modified = from.children.collect(modifyOnlyMatching(elementMatcher, f)).toList
 
-      F.map(F.sequence(tmp)){ elements =>
+      Applicative[F].sequence(modified).map { elements =>
         from.copy(children = elements)
       }
     }
   }
 
-  def deeper(label: String): Traversal[Element, Element] = deeper(ResolvedName.unprefixed(label))
+  def deeper(label: String): Traversal[Element, Element] =
+    deeper(NameMatcher.fromString(label))
 
   val hasOneChild: Optional[Element, Node] = Optional[Element, Node]{ el =>
     onlyChild(el)
@@ -62,11 +52,11 @@ object Optics {
 
   val hasTextOnly: Optional[Element, String] = hasOneChild.composePrism(isTextS)
 
-  def attribute(key: ResolvedName) = Optional[Element, String] { el =>
-    el.attributes.find(_.key == key).map(_.value)
+  def attribute(key: NameMatcher) = Optional[Element, String] { el =>
+    el.attributes.find(attr => key.matches(attr.key)).map(_.value)
   }{ newValue => from =>
     val newAttributes = from.attributes.collect {
-      case attr@Attribute(`key`, _) =>
+      case attr: Attribute if key.matches(attr.key) =>
         attr.copy(value = newValue)
       case attr =>
         attr
@@ -75,7 +65,7 @@ object Optics {
     from.copy(attributes = newAttributes)
   }
 
-  def attribute(key: String): Optional[Element, String] = attribute(ResolvedName.unprefixed(key))
+  def attribute(key: String): Optional[Element, String] = attribute(NameMatcher.fromString(key))
 
   val attributes: Lens[Element, Seq[Attribute]] =
     Lens[Element, Seq[Attribute]](_.attributes)(newAttrs => from => from.copy(attributes = newAttrs))
@@ -86,10 +76,6 @@ object Optics {
   }
 
   val nodeToNodeTraversal = new Traversal[Node, Node] {
-    import scalaz.Applicative
-    import scalaz.std.list._
-    import scalaz.syntax.traverse._
-
     def modifyF[F[_]: Applicative](fun: Node => F[Node])(from: Node): F[Node] = {
       from match {
         case LabeledElement(label, element) =>
@@ -105,6 +91,15 @@ object Optics {
           Applicative[F].pure(comment)
       }
     }
+  }
+
+
+  private def modifyOnlyMatching[F[_] : Applicative](elementMatcher: NameMatcher, f: Element => F[Element]): PartialFunction[Node, F[Node]] = {
+    case el: LabeledElement if elementMatcher.matches(el.label) =>
+      val modifiedElems = f(el.element)
+      modifiedElems.map(modifiedElem => LabeledElement(el.label, modifiedElem))
+    case anythingElse =>
+      Applicative[F].pure(anythingElse)
   }
 
 
