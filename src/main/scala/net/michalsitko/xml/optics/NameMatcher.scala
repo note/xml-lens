@@ -43,9 +43,6 @@ final case class Namespace(uri: Option[String]) {
 }
 
 object Namespace {
-  def apply(uri: Option[String]): Namespace =
-    Namespace(uri)
-
   def apply(uri: String): Namespace =
     Namespace(Some(uri))
 }
