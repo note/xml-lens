@@ -17,31 +17,23 @@ sealed trait Node
   */
 case class LabeledElement(label: ResolvedName, element: Element) extends Node
 
-case class Text(text: String) extends Node {
-  def whiteSpaceOnly: Boolean = {
-    text.forall(_.isWhitespace)
-  }
-}
+case class Text(text: String) extends Node
 
 case class Comment(comment: String) extends Node
 
 // TODO: think if Seq[Attribute] is a good choice taking into account that attribute names have to be unique within
 // single element and printing with XmlStreamWriter a non-unique Attribute will throw an exception
 case class Element(attributes: Seq[Attribute], children: Seq[Node], namespaceDeclarations: Seq[NamespaceDeclaration])
-object Element {
-  def empty: Element = Element(Seq.empty, Seq.empty, Seq.empty)
-}
 
 // when no prefix in XML then: prefix == ""
 // TODO: investigate why in scala-xml Attribute value is defined as `value: Seq[Node]`
 // also, take a look at: https://www.w3.org/TR/xml/#NT-AttValue
 case class Attribute(key: ResolvedName, value: String) {
+  // TODO: should it stay here?
   def sameKey(anotherKey: ResolvedName): Boolean = {
     (key.prefix == anotherKey.prefix) && (key.localName == anotherKey.localName)
   }
 }
-// TODO: maybe should be changed to:
-// Attribute(ResolvedName, String)
 
 object Attribute {
   def unprefixed(key: String, value: String): Attribute =
@@ -60,27 +52,4 @@ object ResolvedName {
 
 case class NamespaceDeclaration(prefix: Option[String], uri: String)
 
-// TODO: hierarchy is not comprehensive - it misses PCDATA, Entity References, Comments among the others
-
-object SomeExample {
-  // try to define following examplary XML
-  """<?xml version="1.0" encoding="UTF-8"?>
-    |<a>
-    |   <c1>
-    |      <f>item1</f>
-    |      <g>item2</g>
-    |   </c1>
-    |   <c1>
-    |      <f>item1</f>
-    |      <h>item2</h>
-    |   </c1>
-    |   <c2>
-    |      <f>item1</f>
-    |      <g>item2</g>
-    |      <h>item3</h>
-    |   </c2>
-    |   <s>summary</s>
-    |</a>
-  """.stripMargin
-
-}
+// TODO: hierarchy is not comprehensive - it misses PCDATA, Entity References among the others

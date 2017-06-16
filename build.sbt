@@ -30,4 +30,8 @@ lazy val optics = (project in file("optics"))
     name := "xml-lens-optics",
     libraryDependencies ++= Seq(monocleCore, monocleLaw, scalaTest)
   )
-  .dependsOn(ast, testsCommon % "test->test")
+  .dependsOn(ast, testsCommon % "test->test", io % "test->test")
+
+lazy val root = (project in file("."))
+  .commonSettings
+  .aggregate(io, optics)

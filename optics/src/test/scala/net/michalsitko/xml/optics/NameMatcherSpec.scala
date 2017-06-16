@@ -1,6 +1,7 @@
 package net.michalsitko.xml.optics
 
 import net.michalsitko.xml.entities.ResolvedName
+import org.scalatest.{Matchers, WordSpec}
 
 class NameMatcherSpec extends WordSpec with Matchers {
   "IgnoreNamespaceMatcher" should {

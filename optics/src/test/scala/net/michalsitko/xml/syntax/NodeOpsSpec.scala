@@ -1,8 +1,10 @@
 package net.michalsitko.xml.syntax
 
 import net.michalsitko.xml.entities.{LabeledElement, Text}
+import net.michalsitko.xml.parsing.XmlParser
+import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.syntax.node._
-import net.michalsitko.xml.utils.ExampleInputs
+import net.michalsitko.xml.test.utils.ExampleInputs
 import org.scalatest.{Matchers, WordSpec}
 
 class NodeOpsSpec extends WordSpec with Matchers with ExampleInputs {

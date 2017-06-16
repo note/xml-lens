@@ -1,6 +1,11 @@
 package net.michalsitko.xml.optics
 
+import monocle.Traversal
 import net.michalsitko.xml.entities._
+import net.michalsitko.xml.parsing.XmlParser
+import net.michalsitko.xml.printing.XmlPrinter
+import net.michalsitko.xml.test.utils.ExampleInputs
+import org.scalatest.{Matchers, WordSpec}
 
 class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
   import net.michalsitko.xml.optics.Optics._

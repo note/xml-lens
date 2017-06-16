@@ -1,7 +1,10 @@
 package net.michalsitko.xml.optics
 
+import monocle.Traversal
 import net.michalsitko.xml.entities.Element
 import net.michalsitko.xml.optics.Optics._
+import net.michalsitko.xml.parsing.XmlParser
+import org.scalatest.{Matchers, WordSpec}
 
 class NamespaceSpec extends WordSpec with Matchers {
   "Optics" should {

@@ -3,7 +3,7 @@ package net.michalsitko.xml.optics.laws
 import monocle.law.discipline.{LensTests, OptionalTests, TraversalTests}
 import net.michalsitko.xml.entities.Node
 import net.michalsitko.xml.optics.Optics
-import net.michalsitko.xml.utils.{ArbitraryElementConfig, ArbitraryInstances, CogenInstances}
+import net.michalsitko.xml.test.utils.{ArbitraryElementConfig, ArbitraryInstances, CogenInstances}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalactic.anyvals.PosZInt
 import org.scalatest.prop.Checkers

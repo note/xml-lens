@@ -1,8 +1,14 @@
 package net.michalsitko.xml.optics
 
+import monocle.function.Plated
 import net.michalsitko.xml.entities.{LabeledElement, Node, ResolvedName, Text}
+import net.michalsitko.xml.parsing.XmlParser
+import net.michalsitko.xml.printing.XmlPrinter
+import net.michalsitko.xml.test.utils.ExampleBuilderHelper
+import org.scalatest.{Matchers, WordSpec}
 
 class PlatedSpec extends WordSpec with Matchers with ExampleBuilderHelper {
+  import OpticsInstances._
 
   "nodePlated" should {
     "be able to transform all Text nodes" in {
