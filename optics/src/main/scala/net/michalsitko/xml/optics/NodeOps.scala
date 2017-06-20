@@ -21,7 +21,7 @@ final class NodeOps (root: LabeledElement) {
     case n => n
   }_
 
-  val removeNonSignificantTexts = Optics.children.modify(_.filterNot(nonSignificantText))
+  private val removeNonSignificantTexts = Optics.children.modify(_.filterNot(nonSignificantText))
 
   private def nonSignificantText(someNode: Node): Boolean = someNode match {
     case Text(text) => text.forall(_.isWhitespace)
