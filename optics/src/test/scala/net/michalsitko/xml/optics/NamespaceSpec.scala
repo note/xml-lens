@@ -13,11 +13,11 @@ class NamespaceSpec extends WordSpec with Matchers {
 
       val ignoreNs = withCriteria(deeper("f"))
       val withNsA = {
-        val ns = Namespace("http://a.com")
+        val ns = Namespace("a", "http://a.com")
         withCriteria(deeper(ns.name("f")))
       }
       val withNsB = {
-        val ns = Namespace("http://b.com")
+        val ns = Namespace("b", "http://b.com")
         withCriteria(deeper(ns.name("f")))
       }
 
@@ -30,7 +30,7 @@ class NamespaceSpec extends WordSpec with Matchers {
       val xml = XmlParser.parse(input2).right.get
 
       val defaultNs = {
-        val ns = Namespace(None)
+        val ns = Namespace.default
         withCriteria(deeper(ns.name("f")))
       }
 

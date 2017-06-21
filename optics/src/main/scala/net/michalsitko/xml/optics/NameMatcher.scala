@@ -28,7 +28,7 @@ final case class IgnoreNamespaceMatcher(localName: String) extends NameMatcher {
     ResolvedName("", None, localName)
 }
 
-final case class ResolvedNameMatcher(uri: Option[String], localName: String) extends NameMatcher {
+final case class ResolvedNameMatcher(prefix: String, uri: Option[String], localName: String) extends NameMatcher {
   // TODO: implement according to https://www.w3.org/TR/xml-names11/#NSNameComparison and
   // https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
   override def matches(resolvedName: ResolvedName): Boolean =
@@ -38,12 +38,15 @@ final case class ResolvedNameMatcher(uri: Option[String], localName: String) ext
     ResolvedName("", uri, localName)
 }
 
-final case class Namespace(uri: Option[String]) {
+final case class Namespace(prefix: String, uri: Option[String]) {
   def name(localName: String): ResolvedNameMatcher =
-    ResolvedNameMatcher(uri, localName)
+    ResolvedNameMatcher(prefix, uri, localName)
 }
 
 object Namespace {
-  def apply(uri: String): Namespace =
-    Namespace(Some(uri))
+  def apply(prefix: String, uri: String): Namespace =
+    Namespace(prefix, Some(uri))
+
+  val default: Namespace =
+    Namespace("", None)
 }

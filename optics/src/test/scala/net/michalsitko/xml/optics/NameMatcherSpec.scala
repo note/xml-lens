@@ -29,7 +29,7 @@ class NameMatcherSpec extends WordSpec with Matchers {
 
   "ResolvedNameMatcher" should {
     "work" in {
-      val matcher = ResolvedNameMatcher(Some("http://a.com"), "elem")
+      val matcher = ResolvedNameMatcher("a", Some("http://a.com"), "elem")
 
       val name = ResolvedName("a", Some("http://a.com"), "elem")
 
@@ -41,7 +41,7 @@ class NameMatcherSpec extends WordSpec with Matchers {
     }
 
     "be case sensitive in regard to namespace" in {
-      val matcher = ResolvedNameMatcher(Some("http://a.com"), "elem")
+      val matcher = ResolvedNameMatcher("a", Some("http://a.com"), "elem")
 
       val name = ResolvedName("a", Some("http://a.com"), "elem")
 
@@ -51,7 +51,7 @@ class NameMatcherSpec extends WordSpec with Matchers {
     }
 
     "be case sensitive in regard to localName" in {
-      val matcher = ResolvedNameMatcher(Some("http://a.com"), "elem")
+      val matcher = ResolvedNameMatcher("a", Some("http://a.com"), "elem")
 
       val name = ResolvedName("a", Some("http://a.com"), "elem")
 
