@@ -12,7 +12,6 @@ class NamespaceSpec extends WordSpec with Matchers {
       val xml = XmlParser.parse(input).right.get
 
       val ignoreNs = withCriteria(deeper("f"))
-      val withPrefix = withCriteria(deeper("b:f"))
       val withNsA = {
         val ns = Namespace("http://a.com")
         withCriteria(deeper(ns.name("f")))
@@ -23,7 +22,6 @@ class NamespaceSpec extends WordSpec with Matchers {
       }
 
       ignoreNs.getAll(xml) should equal(List("a.com", "b.com", "c.com", "d.com"))
-      withPrefix.getAll(xml) should equal(List("b.com", "d.com"))
       withNsA.getAll(xml) should equal(List("a.com"))
       withNsB.getAll(xml) should equal(List("b.com"))
     }

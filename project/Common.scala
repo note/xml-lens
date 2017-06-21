@@ -20,7 +20,7 @@ object Common {
     "-Xlint"
   )
 
-  val commonScalaVersion =  "2.11.8"
+  val commonScalaVersion =  "2.12.2"
   val commonCrossScalaVersions = Seq("2.12.2", "2.11.11")
 
   implicit class ProjectFrom(project: Project) {

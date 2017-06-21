@@ -1,6 +1,6 @@
 package net.michalsitko.xml.syntax
 
-import monocle.{Iso, PTraversal, Traversal}
+import monocle.{Iso, Traversal}
 import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement}
 import net.michalsitko.xml.optics.{NameMatcher, Optics}
 
@@ -25,7 +25,7 @@ class RootBuilder extends OpticsBuilder {
   }
 }
 
-case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends OpticsBuilder {
+case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends OpticsBuilder with ElementOps {
   def \ (nameMatcher: String): DeepBuilder = {
     \ (NameMatcher.fromString(nameMatcher))
   }
@@ -52,6 +52,22 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends Opti
     val r = current.composeLens(Optics.attributes)
     AttributesBuilder(r)
   }
+
+  override def replaceOrAddAttr(key: NameMatcher, newValue: String): (LabeledElement) => LabeledElement = {
+    // TODO: change this implementation!
+    val replaceIfExistsTraversal = current.composeOptional((Optics.attribute(key)))
+    val replaceForExisting = replaceIfExistsTraversal.modify(_ => newValue)
+    val addOtherwiseTraversal = current.composeLens(Optics.attributes)
+    val addNonExisting = addOtherwiseTraversal.modify { attrs =>
+      if(attrs.exists(attr => key.matches(attr.key))) {
+        attrs
+      } else {
+        // TODO: may need to be changed to (e.g. with some extra effort we can try to avoid unreferenced namespaces)
+        attrs :+ Attribute(key.toResolvedName, newValue)
+      }
+    }
+    replaceForExisting andThen addNonExisting
+  }
 }
 
 object DeepBuilder {
@@ -71,4 +87,8 @@ case class AttributesBuilder(current: Traversal[LabeledElement, Seq[Attribute]])
 object AttributesBuilder {
   implicit def toTraversal(builder: AttributesBuilder): Traversal[LabeledElement, Seq[Attribute]] =
     builder.current
+}
+
+trait ElementOps {
+  def replaceOrAddAttr(key: NameMatcher, newValue: String): LabeledElement => LabeledElement
 }
