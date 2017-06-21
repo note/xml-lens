@@ -35,7 +35,7 @@ final case class ResolvedNameMatcher(prefix: String, uri: Option[String], localN
     uri == resolvedName.uri && localName == resolvedName.localName
 
   override def toResolvedName: ResolvedName =
-    ResolvedName("", uri, localName)
+    ResolvedName(prefix, uri, localName)
 }
 
 final case class Namespace(prefix: String, uri: Option[String]) {

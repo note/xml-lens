@@ -1,73 +1,34 @@
 package net.michalsitko.xml.syntax
 
-import monocle.{Iso, Traversal}
-import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement}
-import net.michalsitko.xml.optics.{NameMatcher, Optics}
-
-// TODO: Is it needed at all?
-trait OpticsBuilder {
-}
+import monocle._
+import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement, NamespaceDeclaration}
+import net.michalsitko.xml.optics.{NameMatcher, Optics, ResolvedNameMatcher}
 
 object OpticsBuilder {
   def root = new RootBuilder
 }
 
-class RootBuilder extends OpticsBuilder {
-  val current = Iso.apply[LabeledElement, LabeledElement](identity)(identity)
+class RootBuilder extends AnyRef with ElementOps {
+  val current = Lens[LabeledElement, Element](_.element)(newElement => from => from.copy(element = newElement)).asTraversal
 
   def \ (nameMatcher: String): DeepBuilder = {
     \ (NameMatcher.fromString(nameMatcher))
   }
 
-  def \ (nameMatcher: NameMatcher): DeepBuilder = {
-    val r: Traversal[LabeledElement, Element] = Optics.deep(nameMatcher)
-    DeepBuilder(r)
-  }
+  def \ (nameMatcher: NameMatcher): DeepBuilder = DeepBuilder (
+    Optics.deep(nameMatcher)
+  )
+
 }
 
-case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends OpticsBuilder with ElementOps {
+case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyRef with ElementOps {
   def \ (nameMatcher: String): DeepBuilder = {
     \ (NameMatcher.fromString(nameMatcher))
   }
 
-  def \ (nameMatcher: NameMatcher): DeepBuilder = {
-    val r = current.composeTraversal(Optics.deeper(nameMatcher))
-    DeepBuilder(r)
-  }
-
-  def hasTextOnly: TextBuilder = {
-    val r: Traversal[LabeledElement, String] = current.composeOptional(Optics.hasTextOnly)
-    TextBuilder(r)
-  }
-
-  def attr (nameMatcher: String): TextBuilder =
-    attr(NameMatcher.fromString(nameMatcher))
-
-  def attr (nameMatcher: NameMatcher): TextBuilder = {
-    val r: Traversal[LabeledElement, String] = current.composeOptional(Optics.attribute(nameMatcher))
-    TextBuilder(r)
-  }
-
-  def attrs: AttributesBuilder = {
-    val r = current.composeLens(Optics.attributes)
-    AttributesBuilder(r)
-  }
-
-  override def replaceOrAddAttr(key: NameMatcher, newValue: String): (LabeledElement) => LabeledElement = {
-    // TODO: change this implementation!
-    val replaceIfExistsTraversal = current.composeOptional((Optics.attribute(key)))
-    val replaceForExisting = replaceIfExistsTraversal.modify(_ => newValue)
-    val addOtherwiseTraversal = current.composeLens(Optics.attributes)
-    val addNonExisting = addOtherwiseTraversal.modify { attrs =>
-      if(attrs.exists(attr => key.matches(attr.key))) {
-        attrs
-      } else {
-        // TODO: may need to be changed to (e.g. with some extra effort we can try to avoid unreferenced namespaces)
-        attrs :+ Attribute(key.toResolvedName, newValue)
-      }
-    }
-    replaceForExisting andThen addNonExisting
-  }
+  def \ (nameMatcher: NameMatcher): DeepBuilder = DeepBuilder (
+    current.composeTraversal(Optics.deeper(nameMatcher))
+  )
 }
 
 object DeepBuilder {
@@ -75,14 +36,14 @@ object DeepBuilder {
     builder.current
 }
 
-case class TextBuilder(current: Traversal[LabeledElement, String]) extends OpticsBuilder
+case class TextBuilder(current: Traversal[LabeledElement, String])
 
 object TextBuilder {
   implicit def toTraversal(builder: TextBuilder): Traversal[LabeledElement, String] =
     builder.current
 }
 
-case class AttributesBuilder(current: Traversal[LabeledElement, Seq[Attribute]]) extends OpticsBuilder
+case class AttributesBuilder(current: Traversal[LabeledElement, Seq[Attribute]])
 
 object AttributesBuilder {
   implicit def toTraversal(builder: AttributesBuilder): Traversal[LabeledElement, Seq[Attribute]] =
@@ -90,5 +51,44 @@ object AttributesBuilder {
 }
 
 trait ElementOps {
-  def replaceOrAddAttr(key: NameMatcher, newValue: String): LabeledElement => LabeledElement
+  def current: Traversal[LabeledElement, Element]
+
+  def attr(nameMatcher: String): TextBuilder =
+    attr(NameMatcher.fromString(nameMatcher))
+
+  def attr(nameMatcher: NameMatcher): TextBuilder = TextBuilder (
+    current.composeOptional(Optics.attribute(nameMatcher))
+  )
+
+  def attrs: AttributesBuilder = AttributesBuilder (
+    current.composeLens(Optics.attributes)
+  )
+
+  def replaceOrAddAttr(key: NameMatcher, newValue: String): (LabeledElement) => LabeledElement = { el =>
+    val modifyExisting = Optics.attribute(key).modifyOption(_ => newValue)
+
+    val addNs: (Element) => Element = key match {
+      case matcher: ResolvedNameMatcher if matcher.uri.isDefined =>
+        Optics.namespaces.modify(ns => ns :+ NamespaceDeclaration(Some(matcher.prefix), matcher.uri.get))
+      case _ =>
+        identity[Element]_
+    }
+
+    current.modify { elem =>
+      modifyExisting(elem) match {
+        case Some(changedElem) =>
+          changedElem
+        case None =>
+          val changed = Optics.attributes.modify(attrs => attrs :+ Attribute(key.toResolvedName, newValue))(elem)
+          addNs(changed)
+      }
+    }(el)
+  }
+
+  def replaceOrAddAttr(key: String, newValue: String): (LabeledElement) => LabeledElement =
+    replaceOrAddAttr(NameMatcher.fromString(key), newValue)
+
+  def hasTextOnly: TextBuilder = TextBuilder (
+    current.composeOptional(Optics.hasTextOnly)
+  )
 }

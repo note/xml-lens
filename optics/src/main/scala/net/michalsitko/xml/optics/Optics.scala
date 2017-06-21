@@ -1,7 +1,8 @@
 package net.michalsitko.xml.optics
 
-import monocle._
+import monocle.{Lens, _}
 import net.michalsitko.xml.entities._
+
 import scalaz.Applicative
 import scalaz.std.list._
 import scalaz.syntax.traverse._
@@ -68,6 +69,9 @@ object Optics {
 
   val attributes: Lens[Element, Seq[Attribute]] =
     Lens[Element, Seq[Attribute]](_.attributes)(newAttrs => from => from.copy(attributes = newAttrs))
+
+  val namespaces: Lens[Element, Seq[NamespaceDeclaration]] =
+    Lens[Element, Seq[NamespaceDeclaration]](_.namespaceDeclarations)(newNs => from => from.copy(namespaceDeclarations = newNs))
 
   // TODO: test if lawful
   val children = Lens[LabeledElement, Seq[Node]](_.element.children){ newChildren => from =>
