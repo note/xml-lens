@@ -12,3 +12,13 @@ Of course, JSON is much more popular and XML at the same time is regarded as a l
 ## Status of project
 
 Library is in an early state of initial development.
+
+## Various
+
+#### How to run JMH benchmark
+ 
+Example:
+
+```
+bench/jmh:run -i 10 -wi 10 -f1 -t1 -prof gc .*Roundtrip*.
+```

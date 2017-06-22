@@ -36,7 +36,8 @@ lazy val bench = (project in file("bench"))
   .commonSettings
   .settings(
     name := "xml-lens-bench",
-    libraryDependencies ++= Seq(scalaXml, scalaTest)
+    libraryDependencies ++= Seq(scalaXml, scalaTest),
+    scalacOptions += "-Xlint:_,-missing-interpolator"
   )
   .enablePlugins(JmhPlugin)
   .dependsOn(optics, io)

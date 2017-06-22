@@ -10,6 +10,7 @@ class SimpleTransformationSpec extends FlatSpec with Matchers {
     val withLens = transformWith(SimpleTransformationLens)
     val withStd  = transformWith(SimpleTransformationStd).replace(''', '"')
 
+    withLens should equal (example.output)
     withLens should equal (withStd)
   }
 

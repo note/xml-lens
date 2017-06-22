@@ -34,7 +34,6 @@ object SimpleTransformationStd extends SimpleTransformation {
     val writer = new StringWriter
 
     XML.write(writer, transformed.head, "UTF-8", true, null)
-    val res = writer.toString
-    res
+    writer.toString
   }
 }
