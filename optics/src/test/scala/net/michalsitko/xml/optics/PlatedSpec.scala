@@ -76,6 +76,8 @@ class PlatedSpec extends WordSpec with Matchers with ExampleBuilderHelper {
       XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal (output4)
     }
 
+    // TODO: there's no possibility to compose Optics with Plated as deep, deeper and so on have `Element` as a target
+    // and
     "be able to transform text of all `f` elements in selected, known subtree" ignore {
       val xml = XmlParser.parse(input5).right.get
 

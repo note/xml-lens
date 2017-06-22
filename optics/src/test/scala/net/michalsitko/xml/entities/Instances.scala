@@ -18,4 +18,8 @@ object Instances {
   implicit def seqEq[T : Equal]: Equal[Seq[T]] = new Equal[Seq[T]] {
     override def equal(n1: Seq[T], n2: Seq[T]): Boolean = n1.zip(n2).forall(t => Equal[T].equal(t._1, t._2))
   }
+
+  implicit val attrEq: Equal[Attribute] = new Equal[Attribute] {
+    override def equal(a1: Attribute, a2: Attribute): Boolean = a1 == a2
+  }
 }

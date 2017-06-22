@@ -16,7 +16,7 @@ trait ArbitraryInstances {
   // TODO: may be not the best way
   private val alphanumGen: Gen[String] = Gen.alphaStr.map(_.take(9) + "a")
 
-  private def attributeGen(desiredAttributeKey: Option[String]): Gen[Attribute] = {
+  def attributeGen(desiredAttributeKey: Option[String]): Gen[Attribute] = {
     val attrNameGen = desiredAttributeKey match {
       case Some(attrKey) =>
         Gen.frequency[String]((randomAttributeProbability, alphanumGen), (1, Gen.const(attrKey)))

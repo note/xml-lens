@@ -93,7 +93,6 @@ object Optics {
     }
   }
 
-
   private def modifyOnlyMatching[F[_] : Applicative](elementMatcher: NameMatcher, f: Element => F[Element]): PartialFunction[Node, F[Node]] = {
     case el: LabeledElement if elementMatcher.matches(el.label) =>
       val modifiedElems = f(el.element)

@@ -21,12 +21,15 @@ class OpticsLawsSpec extends LawsSpec with Matchers with ArbitraryInstances with
   implicit val arbNodes = Arbitrary(Gen.listOf(arbNode.arbitrary).map(_.toSeq))
   implicit val arbElem =
     Arbitrary(labeledElementGen(ArbitraryElementConfig(1, 2, None, Some("someAttr"))).map(_.element))
+  implicit val arbAttr = Arbitrary(attributeGen(Some("someAttr")))
 
   val deepTest          = TraversalTests(Optics.deep("abc"))
   val deeperTest        = TraversalTests(Optics.deeper("abc"))
   val nodeTraversalTest = TraversalTests(Optics.nodeToNodeTraversal)
   val hasTextOnlyTest   = OptionalTests(Optics.hasTextOnly)
   val attributeTest     = OptionalTests(Optics.attribute("someAttr"))
+  val hasOneChildTest   = OptionalTests(Optics.hasOneChild)
+  val attributesTest    = LensTests(Optics.attributes)
   val childrenTest      = LensTests(Optics.children)
 
   checkLaws("deep Traversal", deepTest)
@@ -34,6 +37,8 @@ class OpticsLawsSpec extends LawsSpec with Matchers with ArbitraryInstances with
   checkLaws("nodeTraversalTest Traversal", nodeTraversalTest)
   checkLaws("hasTextOnly Optional", hasTextOnlyTest)
   checkLaws("attribute Optional", attributeTest)
+  checkLaws("hasOneChild Optional", hasOneChildTest)
+  checkLaws("attributes Lens", attributesTest)
   // TODO: investigate why tests are slow with default value for maxSize
   checkLaws("children Lens", childrenTest, 8)
 
