@@ -87,11 +87,8 @@ object Optics {
             LabeledElement(label, element.copy(children = ch))
           }
 
-        case t @ Text(_) =>
-          Applicative[F].pure(t)
-
-        case comment: Comment =>
-          Applicative[F].pure(comment)
+        case other =>
+          Applicative[F].pure(other)
       }
     }
   }
