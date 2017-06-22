@@ -32,6 +32,15 @@ lazy val optics = (project in file("optics"))
   )
   .dependsOn(ast, testsCommon % "test->test", io % "test->test")
 
+lazy val bench = (project in file("bench"))
+  .commonSettings
+  .settings(
+    name := "xml-lens-bench",
+    libraryDependencies ++= Seq(scalaXml, scalaTest)
+  )
+  .enablePlugins(JmhPlugin)
+  .dependsOn(optics, io)
+
 lazy val root = (project in file("."))
   .commonSettings
   .aggregate(io, optics)
