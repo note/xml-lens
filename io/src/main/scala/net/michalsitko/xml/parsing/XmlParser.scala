@@ -15,6 +15,16 @@ import scalaz.Trampoline
 // TODO: create proper hierarchy of errors
 case class ParsingException(message: String, cause: Throwable) extends Exception(message, cause)
 
+private [parsing] class LabeledElementBuilder(val label: ResolvedName, val attributes: Seq[Attribute], var children: Vector[Node], val namespaceDeclarations: Seq[NamespaceDeclaration]) {
+  def addChild(node: Node): Unit = {
+    children = children :+ node
+  }
+
+  def build: LabeledElement = {
+    LabeledElement(label, Element(attributes, children, namespaceDeclarations))
+  }
+}
+
 object XmlParser {
   def parse(input: String): Either[ParsingException, LabeledElement] = {
     // TODO: is it ok to hardcode UTF 8?
@@ -36,7 +46,7 @@ object XmlParser {
       case Some(resolvedName) =>
         val nsDeclarations = getNamespaceDeclarations(reader)
         val attrs = getAttributes(reader)
-        readNext(LabeledElement(resolvedName, Element(attrs, Seq.empty, nsDeclarations)), reader).run
+        readNext(new LabeledElementBuilder(resolvedName, attrs, Vector.empty, nsDeclarations), reader).run.build
       case None => // should not really happen - XMLStreamReader takes care of it
         throw new IOException("No root element in XML document")
     }
@@ -56,35 +66,32 @@ object XmlParser {
   }
 
   // TODO: this may be slow - check it with JMH after optimizations
-  def readNext(parent: LabeledElement, reader: XMLStreamReader): Trampoline[LabeledElement] = {
+  def readNext(parent: LabeledElementBuilder, reader: XMLStreamReader): Trampoline[LabeledElementBuilder] = {
     if(reader.hasNext) {
       reader.next() match {
         case START_ELEMENT =>
           val nsDeclarations = getNamespaceDeclarations(reader)
           val attrs = getAttributes(reader)
           val label = getName(reader)
-          val initialChild = LabeledElement(label, Element(attrs, Vector.empty, nsDeclarations))
+          val initialChild = new LabeledElementBuilder(label, attrs, Vector.empty, nsDeclarations)
           for {
             child <- Trampoline.suspend(readNext(initialChild, reader))
-            newChildren = parent.element.children :+ child
-            newParent = parent.copy(element = parent.element.copy(children = newChildren))
-            next <- Trampoline.suspend(readNext(newParent, reader))
+            _ = parent.addChild(child.build)
+            next <- Trampoline.suspend(readNext(parent, reader))
           } yield next
 
         case CHARACTERS =>
           val text = reader.getText
-          val newChildren = parent.element.children :+ Text(text)
-          val newParent = parent.copy(element = parent.element.copy(children = newChildren))
-          Trampoline.suspend(readNext(newParent, reader))
+          parent.addChild(Text(text))
+          Trampoline.suspend(readNext(parent, reader))
 
         case END_ELEMENT =>
           Trampoline.done(parent)
 
         case COMMENT =>
           val commentText = reader.getText()
-          val newChildren = parent.element.children :+ Comment(commentText)
-          val newParent = parent.copy(element = parent.element.copy(children = newChildren))
-          Trampoline.suspend(readNext(newParent, reader))
+          parent.addChild(Comment(commentText))
+          Trampoline.suspend(readNext(parent, reader))
       }
     } else {
       Trampoline.done(parent)
