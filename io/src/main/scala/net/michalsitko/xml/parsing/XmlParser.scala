@@ -63,7 +63,7 @@ object XmlParser {
           val nsDeclarations = getNamespaceDeclarations(reader)
           val attrs = getAttributes(reader)
           val label = getName(reader)
-          val initialChild = LabeledElement(label, Element(attrs, Seq.empty, nsDeclarations))
+          val initialChild = LabeledElement(label, Element(attrs, Vector.empty, nsDeclarations))
           for {
             child <- Trampoline.suspend(readNext(initialChild, reader))
             newChildren = parent.element.children :+ child
