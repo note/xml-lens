@@ -48,12 +48,41 @@ class PlatedSpec extends WordSpec with Matchers with ExampleBuilderHelper {
       XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal (output3)
     }
 
-    // TODO: it does not work for top level.
+    "be able to transform all `f` labels to `xyz` (even at top level)" in {
+      val xml = XmlParser.parse(input4).right.get
+
+      val res = Plated.rewrite[Node] {
+        case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
+          Some(el.copy(label = ResolvedName.unprefixed("xyz")))
+        case node => None
+      }(xml)
+
+      XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal (output4)
+    }
+
+    // TODO: it does not work on top level.
     // Probably Plated works like this but it should be either well documented here or
     // we should provide facade that take care of that
     // See also at implementation of NodeOps.minimize where there's a similar problem
-    "be able to transform all `f` labels to `xyz` (even at top level)" ignore {
+    // TODO: investigate different behavior for rewrite and transform and either document or abstract this difference
+    "be able to transform all `f` labels to `xyz` (even at top level) 2" ignore {
       val xml = XmlParser.parse(input4).right.get
+
+      val res = Plated.transform[Node] {
+        case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
+          el.copy(label = ResolvedName.unprefixed("xyz"))
+      }(xml)
+
+      XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal (output4)
+    }
+
+    "be able to transform text of all `f` elements in selected, known subtree" ignore {
+      val xml = XmlParser.parse(input5).right.get
+
+//      val transform: (Node) => Node = Plated.transform[Node] {
+//        case Text(txt) => Text(txt.toUpperCase)
+//        case node => node
+//      }
 
       val res = Plated.transform[Node] {
         case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
@@ -61,7 +90,7 @@ class PlatedSpec extends WordSpec with Matchers with ExampleBuilderHelper {
         case node => node
       }(xml)
 
-      XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal (output4)
+      XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal (output5)
     }
 
   }
@@ -111,4 +140,50 @@ class PlatedSpec extends WordSpec with Matchers with ExampleBuilderHelper {
   val output4 =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<xyz><xyz>something</xyz><c1><xyz>item1</xyz><g>item2</g></c1><c2><xyz>item1<xyz></xyz></xyz><h>another item<xyz></xyz></h><xyz><a>item3</a></xyz></c2></xyz>""".stripMargin
+
+  val input5 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item</f>
+      |      <g>item</g>
+      |   </c1>
+      |   <b>
+      |     <f>item</f>
+      |     <g>item</g>
+      |     <c1>
+      |       <f>item</f>
+      |       <g>item</g>
+      |     </c1>
+      |   </b>
+      |   <c>
+      |     <c1>
+      |        <f>item</f>
+      |        <h>item</h>
+      |     </c1>
+      |   </c>
+      |</a>""".stripMargin
+
+  val output5 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item</f>
+      |      <g>item</g>
+      |   </c1>
+      |   <b>
+      |     <f>ITEM</f>
+      |     <g>item</g>
+      |     <c1>
+      |       <f>ITEM</f>
+      |       <g>item</g>
+      |     </c1>
+      |   </b>
+      |   <c>
+      |     <c1>
+      |        <f>item</f>
+      |        <h>item</h>
+      |     </c1>
+      |   </c>
+      |</a>""".stripMargin
 }
