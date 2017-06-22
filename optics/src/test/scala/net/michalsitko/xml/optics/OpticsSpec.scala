@@ -47,7 +47,6 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       XmlPrinter.print(res) should equal(expectedRes4)
     }
 
-    // TODO: think about extracting operation implemented here to library itself
     "modifyExistingOrAdd" in {
       def replaceExistingAttrOrAdd(traversal: Traversal[LabeledElement, Element])(key: String, newValue: String): (LabeledElement) => LabeledElement = {
         val keyMatcher = NameMatcher.fromString(key)
@@ -58,7 +57,6 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
           if(attrs.exists(attr => keyMatcher.matches(attr.key))) {
             attrs
           } else {
-            // in case it would be included in library itself the line below should be rethought
             attrs :+ Attribute(ResolvedName.unprefixed(key), newValue)
           }
         }
