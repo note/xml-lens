@@ -9,8 +9,6 @@ import net.michalsitko.xml.entities._
 
 import scala.annotation.tailrec
 import scala.util.Try
-import scalaz.Free.Trampoline
-import scalaz.Trampoline
 
 // TODO: create proper hierarchy of errors
 case class ParsingException(message: String, cause: Throwable) extends Exception(message, cause)
@@ -46,7 +44,9 @@ object XmlParser {
       case Some(resolvedName) =>
         val nsDeclarations = getNamespaceDeclarations(reader)
         val attrs = getAttributes(reader)
-        readNext(new LabeledElementBuilder(resolvedName, attrs, Vector.empty, nsDeclarations), reader).run.build
+        val root = new LabeledElementBuilder(resolvedName, attrs, Vector.empty, nsDeclarations)
+        readNext(root, reader)
+        root.build
       case None => // should not really happen - XMLStreamReader takes care of it
         throw new IOException("No root element in XML document")
     }
@@ -66,37 +66,40 @@ object XmlParser {
   }
 
   // TODO: this may be slow - check it with JMH after optimizations
-  def readNext(parent: LabeledElementBuilder, reader: XMLStreamReader): Trampoline[LabeledElementBuilder] = {
-    if(reader.hasNext) {
+  def readNext(parent: LabeledElementBuilder, reader: XMLStreamReader): Unit = {
+    var elementStack = scala.collection.mutable.MutableList.empty[LabeledElementBuilder]
+    elementStack .+=:(parent)
+
+    while(reader.hasNext) {
       reader.next() match {
         case START_ELEMENT =>
           val nsDeclarations = getNamespaceDeclarations(reader)
           val attrs = getAttributes(reader)
           val label = getName(reader)
           val initialChild = new LabeledElementBuilder(label, attrs, Vector.empty, nsDeclarations)
-          for {
-            child <- Trampoline.suspend(readNext(initialChild, reader))
-            _ = parent.addChild(child.build)
-            next <- Trampoline.suspend(readNext(parent, reader))
-          } yield next
+          elementStack .+=:(initialChild)
 
         case CHARACTERS =>
+          val parent = elementStack.head
           val text = reader.getText
           parent.addChild(Text(text))
-          Trampoline.suspend(readNext(parent, reader))
 
         case END_ELEMENT =>
-          Trampoline.done(parent)
+          val current = elementStack.head
+          elementStack.tail.headOption.map(_.addChild(current.build))
+          elementStack = elementStack.tail
 
         case COMMENT =>
+          val parent = elementStack.head
           val commentText = reader.getText()
           parent.addChild(Comment(commentText))
-          Trampoline.suspend(readNext(parent, reader))
+
+        case _ =>
+          // ignore for now
       }
-    } else {
-      Trampoline.done(parent)
     }
   }
+
   private def getName(reader: XMLStreamReader): ResolvedName = {
     val prefix = reader.getPrefix()
     val uri = reader.getNamespaceURI()

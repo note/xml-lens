@@ -20,7 +20,7 @@ lazy val io = (project in file("io"))
   .commonSettings
   .settings(
     name := "xml-lens-io",
-    libraryDependencies ++= Seq(scalaz, scalaTest)
+    libraryDependencies ++= Seq(scalaTest)
   )
   .dependsOn(ast, testsCommon % "test->test")
 
