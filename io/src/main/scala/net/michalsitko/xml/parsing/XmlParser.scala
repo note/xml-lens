@@ -8,18 +8,19 @@ import javax.xml.stream.{XMLInputFactory, XMLStreamReader}
 import net.michalsitko.xml.entities._
 
 import scala.annotation.tailrec
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
 // TODO: create proper hierarchy of errors
 case class ParsingException(message: String, cause: Throwable) extends Exception(message, cause)
 
-private [parsing] class LabeledElementBuilder(val label: ResolvedName, val attributes: Seq[Attribute], var children: Vector[Node], val namespaceDeclarations: Seq[NamespaceDeclaration]) {
+private [parsing] class LabeledElementBuilder(val label: ResolvedName, val attributes: Seq[Attribute], var children: ArrayBuffer[Node], val namespaceDeclarations: Seq[NamespaceDeclaration]) {
   def addChild(node: Node): Unit = {
-    children = children :+ node
+    children += (node)
   }
 
   def build: LabeledElement = {
-    LabeledElement(label, Element(attributes, children, namespaceDeclarations))
+    LabeledElement(label, Element(attributes, children.toList, namespaceDeclarations))
   }
 }
 
@@ -44,7 +45,7 @@ object XmlParser {
       case Some(resolvedName) =>
         val nsDeclarations = getNamespaceDeclarations(reader)
         val attrs = getAttributes(reader)
-        val root = new LabeledElementBuilder(resolvedName, attrs, Vector.empty, nsDeclarations)
+        val root = new LabeledElementBuilder(resolvedName, attrs, ArrayBuffer.empty[Node], nsDeclarations)
         readNext(root, reader)
         root.build
       case None => // should not really happen - XMLStreamReader takes care of it
@@ -76,7 +77,7 @@ object XmlParser {
           val nsDeclarations = getNamespaceDeclarations(reader)
           val attrs = getAttributes(reader)
           val label = getName(reader)
-          val initialChild = new LabeledElementBuilder(label, attrs, Vector.empty, nsDeclarations)
+          val initialChild = new LabeledElementBuilder(label, attrs, ArrayBuffer.empty[Node], nsDeclarations)
           elementStack .+=:(initialChild)
 
         case CHARACTERS =>
