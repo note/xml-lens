@@ -17,6 +17,12 @@ class ParserPrinterSpec extends WordSpec with Matchers {
         printed should equal(example)
       }
     }
+
+    "pretty print" in {
+      val xml = XmlParser.parse(uglyXmlString).right.get
+      val printed = XmlPrinter.prettyPrint(xml)
+      printed should equal(prettyXmlString)
+    }
   }
 
   val exampleXmlString =
@@ -37,5 +43,48 @@ class ParserPrinterSpec extends WordSpec with Matchers {
   val exampleXmlString2 =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<detail><band height="20"><!-- hello --></band></detail>""".stripMargin
+
+  val uglyXmlString =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a><c1><f>item  </f>
+      |      <g>
+      |          item</g>
+      |   </c1>
+      |   <c1>
+      |      <f>  </f>
+      |      <h>
+      |
+      |      </h>
+      |   </c1>
+      |   <c1>
+      |      <f>item</f>
+      |   </c1>
+      |   <c1>
+      |      item
+      |      <f>item</f>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val prettyXmlString =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |	<c1>
+      |		<f>item  </f>
+      |		<g>
+      |          item</g>
+      |	</c1>
+      |	<c1>
+      |		<f></f>
+      |		<h></h>
+      |	</c1>
+      |	<c1>
+      |		<f>item</f>
+      |	</c1>
+      |	<c1>
+      |      item
+      |
+      |		<f>item</f>
+      |	</c1>
+      |</a>""".stripMargin
 
 }

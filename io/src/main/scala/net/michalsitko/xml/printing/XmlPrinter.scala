@@ -6,6 +6,7 @@ import javax.xml.stream.{XMLOutputFactory, XMLStreamWriter}
 import net.michalsitko.xml.entities._
 
 import scala.annotation.tailrec
+import scala.collection.mutable.Buffer
 
 sealed trait WriteOperation
 case class WriteElement(el: LabeledElement) extends WriteOperation
@@ -26,10 +27,53 @@ object XmlPrinter {
     // it's arbitrary but AFAIK it's the most popular convention
     writer.writeCharacters(System.getProperty("line.separator"))
 
+    newLoop2(elem, writer)
+
+    writer.flush()
+    stringWriter.toString
+  }
+
+  def prettyPrint(elem: LabeledElement): String = {
+    val stringWriter = new StringWriter()
+    val xmlOutFact = XMLOutputFactory.newInstance()
+    val writer = xmlOutFact.createXMLStreamWriter(stringWriter)
+
+    // TODO: assumes XML version 1.0 and utf-8, make it works with different values (change in XmlParser required)
+    writer.writeStartDocument("UTF-8", "1.0")
+    // it's arbitrary but AFAIK it's the most popular convention
+    writer.writeCharacters(System.getProperty("line.separator"))
+
     newLoop(elem, writer, List.empty[Vector[Node]])
 
     writer.flush()
     stringWriter.toString
+  }
+
+  def newLoop2(root: LabeledElement, writer: XMLStreamWriter) = {
+    var toVisit = Buffer.empty[Option[Node]]
+    val toAdd = Buffer(Some(root))
+    toVisit = toAdd ++ toVisit
+
+    while(toVisit.nonEmpty) {
+      val current = toVisit.head
+      toVisit = toVisit.tail
+      current match {
+        case Some(elem: LabeledElement) =>
+          writeLabeled(elem, writer)
+          val toAdd = elem.element.children.map(Some(_).asInstanceOf[Option[Node]]).toBuffer
+          toAdd.append(None)
+          toVisit = toAdd ++ toVisit
+
+        case Some(text: Text) =>
+          writer.writeCharacters(text.text)
+
+        case Some(comment: Comment) =>
+          writer.writeComment(comment.comment)
+
+        case None =>
+          writer.writeEndElement()
+      }
+    }
   }
 
   @tailrec
