@@ -19,6 +19,10 @@ trait LabeledElementOptics {
   }
 
   val children = element.composeLens(ElementOptics.children)
+
+  val label = Lens[LabeledElement, ResolvedName](_.label)(newLabel => from => from.copy(label = newLabel))
+
+  val localName = label.composeLens(ResolvedNameOptics.localName)
 }
 
 object LabeledElementOptics extends LabeledElementOptics
@@ -80,16 +84,15 @@ trait ElementOptics {
     from.copy(children = newChildren)
   }
 
-  // TODO: check lawfulness
-//  val childrenElements = new Traversal[Element, LabeledElement] {
-//    def modifyF[F[_]: Applicative](fun: LabeledElement => F[LabeledElement])(from: Element): F[Element] = {
-//      val filtered = from.children.collect {
-//        case el: LabeledElement => el
-//      }
-//      val r: F[List[LabeledElement]] = filtered.toList.traverse(fun)
-//      r.map(modifiedChildren => from.copy(children = modifiedChildren))
-//    }
-//  }
+  val allChildren = new Traversal[Element, Node] {
+    def modifyF[F[_]: Applicative](fun: Node => F[Node])(from: Element): F[Element] = {
+      from.children.toList.traverse(fun).map { modified =>
+        from.copy(children = modified)
+      }
+    }
+  }
+
+  val allLabeledElements: Traversal[Element, LabeledElement] = allChildren.composePrism(NodeOptics.isLabeledElement)
 
   private def onlyChild(element: Element): Option[Node] = {
     if (element.children.size == 1) {
@@ -118,6 +121,10 @@ trait NodeOptics {
 
   val isTextS: PPrism[Node, Node, String, String] = isText.composeIso(TextOptics.textIso)
 
+  val isLabeledElement: Prism[Node, LabeledElement] = Prism.partial[Node, LabeledElement]{
+    case elem: LabeledElement => elem
+  }(identity)
+
   val nodeToNodeTraversal = new Traversal[Node, Node] {
     def modifyF[F[_]: Applicative](fun: Node => F[Node])(from: Node): F[Node] = {
       from match {
@@ -143,3 +150,8 @@ trait TextOptics {
 
 object TextOptics extends TextOptics
 
+trait ResolvedNameOptics {
+  val localName = Lens[ResolvedName, String](_.localName)(newLocalName => from => from.copy(localName = newLocalName))
+}
+
+object ResolvedNameOptics extends ResolvedNameOptics

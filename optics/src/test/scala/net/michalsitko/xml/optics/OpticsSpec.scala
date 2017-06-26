@@ -122,15 +122,16 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
 
     "rename element label" in {
       val parsed = XmlParser.parse(input9).right.get
+      val nameMatcher = NameMatcher.fromString("f")
 
-      val renameLabel: Element => Element = { element =>
-        val newChildren = element.children.collect {
-          case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
-            el.copy(label = ResolvedName.unprefixed("xyz"))
-          case anythingElse =>
-            anythingElse
-        }
-        element.copy(children = newChildren)
+      val renameLabel = { element: Element =>
+        allLabeledElements.modify { el =>
+          if (nameMatcher.matches(el.label)) {
+            localName.set("xyz")(el)
+          } else {
+            el
+          }
+        }(element)
       }
 
       val traversal = deep("c1")
@@ -143,11 +144,9 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       val parsed = XmlParser.parse(input11).right.get
 
       val modFun: Element => Element = { el =>
-        val a = deeper("h").composeOptional(hasTextOnly).headOption(el).map { textInH =>
+        deeper("h").composeOptional(hasTextOnly).headOption(el).map { textInH =>
           deeper("f").composeLens(ElementOptics.children).set(List(Text(textInH)))(el)
-        }
-
-        a.getOrElse(el)
+        }.getOrElse(el)
       }
 
       val res = deep("c1").modify(modFun)(parsed)
