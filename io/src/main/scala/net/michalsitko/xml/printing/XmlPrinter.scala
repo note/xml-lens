@@ -18,19 +18,15 @@ case object EndElement extends WriteOperation
 // isRepairingNamespaces, escaping special characters
 object XmlPrinter {
   def print(elem: LabeledElement): String = {
-    val stringWriter = new StringWriter()
-    val xmlOutFact = XMLOutputFactory.newInstance()
-    val writer = xmlOutFact.createXMLStreamWriter(stringWriter)
+    val sb = new StringBuilder
 
     // TODO: assumes XML version 1.0 and utf-8, make it works with different values (change in XmlParser required)
-    writer.writeStartDocument("UTF-8", "1.0")
+    sb.append("""<?xml version="1.0" encoding="UTF-8"?>""")
     // it's arbitrary but AFAIK it's the most popular convention
-    writer.writeCharacters(System.getProperty("line.separator"))
+    sb.append(System.getProperty("line.separator"))
 
-    newLoop2(elem, writer)
-
-    writer.flush()
-    stringWriter.toString
+    newLoop2(elem, sb)
+    sb.toString
   }
 
   def prettyPrint(elem: LabeledElement): String = {
@@ -49,30 +45,39 @@ object XmlPrinter {
     stringWriter.toString
   }
 
-  def newLoop2(root: LabeledElement, writer: XMLStreamWriter) = {
-    var toVisit = Buffer.empty[Option[Node]]
-    val toAdd = Buffer(Some(root))
-    toVisit = toAdd ++ toVisit
+  def newLoop2(root: LabeledElement, sb: StringBuilder) = {
+
+    var toVisit = Buffer[Either[String, Node]](Right(root))
 
     while(toVisit.nonEmpty) {
       val current = toVisit.head
       toVisit = toVisit.tail
       current match {
-        case Some(elem: LabeledElement) =>
-          writeLabeled(elem, writer)
-          val toAdd = elem.element.children.map(Some(_).asInstanceOf[Option[Node]]).toBuffer
-          toAdd.append(None)
+        case Right(elem: LabeledElement) =>
+          writeLabeled2(elem, sb)
+          val toAdd = elem.element.children.map(Right(_).asInstanceOf[Either[String, Node]]).toBuffer
+          toAdd.append(Left(resolvedNameToString(elem.label)))
           toVisit = toAdd ++ toVisit
 
-        case Some(text: Text) =>
-          writer.writeCharacters(text.text)
+        case Right(text: Text) =>
+          sb.append(text.text)
 
-        case Some(comment: Comment) =>
-          writer.writeComment(comment.comment)
+        case Right(comment: Comment) =>
+          sb.append("<!--")
+          sb.append(comment.comment)
+          sb.append("-->")
 
-        case None =>
-          writer.writeEndElement()
+        case Left(str) =>
+          sb.append(s"</$str>")
       }
+    }
+  }
+
+  private def resolvedNameToString(r: ResolvedName): String = {
+    if(r.prefix.isEmpty) {
+      r.localName
+    } else {
+      r.prefix + ":" + r.localName
     }
   }
 
@@ -141,8 +146,36 @@ object XmlPrinter {
     writeAttributes(elem.element.attributes, writer)
   }
 
-  def writeElement(resolvedName: ResolvedName, writer: XMLStreamWriter): Unit = {
+  def writeLabeled2(elem: LabeledElement, sb: StringBuilder): Unit = {
+    writeElementLabel2(elem.label, sb)
+    writeNamespaces2(elem.element.namespaceDeclarations, sb)
+    writeAttributes2(elem.element.attributes, sb)
+    sb.append(">")
   }
+
+  def writeElementLabel2(resolvedName: ResolvedName, sb: StringBuilder): Unit = {
+    sb.append("<")
+    sb.append(resolvedNameToString(resolvedName))
+  }
+
+  def writeNamespaces2(namespaces: Seq[NamespaceDeclaration], sb: StringBuilder): Unit = {
+    namespaces.foreach { ns =>
+      ns.prefix match {
+        case Some(prefix) =>
+          sb.append(s""" xmlns:$prefix="${ns.uri}"""")
+        case None =>
+          sb.append(s""" xmlns="${ns.uri}"""")
+      }
+
+    }
+  }
+
+  def writeAttributes2(attributes: Seq[Attribute], sb: StringBuilder): Unit = {
+    attributes.foreach { attr =>
+      sb.append(s""" ${resolvedNameToString(attr.key)}="${attr.value}"""")
+    }
+  }
+
 
   def writeElementLabel(resolvedName: ResolvedName, writer: XMLStreamWriter): Unit =
     if(resolvedName.hasPrefix) { // TODO: probably this if is not needed
