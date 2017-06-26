@@ -8,7 +8,8 @@ import net.michalsitko.xml.test.utils.ExampleInputs
 import org.scalatest.{Matchers, WordSpec}
 
 class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
-  import net.michalsitko.xml.optics.Optics._
+  import net.michalsitko.xml.optics.ElementOptics._
+  import net.michalsitko.xml.optics.LabeledElementOptics._
 
   "deeper" should {
     "enable to set new Text" in {
@@ -23,7 +24,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
     "modify text" in {
       val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeOptional(Optics.hasTextOnly)
+      val traversal = deep("c1").composeTraversal(deeper("f")).composeOptional(hasTextOnly)
 
       val res = traversal.modify(_.toUpperCase)(parsed)
       XmlPrinter.print(res) should equal(expectedRes2)
@@ -32,7 +33,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
     "modify existing attribute value" in {
       val parsed = XmlParser.parse(input3).right.get
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeOptional(Optics.attribute("someKey"))
+      val traversal = deep("c1").composeTraversal(deeper("f")).composeOptional(attribute("someKey"))
 
       val res = traversal.set("newValue")(parsed)
       XmlPrinter.print(res) should equal(expectedRes3)
@@ -41,7 +42,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
     "add attribute" in {
       val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(Optics.attributes)
+      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(attributes)
 
       val res = traversal.modify(attrs => attrs :+ Attribute.unprefixed("someKey", "newValue"))(parsed)
       XmlPrinter.print(res) should equal(expectedRes4)
@@ -50,9 +51,9 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
     "modifyExistingOrAdd" in {
       def replaceExistingAttrOrAdd(traversal: Traversal[LabeledElement, Element])(key: String, newValue: String): (LabeledElement) => LabeledElement = {
         val keyMatcher = NameMatcher.fromString(key)
-        val replaceIfExists = traversal.composeOptional((Optics.attribute(keyMatcher)))
+        val replaceIfExists = traversal.composeOptional((attribute(keyMatcher)))
         val f1 = replaceIfExists.modify(_ => newValue)
-        val addOtherwise = traversal.composeLens(Optics.attributes)
+        val addOtherwise = traversal.composeLens(attributes)
         val f2 = addOtherwise.modify { attrs =>
           if(attrs.exists(attr => keyMatcher.matches(attr.key))) {
             attrs
@@ -74,7 +75,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
     "delete all attributes" in {
       val parsed = XmlParser.parse(input5).right.get
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(Optics.attributes)
+      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(attributes)
 
       val res = traversal.modify(_ => List.empty)(parsed)
       XmlPrinter.print(res) should equal(expectedRes6)
@@ -83,7 +84,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
     "delete single attribute" in {
       val parsed = XmlParser.parse(input5).right.get
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(Optics.attributes)
+      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(attributes)
 
       val res = traversal.modify(attrs => attrs.filter(_.key != ResolvedName.unprefixed("someKey")))(parsed)
       XmlPrinter.print(res) should equal(expectedRes7)
@@ -138,6 +139,16 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       XmlPrinter.print(res) should equal(expectedRes10)
     }
 
+    "modify element's child node based on existence of another child" in {
+//      val parsed = XmlParser.parse(input11).right.get
+//
+//      val hasH: (Element) => Option[Element] = deeper("h").headOption _
+//
+//      val a: PTraversal[Element, Element, Nothing, Nothing] = deeper("f").composeLens(ElementOptics.children)
+//
+//
+//      deep("c1").composePrism(hasChildLabeled("h"))
+    }
 
   }
 
@@ -321,6 +332,32 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |   <c2>
       |     <f>item1</f>
       |   </c2>
+      |</a>""".stripMargin
+
+  val input11 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item</f>
+      |      <g>item</g>
+      |   </c1>
+      |   <c1>
+      |      <f>something</f>
+      |      <h>item</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val output11 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item</f>
+      |      <g>item</g>
+      |   </c1>
+      |   <c1>
+      |      <f>something</f>
+      |      <h>something</h>
+      |   </c1>
       |</a>""".stripMargin
 
 }

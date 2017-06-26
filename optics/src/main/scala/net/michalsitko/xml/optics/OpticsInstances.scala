@@ -6,7 +6,7 @@ import net.michalsitko.xml.entities._
 
 trait OpticsInstances {
   implicit val nodePlated: Plated[Node] = new Plated[Node] {
-    override def plate: Traversal[Node, Node] = Optics.nodeToNodeTraversal
+    override def plate: Traversal[Node, Node] = NodeOptics.nodeToNodeTraversal
   }
 }
 

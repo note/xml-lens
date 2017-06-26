@@ -7,22 +7,23 @@ import scalaz.Applicative
 import scalaz.std.list._
 import scalaz.syntax.traverse._
 
-
-object Optics {
-
-  def deep(elementMatcher: NameMatcher): Traversal[LabeledElement, Element] = new Traversal[LabeledElement, Element] {
-    override final def modifyF[F[_]: Applicative](f: (Element) => F[Element])(from: LabeledElement): F[LabeledElement] = {
-      val modified = from.element.children.collect(modifyOnlyMatching(elementMatcher, f)).toList
-
-      Applicative[F].sequence(modified).map { elements =>
-        from.copy(element = from.element.copy(children = elements))
-      }
-    }
-  }
+trait LabeledElementOptics {
+  def deep(elementMatcher: NameMatcher): Traversal[LabeledElement, Element] =
+    element.composeTraversal(ElementOptics.deeper(elementMatcher))
 
   def deep(label: String): Traversal[LabeledElement, Element] =
     deep(NameMatcher.fromString(label))
 
+  val element = Lens[LabeledElement, Element](_.element){ newElement => from =>
+    from.copy(element = newElement)
+  }
+
+  val children = element.composeLens(ElementOptics.children)
+}
+
+object LabeledElementOptics extends LabeledElementOptics
+
+trait ElementOptics {
   def deeper(elementMatcher: NameMatcher): Traversal[Element, Element] = new Traversal[Element, Element] {
     override final def modifyF[F[_]: Applicative](f: (Element) => F[Element])(from: Element): F[Element] = {
       val modified = from.children.collect(modifyOnlyMatching(elementMatcher, f)).toList
@@ -37,20 +38,22 @@ object Optics {
     deeper(NameMatcher.fromString(label))
 
   val hasOneChild: Optional[Element, Node] = Optional[Element, Node]{ el =>
-    onlyChild(el)
-  }{ newNode => from =>
-    onlyChild(from).fold(from)(_ => from.copy(children = Vector(newNode)))
-  }
+      onlyChild(el)
+    }{ newNode => from =>
+      onlyChild(from).fold(from)(_ => from.copy(children = Vector(newNode)))
+    }
 
-  val isText: Prism[Node, Text] = Prism.partial[Node, Text]{
-    case text: Text => text
-  }(identity)
+//  def hasChildLabeled(label: String): Prism[Element, Element] =
+//    hasChildLabeled(NameMatcher.fromString(label))
+//
+//  def hasChildLabeled(nameMatcher: NameMatcher): Prism[Element, Element] = Prism.apply[Element, Element]{ el =>
+//    childrenElements.find(el => nameMatcher.matches(el.label))(el) match {
+//      case Some(_) => Some(el)
+//      case None => None
+//    }
+//  }(identity)
 
-  val textIso: Iso[Text, String] = Iso[Text, String](_.text)(Text(_))
-
-  val isTextS = isText.composeIso(textIso)
-
-  val hasTextOnly: Optional[Element, String] = hasOneChild.composePrism(isTextS)
+  val hasTextOnly: Optional[Element, String] = hasOneChild.composePrism(NodeOptics.isTextS)
 
   def attribute(key: NameMatcher) = Optional[Element, String] { el =>
     el.attributes.find(attr => key.matches(attr.key)).map(_.value)
@@ -73,10 +76,47 @@ object Optics {
   val namespaces: Lens[Element, Seq[NamespaceDeclaration]] =
     Lens[Element, Seq[NamespaceDeclaration]](_.namespaceDeclarations)(newNs => from => from.copy(namespaceDeclarations = newNs))
 
-  // TODO: test if lawful
-  val children = Lens[LabeledElement, Seq[Node]](_.element.children){ newChildren => from =>
-    from.copy(element = from.element.copy(children = newChildren))
+  val children = Lens[Element, Seq[Node]](_.children){ newChildren => from =>
+    from.copy(children = newChildren)
   }
+
+  // TODO: check lawfulness
+//  val childrenElements = new Traversal[Element, LabeledElement] {
+//    def modifyF[F[_]: Applicative](fun: LabeledElement => F[LabeledElement])(from: Element): F[Element] = {
+//      val filtered = from.children.collect {
+//        case el: LabeledElement => el
+//      }
+//      val r: F[List[LabeledElement]] = filtered.toList.traverse(fun)
+//      r.map(modifiedChildren => from.copy(children = modifiedChildren))
+//    }
+//  }
+
+  private def onlyChild(element: Element): Option[Node] = {
+    if (element.children.size == 1) {
+      Some(element.children.head)
+    } else {
+      None
+    }
+  }
+
+  private def modifyOnlyMatching[F[_] : Applicative](elementMatcher: NameMatcher, f: Element => F[Element]): PartialFunction[Node, F[Node]] = {
+    case el: LabeledElement if elementMatcher.matches(el.label) =>
+      val modifiedElems = f(el.element)
+      modifiedElems.map(modifiedElem => LabeledElement(el.label, modifiedElem))
+    case anythingElse =>
+      Applicative[F].pure(anythingElse)
+  }
+
+}
+
+object ElementOptics extends ElementOptics
+
+trait NodeOptics {
+  val isText: Prism[Node, Text] = Prism.partial[Node, Text]{
+    case text: Text => text
+  }(identity)
+
+  val isTextS: PPrism[Node, Node, String, String] = isText.composeIso(TextOptics.textIso)
 
   val nodeToNodeTraversal = new Traversal[Node, Node] {
     def modifyF[F[_]: Applicative](fun: Node => F[Node])(from: Node): F[Node] = {
@@ -93,21 +133,13 @@ object Optics {
     }
   }
 
-  private def modifyOnlyMatching[F[_] : Applicative](elementMatcher: NameMatcher, f: Element => F[Element]): PartialFunction[Node, F[Node]] = {
-    case el: LabeledElement if elementMatcher.matches(el.label) =>
-      val modifiedElems = f(el.element)
-      modifiedElems.map(modifiedElem => LabeledElement(el.label, modifiedElem))
-    case anythingElse =>
-      Applicative[F].pure(anythingElse)
-  }
-
-
-  private def onlyChild(element: Element): Option[Node] = {
-    if (element.children.size == 1) {
-      Some(element.children.head)
-    } else {
-      None
-    }
-  }
-
 }
+
+object NodeOptics extends NodeOptics
+
+trait TextOptics {
+  val textIso: Iso[Text, String] = Iso[Text, String](_.text)(Text(_))
+}
+
+object TextOptics extends TextOptics
+

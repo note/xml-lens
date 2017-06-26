@@ -2,11 +2,12 @@ package net.michalsitko.xml.optics
 
 import monocle.Traversal
 import net.michalsitko.xml.entities.Element
-import net.michalsitko.xml.optics.Optics._
 import net.michalsitko.xml.parsing.XmlParser
 import org.scalatest.{Matchers, WordSpec}
 
 class NamespaceSpec extends WordSpec with Matchers {
+  import ElementOptics._
+
   "Optics" should {
     "should respect namespaces" in new Context {
       val xml = XmlParser.parse(input).right.get
@@ -64,6 +65,9 @@ trait Context {
       |</a>""".stripMargin
 
   def withCriteria(criteria: Traversal[Element, Element]) = {
+    import LabeledElementOptics._
+    import ElementOptics._
+
     deep("c1").composeTraversal(criteria).composeOptional(hasTextOnly)
   }
 }

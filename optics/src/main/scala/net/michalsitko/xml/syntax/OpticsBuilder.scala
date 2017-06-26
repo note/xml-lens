@@ -2,7 +2,7 @@ package net.michalsitko.xml.syntax
 
 import monocle._
 import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement, NamespaceDeclaration}
-import net.michalsitko.xml.optics.{NameMatcher, Optics, ResolvedNameMatcher}
+import net.michalsitko.xml.optics._
 
 object OpticsBuilder {
   def root = new RootBuilder
@@ -16,7 +16,7 @@ class RootBuilder extends AnyRef with ElementOps {
   }
 
   def \ (nameMatcher: NameMatcher): DeepBuilder = DeepBuilder (
-    Optics.deep(nameMatcher)
+    LabeledElementOptics.deep(nameMatcher)
   )
 
 }
@@ -27,7 +27,7 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
   }
 
   def \ (nameMatcher: NameMatcher): DeepBuilder = DeepBuilder (
-    current.composeTraversal(Optics.deeper(nameMatcher))
+    current.composeTraversal(ElementOptics.deeper(nameMatcher))
   )
 }
 
@@ -57,19 +57,19 @@ trait ElementOps {
     attr(NameMatcher.fromString(nameMatcher))
 
   def attr(nameMatcher: NameMatcher): TextBuilder = TextBuilder (
-    current.composeOptional(Optics.attribute(nameMatcher))
+    current.composeOptional(ElementOptics.attribute(nameMatcher))
   )
 
   def attrs: AttributesBuilder = AttributesBuilder (
-    current.composeLens(Optics.attributes)
+    current.composeLens(ElementOptics.attributes)
   )
 
   def replaceOrAddAttr(key: NameMatcher, newValue: String): (LabeledElement) => LabeledElement = { el =>
-    val modifyExisting = Optics.attribute(key).modifyOption(_ => newValue)
+    val modifyExisting = ElementOptics.attribute(key).modifyOption(_ => newValue)
 
     val addNs: (Element) => Element = key match {
       case matcher: ResolvedNameMatcher if matcher.uri.isDefined =>
-        Optics.namespaces.modify(ns => ns :+ NamespaceDeclaration(Some(matcher.prefix), matcher.uri.get))
+        ElementOptics.namespaces.modify(ns => ns :+ NamespaceDeclaration(Some(matcher.prefix), matcher.uri.get))
       case _ =>
         identity[Element]_
     }
@@ -79,7 +79,7 @@ trait ElementOps {
         case Some(changedElem) =>
           changedElem
         case None =>
-          val changed = Optics.attributes.modify(attrs => attrs :+ Attribute(key.toResolvedName, newValue))(elem)
+          val changed = ElementOptics.attributes.modify(attrs => attrs :+ Attribute(key.toResolvedName, newValue))(elem)
           addNs(changed)
       }
     }(el)
@@ -89,6 +89,6 @@ trait ElementOps {
     replaceOrAddAttr(NameMatcher.fromString(key), newValue)
 
   def hasTextOnly: TextBuilder = TextBuilder (
-    current.composeOptional(Optics.hasTextOnly)
+    current.composeOptional(ElementOptics.hasTextOnly)
   )
 }

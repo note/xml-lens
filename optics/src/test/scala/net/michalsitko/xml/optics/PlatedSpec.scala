@@ -28,7 +28,7 @@ class PlatedSpec extends WordSpec with Matchers with ExampleBuilderHelper {
 
       val res = Plated.transform[Node] {
         case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
-          Optics.children.set(List(Text("something")))(el)
+          LabeledElementOptics.children.set(List(Text("something")))(el)
         case node => node
       }(xml)
 
