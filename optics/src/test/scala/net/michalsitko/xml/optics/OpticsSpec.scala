@@ -140,14 +140,18 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "modify element's child node based on existence of another child" in {
-//      val parsed = XmlParser.parse(input11).right.get
-//
-//      val hasH: (Element) => Option[Element] = deeper("h").headOption _
-//
-//      val a: PTraversal[Element, Element, Nothing, Nothing] = deeper("f").composeLens(ElementOptics.children)
-//
-//
-//      deep("c1").composePrism(hasChildLabeled("h"))
+      val parsed = XmlParser.parse(input11).right.get
+
+      val modFun: Element => Element = { el =>
+        val a = deeper("h").composeOptional(hasTextOnly).headOption(el).map { textInH =>
+          deeper("f").composeLens(ElementOptics.children).set(List(Text(textInH)))(el)
+        }
+
+        a.getOrElse(el)
+      }
+
+      val res = deep("c1").modify(modFun)(parsed)
+      XmlPrinter.print(res) should equal(output11)
     }
 
   }
@@ -339,17 +343,25 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |<a>
       |   <c1>
       |      <f>item</f>
+      |      <h>something</h>
+      |   </c1>
+      |   <c1>
+      |      <f>item</f>
       |      <g>item</g>
       |   </c1>
       |   <c1>
-      |      <f>something</f>
-      |      <h>item</h>
+      |      <f>item</f>
+      |      <h>something</h>
       |   </c1>
       |</a>""".stripMargin
 
   val output11 =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a>
+      |   <c1>
+      |      <f>something</f>
+      |      <h>something</h>
+      |   </c1>
       |   <c1>
       |      <f>item</f>
       |      <g>item</g>
