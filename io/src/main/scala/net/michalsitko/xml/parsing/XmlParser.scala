@@ -68,8 +68,8 @@ object XmlParser {
 
   // TODO: this may be slow - check it with JMH after optimizations
   def readNext(parent: LabeledElementBuilder, reader: XMLStreamReader): Unit = {
-    var elementStack = scala.collection.mutable.MutableList.empty[LabeledElementBuilder]
-    elementStack .+=:(parent)
+    var elementStack = List.empty[LabeledElementBuilder]
+    elementStack = parent :: elementStack
 
     while(reader.hasNext) {
       reader.next() match {
@@ -78,7 +78,7 @@ object XmlParser {
           val attrs = getAttributes(reader)
           val label = getName(reader)
           val initialChild = new LabeledElementBuilder(label, attrs, ArrayBuffer.empty[Node], nsDeclarations)
-          elementStack .+=:(initialChild)
+          elementStack = initialChild :: elementStack
 
         case CHARACTERS =>
           val parent = elementStack.head

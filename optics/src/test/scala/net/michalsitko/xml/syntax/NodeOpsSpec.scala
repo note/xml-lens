@@ -7,7 +7,7 @@ import net.michalsitko.xml.syntax.node._
 import net.michalsitko.xml.test.utils.ExampleInputs
 import org.scalatest.{Matchers, WordSpec}
 
-class NodeOpsSpec extends WordSpec with Matchers with ExampleInputs {
+class NodeOpsSpec extends WordSpec with Matchers with ExampleInputs with Examples {
   "minimize" should {
     "work as expected" in {
       val input = labeledElement("a",
@@ -48,5 +48,45 @@ class NodeOpsSpec extends WordSpec with Matchers with ExampleInputs {
       // TODO: get rid of asInstanceOf
       XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal(expectedRes)
     }
+
+    "respect comments" in {
+      val input = XmlParser.parse(inputWithComments).right.get
+
+      val res = input.minimize
+
+      XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal(outputWithComments)
+    }
   }
+}
+
+trait Examples {
+  val inputWithComments =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c1>
+      |   <!--
+      |something
+      |something more
+      |even 	more
+      |
+      |-
+      |-->
+      |      <f>item1</f>
+      |      <h>item2</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val outputWithComments =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a><c1><f>item1</f><g>item2</g></c1><c1><!--
+      |something
+      |something more
+      |even 	more
+      |
+      |-
+      |--><f>item1</f><h>item2</h></c1></a>""".stripMargin
 }
