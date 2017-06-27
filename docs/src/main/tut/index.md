@@ -15,6 +15,17 @@ you need to work with XML. `xml-optics` is an attempt to make this experience as
 Main focus of `xml-optics` is on traversing and transforming XML trees - something `scala-xml` is not 
 really good at. To make those operations natural concept of `Optics` has been used.
 
-## <a name="getting_started">Getting started</a>
+## <a name="quick_start">Quick start</a>
 
+```tut
+import scala.concurrent.Future
+val s = Future.successful("hello")
+val x = 44
+```
 
+And now:
+
+```tut
+val y = x + 10
+println(y)
+```

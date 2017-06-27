@@ -1,7 +1,7 @@
 ---
 layout: docs
 title:  "Cookbook"
-position: 2
+position: 1
 ---
 
 ## Cookbook

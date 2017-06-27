@@ -1,5 +1,8 @@
 options:
 
+  - title: Quick start
+    url: index.html#quick_start
+
   - title: Cookbook
     url: docs/cookbook.html
 

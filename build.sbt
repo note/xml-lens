@@ -1,6 +1,5 @@
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin.ghpagesProjectSettings
-import sbt.Keys._
-import sbt.Keys.{libraryDependencies, version}
+import sbt.Keys.{libraryDependencies, scalacOptions, version, _}
 import Common._
 import Dependencies._
 import com.typesafe.sbt.SbtSite.SiteKeys._
@@ -73,6 +72,7 @@ lazy val docs = (project in file("docs"))
     name := "xml-lens-docs"
   )
   .settings(docSettings)
+  .settings(scalacOptions in Tut := (scalacOptions in Tut).value.filterNot(Set("-Ywarn-unused-import", "-Xfatal-warnings", "-Xlint")))
   .enablePlugins(GhpagesPlugin)
   .enablePlugins(MicrositesPlugin)
   .enablePlugins(ScalaUnidocPlugin)

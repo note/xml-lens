@@ -26,6 +26,18 @@ object Common {
   implicit class ProjectFrom(project: Project) {
     def commonSettings: Project = project.settings(
       scalacOptions ++= commonScalacOptions,
+      scalacOptions in (Compile, console) ~= {
+        _.filterNot(Set("-Ywarn-unused-import")).map {
+          case "-Xlint" => "-Xlint:-unused,_"
+          case another => another
+        }
+      },
+      scalacOptions in (Test, console) ~= {
+        _.filterNot(Set("-Ywarn-unused-import")).map {
+          case "-Xlint" => "-Xlint:-unused,_"
+          case another => another
+        }
+      },
       scalaVersion := commonScalaVersion,
       crossScalaVersions := commonCrossScalaVersions,
       coverageHighlighting := true,
