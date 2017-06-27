@@ -1,31 +1,11 @@
 package net.michalsitko.xml.optics
 
-import monocle.{Lens, _}
+import monocle.{Lens, Optional, Traversal}
 import net.michalsitko.xml.entities._
 
 import scalaz.Applicative
 import scalaz.std.list._
 import scalaz.syntax.traverse._
-
-trait LabeledElementOptics {
-  def deep(elementMatcher: NameMatcher): Traversal[LabeledElement, Element] =
-    element.composeTraversal(ElementOptics.deeper(elementMatcher))
-
-  def deep(label: String): Traversal[LabeledElement, Element] =
-    deep(NameMatcher.fromString(label))
-
-  val element = Lens[LabeledElement, Element](_.element){ newElement => from =>
-    from.copy(element = newElement)
-  }
-
-  val children = element.composeLens(ElementOptics.children)
-
-  val label = Lens[LabeledElement, ResolvedName](_.label)(newLabel => from => from.copy(label = newLabel))
-
-  val localName = label.composeLens(ResolvedNameOptics.localName)
-}
-
-object LabeledElementOptics extends LabeledElementOptics
 
 trait ElementOptics {
   def deeper(elementMatcher: NameMatcher): Traversal[Element, Element] = new Traversal[Element, Element] {
@@ -33,7 +13,7 @@ trait ElementOptics {
       val modified = from.children.collect(modifyOnlyMatching(elementMatcher, f)).toList
 
       Applicative[F].sequence(modified).map { elements =>
-        from.copy(children = elements)
+        children.set(elements)(from)
       }
     }
   }
@@ -42,20 +22,10 @@ trait ElementOptics {
     deeper(NameMatcher.fromString(label))
 
   val hasOneChild: Optional[Element, Node] = Optional[Element, Node]{ el =>
-      onlyChild(el)
-    }{ newNode => from =>
-      onlyChild(from).fold(from)(_ => from.copy(children = Vector(newNode)))
-    }
-
-//  def hasChildLabeled(label: String): Prism[Element, Element] =
-//    hasChildLabeled(NameMatcher.fromString(label))
-//
-//  def hasChildLabeled(nameMatcher: NameMatcher): Prism[Element, Element] = Prism.apply[Element, Element]{ el =>
-//    childrenElements.find(el => nameMatcher.matches(el.label))(el) match {
-//      case Some(_) => Some(el)
-//      case None => None
-//    }
-//  }(identity)
+    onlyChild(el)
+  }{ newNode => from =>
+    onlyChild(from).fold(from)(_ => from.copy(children = Vector(newNode)))
+  }
 
   val hasTextOnly: Optional[Element, String] = hasOneChild.composePrism(NodeOptics.isTextS)
 
@@ -113,45 +83,3 @@ trait ElementOptics {
 }
 
 object ElementOptics extends ElementOptics
-
-trait NodeOptics {
-  val isText: Prism[Node, Text] = Prism.partial[Node, Text]{
-    case text: Text => text
-  }(identity)
-
-  val isTextS: PPrism[Node, Node, String, String] = isText.composeIso(TextOptics.textIso)
-
-  val isLabeledElement: Prism[Node, LabeledElement] = Prism.partial[Node, LabeledElement]{
-    case elem: LabeledElement => elem
-  }(identity)
-
-  val nodeToNodeTraversal = new Traversal[Node, Node] {
-    def modifyF[F[_]: Applicative](fun: Node => F[Node])(from: Node): F[Node] = {
-      from match {
-        case LabeledElement(label, element) =>
-          val appOfList = element.children.toList.traverse(fun)
-          appOfList.map { ch =>
-            LabeledElement(label, element.copy(children = ch))
-          }
-
-        case other =>
-          Applicative[F].pure(other)
-      }
-    }
-  }
-
-}
-
-object NodeOptics extends NodeOptics
-
-trait TextOptics {
-  val textIso: Iso[Text, String] = Iso[Text, String](_.text)(Text(_))
-}
-
-object TextOptics extends TextOptics
-
-trait ResolvedNameOptics {
-  val localName = Lens[ResolvedName, String](_.localName)(newLocalName => from => from.copy(localName = newLocalName))
-}
-
-object ResolvedNameOptics extends ResolvedNameOptics

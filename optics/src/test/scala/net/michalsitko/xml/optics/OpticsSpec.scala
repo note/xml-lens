@@ -153,6 +153,18 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       XmlPrinter.print(res) should equal(output11)
     }
 
+    "do a few modifications" in {
+      val parsed = XmlParser.parse(input12).right.get
+
+      val addAttr = attributes.modify(attrs => attrs :+ Attribute(ResolvedName.unprefixed("someKey"), "someValue"))
+      val modifyText = hasTextOnly.modify(_.toUpperCase)
+
+      val traversal = deep("c1").composeTraversal(deeper("f"))
+      val res = traversal.modify(addAttr andThen modifyText)(parsed)
+
+      XmlPrinter.print(res) should equal(output12)
+    }
+
   }
 
   val expectedRes =
@@ -371,4 +383,30 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       |   </c1>
       |</a>""".stripMargin
 
+  val input12 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item</f>
+      |      <h>something</h>
+      |   </c1>
+      |   <c1>
+      |      <f>item</f>
+      |      <g>item</g>
+      |   </c1>
+      |</a>""".stripMargin
+
+
+  val output12 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f someKey="someValue">ITEM</f>
+      |      <h>something</h>
+      |   </c1>
+      |   <c1>
+      |      <f someKey="someValue">ITEM</f>
+      |      <g>item</g>
+      |   </c1>
+      |</a>""".stripMargin
 }
