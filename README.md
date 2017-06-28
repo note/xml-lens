@@ -1,4 +1,4 @@
-XML Optics library for Scala
+XML Optics library for Scala. Documentation available here: https://note.github.io/xml-lens/
 
 [![Build Status](https://api.travis-ci.org/note/xml-lens.svg)](https://travis-ci.org/note/xml-lens)
 [![codecov](https://codecov.io/gh/note/xml-lens/branch/master/graph/badge.svg)](https://codecov.io/gh/note/xml-lens)

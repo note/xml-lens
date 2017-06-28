@@ -1,8 +1,6 @@
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.ghpagesProjectSettings
 import sbt.Keys.{libraryDependencies, scalacOptions, version, _}
 import Common._
 import Dependencies._
-import com.typesafe.sbt.SbtSite.SiteKeys._
 
 lazy val ast = (project in file("ast"))
   .commonSettings
@@ -44,6 +42,16 @@ lazy val bench = (project in file("bench"))
   .enablePlugins(JmhPlugin)
   .dependsOn(optics, io)
 
+lazy val examples = (project in file("examples"))
+  .commonSettings
+  .settings(
+    name := "xml-lens-examples",
+    libraryDependencies ++= Seq(scalaXml, scalaTest),
+    scalacOptions += "-Xlint:_,-missing-interpolator"
+  )
+  .enablePlugins(JmhPlugin)
+  .dependsOn(optics, io)
+
 lazy val docSettings = Seq(
   micrositeName := "xml-lens",
   micrositeDescription := "XML Optics library for Scala",
@@ -62,7 +70,9 @@ lazy val docSettings = Seq(
   fork in (ScalaUnidoc, unidoc) := true,
   git.remoteRepo := "git@github.com:note/xml-lens.git",
   includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md",
-  micrositeDataDirectory := (resourceDirectory in Compile).value / "microsite" / "data"
+  micrositeDataDirectory := (resourceDirectory in Compile).value / "microsite" / "data",
+  micrositePushSiteWith := GitHub4s,
+  micrositeGithubToken := sys.env.get("GITHUB_TOKEN")
 )
 
 
@@ -76,6 +86,7 @@ lazy val docs = (project in file("docs"))
   .enablePlugins(GhpagesPlugin)
   .enablePlugins(MicrositesPlugin)
   .enablePlugins(ScalaUnidocPlugin)
+  .dependsOn(ast, io, optics)
 
 lazy val root = (project in file("."))
   .commonSettings

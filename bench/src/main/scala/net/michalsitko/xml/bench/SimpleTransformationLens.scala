@@ -8,8 +8,8 @@ object SimpleTransformationLens extends SimpleTransformation {
   override def transform(input: String): String = {
     val parsed = XmlParser.parse(input).right.get
 
-    val traversal = (root \ "f").hasTextOnly
-    val res = traversal.modify(_.toUpperCase).apply(parsed)
+    val modify = (root \ "f").hasTextOnly.modify(_.toUpperCase)
+    val res = modify(parsed)
 
     XmlPrinter.print(res)
   }
