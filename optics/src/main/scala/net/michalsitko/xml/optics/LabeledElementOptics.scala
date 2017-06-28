@@ -10,13 +10,14 @@ trait LabeledElementOptics {
   def deep(label: String): Traversal[LabeledElement, Element] =
     deep(NameMatcher.fromString(label))
 
-  val element = Lens[LabeledElement, Element](_.element){ newElement => from =>
+  val element: Lens[LabeledElement, Element] = Lens[LabeledElement, Element](_.element){ newElement =>from =>
     from.copy(element = newElement)
   }
 
   val children = element.composeLens(ElementOptics.children)
 
-  val label = Lens[LabeledElement, ResolvedName](_.label)(newLabel => from => from.copy(label = newLabel))
+  val label: Lens[LabeledElement, ResolvedName] =
+    Lens[LabeledElement, ResolvedName](_.label)(newLabel => from => from.copy(label = newLabel))
 
   val localName = label.composeLens(ResolvedNameOptics.localName)
 }
