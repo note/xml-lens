@@ -1,0 +1,82 @@
+<html><head><title>xml-lens</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="xml-lens-docs" /><meta name="description" content="XML Optics library for Scala" /><meta name="og:image" content="/xml-lens/img/poster.png" /><meta name="og:title" content="xml-lens" /><meta name="og:site_name" content="xml-lens" /><meta name="og:url" content="http://note.github.io/xml-lens" /><meta name="og:type" content="website" /><meta name="og:description" content="XML Optics library for Scala" /><link rel="icon" type="image/png" href="/xml-lens/img/favicon.png" /><meta name="twitter:title" content="xml-lens" /><meta name="twitter:image" content="http://note.github.io/xml-lensimg/poster.png" /><meta name="twitter:description" content="XML Optics library for Scala" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/xml-lens/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/xml-lens/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/xml-lens/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/xml-lens/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/xml-lens/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/xml-lens/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/xml-lens/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/xml-lens/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/xml-lens/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/xml-lens/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/xml-lens/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/xml-lens/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/xml-lens/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/xml-lens/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/xml-lens/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/xml-lens/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/xml-lens/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/xml-lens/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/xml-lens/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/xml-lens/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/xml-lens/highlight/styles/default.css" /><link rel="stylesheet" href="/xml-lens/css/style.css" /><link rel="stylesheet" href="/xml-lens/css/palette.css" /><link rel="stylesheet" href="/xml-lens/css/codemirror.css" /><link rel="stylesheet" href="/xml-lens/css/kazari-style.css" /><link rel="stylesheet" href="/xml-lens/css/monokai.css" /></head><body><header id="site-header"><div class="navbar-wrapper"><div class="container"><div class="row"><div class="col-xs-6"><a href="/xml-lens/" class="brand"><div class="icon-wrapper"><span>xml-lens</span></div></a></div><div class="col-xs-6"><nav class="text-right"><ul class=""><li><a href="https://github.com/note/xml-lens"><i class="fa fa-github"></i><span class="hidden-xs">GitHub</span></a></li><li><a href="/xml-lens/api"><i class="fa fa-file-text"></i><span class="hidden-xs">Documentation</span></a></li></ul></nav></div></div></div></div><div class="jumbotron"><div class="container"><h1 class="text-center">XML Optics library for Scala</h1><h2></h2><p class="text-center"><a href="https://github.com/note/xml-lens" class="btn btn-outline-inverse">View on GitHub</a></p></div></div><div><ul class="horizontalNav">       <li><a class="" href="/xml-lens/docs/cookbook.html">Cookbook</a></li>  <li><a class="" href="/xml-lens/docs/modularity.html">Modularity</a></li>  <li><a class="" href="/xml-lens/docs/parsing_printing.html">Parsing and Printing</a></li>  <li><a class="" href="/xml-lens/docs/namespaces.html">Namespaces</a></li> </ul></div></header><main id="site-main"><section class="use"><div class="container"><div id="content"><h2 id="about">About</h2>
+
+<p>XML scala libraries are kind of neglected. That stands in stark contrast to JSON for which Scala has dozens of projects.
+Of course, JSON is much more popular while XML is regarded as a legacy standard. Still, there are many situations when 
+you need to work with XML. <code class="highlighter-rouge">xml-optics</code> is an attempt to make this experience as painless as possible.</p>
+
+<p>Main focus of <code class="highlighter-rouge">xml-optics</code> is on traversing and transforming XML trees - something <code class="highlighter-rouge">scala-xml</code> is not 
+really good at. To make those operations natural concept of <code class="highlighter-rouge">Optics</code> has been used.</p>
+
+<h2 id="quick-start"><a name="quick_start">Quick start</a></h2>
+
+<p>TODO: add lines needed in <code class="highlighter-rouge">build.sbt</code> as soon as library is published.</p>
+
+<p>Let’s say we want to transform <code class="highlighter-rouge">f</code> node in the following XML in such way that its text value will be converted to 
+upper case:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">input</span> <span class="k">=</span>
+      <span class="s">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+        |&lt;a&gt;
+        |  &lt;e&gt;item&lt;/e&gt;
+        |  &lt;f&gt;item&lt;/f&gt;
+        |  &lt;g&gt;item&lt;/g&gt;
+        |&lt;/a&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
+</code></pre>
+</div>
+
+<p>We can define transformation in the following way:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">net.michalsitko.xml.syntax.OpticsBuilder.root</span>
+<span class="k">import</span> <span class="nn">net.michalsitko.xml.syntax.OpticsBuilder.root</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">modify</span> <span class="k">=</span> <span class="o">(</span><span class="n">root</span> <span class="o">\</span> <span class="s">"f"</span><span class="o">).</span><span class="n">hasTextOnly</span><span class="o">.</span><span class="n">modify</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">toUpperCase</span><span class="o">)</span>
+<span class="n">modify</span><span class="k">:</span> <span class="kt">net.michalsitko.xml.entities.LabeledElement</span> <span class="o">=&gt;</span> <span class="n">net</span><span class="o">.</span><span class="n">michalsitko</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">entities</span><span class="o">.</span><span class="nc">LabeledElement</span> <span class="k">=</span> <span class="n">monocle</span><span class="o">.</span><span class="nc">PTraversal$$Lambda$1189</span><span class="o">/</span><span class="mi">1720887856</span><span class="nd">@a6eea37</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">root</code> stands for root element of XML document. Every XML document should contain exactly one root element. In case
+of our example <code class="highlighter-rouge">&lt;a&gt;</code> is a root element.</p>
+
+<p>Then we can navigate deeper using <code class="highlighter-rouge">\</code> operator. It takes a <code class="highlighter-rouge">String</code> argument which is a label of direct children we want to 
+“zoom into”. There’s an overloaded <code class="highlighter-rouge">\</code> operator which takes <code class="highlighter-rouge">NameMatcher</code> instead of <code class="highlighter-rouge">String</code> which allows you to specify 
+namespace. You can read more about it in section <a href="docs/namespaces.html">Namespaces</a>. <code class="highlighter-rouge">\</code> taking <code class="highlighter-rouge">String</code> ignores namespaces - 
+will match all nodes that have specified label.</p>
+
+<p>Next, we narrow down our selection specifically to <code class="highlighter-rouge">f</code> nodes having only a text child. We do this by calling <code class="highlighter-rouge">hasTextOnly</code>.</p>
+
+<p>After we specified what we want to modify, we can define what it should be modified to. We do this by using <code class="highlighter-rouge">modify</code>,
+which takes a function from <code class="highlighter-rouge">String</code> to <code class="highlighter-rouge">String</code>.</p>
+
+<p>Now, when we have <code class="highlighter-rouge">modify</code> function declared we can use it on parsed XML. Here the full code which parse input,
+modify it:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.parsing.XmlParser</span>
+<span class="k">import</span> <span class="nn">net.michalsitko.xml.printing.XmlPrinter</span>
+
+<span class="k">val</span> <span class="n">parsed</span> <span class="k">=</span> <span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input</span><span class="o">).</span><span class="n">right</span><span class="o">.</span><span class="n">get</span>
+
+<span class="k">val</span> <span class="n">res</span> <span class="k">=</span> <span class="n">modify</span><span class="o">(</span><span class="n">parsed</span><span class="o">)</span>
+</code></pre>
+</div>
+
+<p>Finally, we can print the result back to verify it:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">res</span><span class="o">)</span>
+<span class="n">res2</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span>
+<span class="o">&lt;?</span><span class="n">xml</span> <span class="n">version</span><span class="o">=</span><span class="s">"1.0"</span> <span class="n">encoding</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="o">?&gt;</span>
+<span class="o">&lt;</span><span class="n">a</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">e</span><span class="o">&gt;</span><span class="n">item</span><span class="o">&lt;/</span><span class="n">e</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">f</span><span class="o">&gt;</span><span class="nc">ITEM</span><span class="o">&lt;/</span><span class="n">f</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">g</span><span class="o">&gt;</span><span class="n">item</span><span class="o">&lt;/</span><span class="n">g</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+</code></pre>
+</div>
+</div></div></section><section class="technologies"><div class="container"><div class="row"></div></div></section></main><footer id="site-footer"><div class="container"><div class="row"><div class="col-xs-6"><p>xml-lens is designed and developed by <a href="" target="_blank">xml-lens-docs</a></p></div><div class="col-xs-6"><p class="text-right"><a href="https://github.com/note/xml-lens"><span class="fa fa-github"></span>View on GitHub</a></p></div></div><div class="row"><div class="col-xs-6"><p>Website built with <a href="https://47deg.github.io/sbt-microsites/" target="_blank">Sbt-microsites</a> - © 2016 <a href="https://www.47deg.com/" target="_blank">47 Degrees</a></p></div></div></div></footer><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/xml-lens/highlight/highlight.pack.js"></script><script>hljs.configure({
+languages:['scala','java','bash']
+});
+hljs.initHighlighting();
+             </script><script src="/xml-lens/js/kazari.js"></script><script>
+$(document).ready(function() {
+	kazari.KazariPlugin().decorateCode('https://scala-evaluator-212.herokuapp.com/eval', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.S2F6YXJp.Jl2eqMfw8IakJF93PjxTbrf-8YUJgX5OoOfy5JHE8Yw', '', 'monokai')
+})
+    </script></body></html>
