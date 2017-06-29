@@ -5,18 +5,22 @@ import net.michalsitko.xml.entities.ResolvedName
 // TODO: should be sealed?
 trait NameMatcher {
   def matches(resolvedName: ResolvedName): Boolean
+}
+
+trait ToResolvedName {
   def toResolvedName: ResolvedName
 }
 
+// TODO: should be package-private?
 object NameMatcher {
   // TODO: probably no longer needed?
-  def fromString(matcher: String): NameMatcher = {
+  def fromString(matcher: String): IgnoreNamespaceMatcher = {
     IgnoreNamespaceMatcher(matcher)
   }
 }
 
 // TODO: think about making it package-private
-final case class IgnoreNamespaceMatcher(localName: String) extends NameMatcher {
+final case class IgnoreNamespaceMatcher(localName: String) extends NameMatcher with ToResolvedName {
   override def matches(resolvedName: ResolvedName): Boolean =
     localName == resolvedName.localName
 
@@ -25,28 +29,39 @@ final case class IgnoreNamespaceMatcher(localName: String) extends NameMatcher {
   // we want to add attribute without namespace
   // TODO: add documentation about it
   override def toResolvedName: ResolvedName =
-    ResolvedName("", None, localName)
+    ResolvedName("", "", localName)
 }
 
-final case class ResolvedNameMatcher(prefix: String, uri: Option[String], localName: String) extends NameMatcher {
+// TODO: probably should be package-private
+final case class ResolvedNameMatcher(uri: String, localName: String) extends NameMatcher {
   // TODO: implement according to https://www.w3.org/TR/xml-names11/#NSNameComparison and
   // https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
   override def matches(resolvedName: ResolvedName): Boolean =
     uri == resolvedName.uri && localName == resolvedName.localName
+}
+
+// TODO: probably should be package-private
+final case class PrefixedResolvedNameMatcher(prefix: String, uri: String, localName: String) extends NameMatcher with ToResolvedName {
+  // TODO: implement according to https://www.w3.org/TR/xml-names11/#NSNameComparison and
+  // https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
+  override def matches(resolvedName: ResolvedName): Boolean =
+  uri == resolvedName.uri && localName == resolvedName.localName
 
   override def toResolvedName: ResolvedName =
     ResolvedName(prefix, uri, localName)
 }
 
-final case class Namespace(prefix: String, uri: Option[String]) {
+final case class Namespace(uri: String) {
   def name(localName: String): ResolvedNameMatcher =
-    ResolvedNameMatcher(prefix, uri, localName)
+    ResolvedNameMatcher(uri, localName)
 }
 
 object Namespace {
-  def apply(prefix: String, uri: String): Namespace =
-    Namespace(prefix, Some(uri))
+  val empty: Namespace =
+    Namespace("")
+}
 
-  val default: Namespace =
-    Namespace("", None)
+final case class PrefixedNamespace(prefix: String, uri: String) {
+  def name(localName: String): PrefixedResolvedNameMatcher =
+    PrefixedResolvedNameMatcher(prefix, uri, localName)
 }

@@ -41,6 +41,11 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
 
       XmlParser.parse(input).isRight should equal(true)
     }
+
+    "deal with empty XMLN value" in {
+      checkCorrectInput(emptyStringAsXmlnsValue)
+    }
+
   }
 
   def checkCorrectInput(specificExample: Example): Unit = {

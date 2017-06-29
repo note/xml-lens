@@ -64,12 +64,12 @@ trait ElementOps {
     current.composeLens(ElementOptics.attributes)
   )
 
-  def replaceOrAddAttr(key: NameMatcher, newValue: String): (LabeledElement) => LabeledElement = { el =>
+  def replaceOrAddAttr(key: NameMatcher with ToResolvedName, newValue: String): (LabeledElement) => LabeledElement = { el =>
     val modifyExisting = ElementOptics.attribute(key).modifyOption(_ => newValue)
 
     val addNs: (Element) => Element = key match {
-      case matcher: ResolvedNameMatcher if matcher.uri.isDefined =>
-        ElementOptics.namespaces.modify(ns => ns :+ NamespaceDeclaration(Some(matcher.prefix), matcher.uri.get))
+      case matcher: PrefixedResolvedNameMatcher if matcher.uri.nonEmpty =>
+        ElementOptics.namespaces.modify(ns => ns :+ NamespaceDeclaration(matcher.prefix, matcher.uri))
       case _ =>
         identity[Element]_
     }

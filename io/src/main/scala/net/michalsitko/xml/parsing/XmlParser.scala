@@ -103,27 +103,35 @@ object XmlParser {
 
   private def getName(reader: XMLStreamReader): ResolvedName = {
     val prefix = reader.getPrefix()
-    val uri = reader.getNamespaceURI()
+    val uri = getString(reader.getNamespaceURI())
     val localName = reader.getLocalName()
 
-    ResolvedName(prefix, Option(uri), localName)
+    ResolvedName(prefix, uri, localName)
   }
 
   private def getNamespaceDeclarations(reader: XMLStreamReader): Seq[NamespaceDeclaration] =
     for {
       i       <- 0 until reader.getNamespaceCount
-      prefix  = reader.getNamespacePrefix(i)
+      prefix  = getString(reader.getNamespacePrefix(i))
       uri     = reader.getNamespaceURI(i)
-    } yield NamespaceDeclaration(Option(prefix), uri)
+    } yield NamespaceDeclaration(prefix, getString(uri))
 
   private def getAttributes(reader: XMLStreamReader): Seq[Attribute] = {
     for {
       i         <- 0 until reader.getAttributeCount
       prefix    = reader.getAttributePrefix(i)
-      namespace = reader.getAttributeNamespace(i)
+      namespace = getString(reader.getAttributeNamespace(i))
       localName = reader.getAttributeLocalName(i)
       value     = reader.getAttributeValue(i)
-      resolved  = ResolvedName(prefix, Option(namespace), localName)
+      resolved  = ResolvedName(prefix, namespace, localName)
     } yield Attribute(resolved, value)
+  }
+
+  private def getString(input: String): String = {
+    if(input != null) {
+      input
+    } else {
+      ""
+    }
   }
 }

@@ -75,25 +75,25 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
         |   </c1>
         |</a>
       """.stripMargin,
-      LabeledElement(ResolvedName("", Some(defaultNs), "a"), Element(Seq.empty, List(
+      LabeledElement(ResolvedName("", defaultNs, "a"), Element(Seq.empty, List(
         indent(1),
-        LabeledElement(ResolvedName("", Some(defaultNs), "c1"), element(
+        LabeledElement(ResolvedName("", defaultNs, "c1"), element(
           indent(2),
-          LabeledElement(ResolvedName("", Some(defaultNs), "f"), element(Text("item1"))),
+          LabeledElement(ResolvedName("", defaultNs, "f"), element(Text("item1"))),
           indent(2),
-          LabeledElement(ResolvedName("", Some(defaultNs), "g"), element(Text("item2"))),
+          LabeledElement(ResolvedName("", defaultNs, "g"), element(Text("item2"))),
           indent(1)
         )),
         indent(1),
-        LabeledElement(ResolvedName("", Some(defaultNs), "c1"), element(
+        LabeledElement(ResolvedName("", defaultNs, "c1"), element(
           indent(2),
-          LabeledElement(ResolvedName("", Some(defaultNs), "f"), element(Text("item1"))),
+          LabeledElement(ResolvedName("", defaultNs, "f"), element(Text("item1"))),
           indent(2),
-          LabeledElement(ResolvedName("xyz", Some(anotherNs), "h"), element(Text("item2"))),
+          LabeledElement(ResolvedName("xyz", anotherNs, "h"), element(Text("item2"))),
           indent(1)
         )),
         Text(lineBreak)
-      ), List(NamespaceDeclaration(None, "http://www.develop.com/student"), NamespaceDeclaration(Some("xyz"), "http://www.example.com"))))
+      ), List(NamespaceDeclaration("", "http://www.develop.com/student"), NamespaceDeclaration("xyz", "http://www.example.com"))))
     )
   }
 
@@ -122,20 +122,20 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
     val bNs = "http://www.b.com"
 
     // https://stackoverflow.com/questions/41561/xml-namespaces-and-attributes
-    val fAttributes = List(Attribute.unprefixed("name", "abc"), Attribute(ResolvedName("b", Some(bNs), "attr"), "attr1"))
-    val gAttributes = List(Attribute(ResolvedName("b", Some(bNs), "name"), "def"))
+    val fAttributes = List(Attribute.unprefixed("name", "abc"), Attribute(ResolvedName("b", bNs, "attr"), "attr1"))
+    val gAttributes = List(Attribute(ResolvedName("b", bNs, "name"), "def"))
     val hAttributes = List(Attribute.unprefixed("name", "ghi"))
 
     Example.right(
       """<?xml version="1.0" encoding="UTF-8"?>
         |<a xmlns="http://www.a.com" xmlns:b="http://www.b.com"><c1><f name="abc" b:attr="attr1">item1</f><g b:name="def">item2</g><b:h name="ghi">item3</b:h></c1></a>""".stripMargin,
-      LabeledElement(ResolvedName("", Some(defaultNs), "a"), Element(Seq.empty, List(
-        LabeledElement(ResolvedName("", Some(defaultNs), "c1"), element(
-          LabeledElement(ResolvedName("", Some(defaultNs), "f"), Element(fAttributes, List(Text("item1")), Seq.empty)),
-          LabeledElement(ResolvedName("", Some(defaultNs), "g"), Element(gAttributes, List(Text("item2")), Seq.empty)),
-          LabeledElement(ResolvedName("b", Some(bNs), "h"), Element(hAttributes, List(Text("item3")), Seq.empty))
+      LabeledElement(ResolvedName("", defaultNs, "a"), Element(Seq.empty, List(
+        LabeledElement(ResolvedName("", defaultNs, "c1"), element(
+          LabeledElement(ResolvedName("", defaultNs, "f"), Element(fAttributes, List(Text("item1")), Seq.empty)),
+          LabeledElement(ResolvedName("", defaultNs, "g"), Element(gAttributes, List(Text("item2")), Seq.empty)),
+          LabeledElement(ResolvedName("b", bNs, "h"), Element(hAttributes, List(Text("item3")), Seq.empty))
         ))
-      ), List(NamespaceDeclaration(None, "http://www.a.com"), NamespaceDeclaration(Some("b"), "http://www.b.com"))))
+      ), List(NamespaceDeclaration("", "http://www.a.com"), NamespaceDeclaration("b", "http://www.b.com"))))
     )
   }
 
@@ -155,6 +155,13 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
       )
     )
   )
+
+  val emptyStringAsXmlnsValue =
+    Example.right("""<?xml version="1.0" encoding="UTF-8"?>
+        |<a xmlns=""></a>
+      """.stripMargin,
+      LabeledElement(ResolvedName("", "", "a"), Element(Seq.empty, Seq.empty, Seq(NamespaceDeclaration("", ""))))
+    )
 
   val malformedXmlStrings = List(
     """<?xml version="1.0" encoding="UTF-8"?>
@@ -195,6 +202,15 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
         |   </a>
         |</a>
       """.stripMargin,
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a xmlns:b=""></a>
+    """.stripMargin,
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a xmlns=></a>
+    """.stripMargin,
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a xmlns></a>
+    """.stripMargin,
     "".stripMargin,
     "<></>".stripMargin
   )

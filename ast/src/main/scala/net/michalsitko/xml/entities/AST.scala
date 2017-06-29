@@ -41,15 +41,15 @@ object Attribute {
 }
 
 // should prefix and/or uri be optional?
-case class ResolvedName(prefix: String, uri: Option[String], localName: String) {
+case class ResolvedName(prefix: String, uri: String, localName: String) {
   def hasPrefix: Boolean = prefix.nonEmpty
 }
 
 object ResolvedName {
   def unprefixed(localName: String): ResolvedName =
-    ResolvedName("", None, localName)
+    ResolvedName("", "", localName)
 }
 
-case class NamespaceDeclaration(prefix: Option[String], uri: String)
+case class NamespaceDeclaration(prefix: String, uri: String)
 
 // TODO: hierarchy is not comprehensive - it misses PCDATA, Entity References among the others

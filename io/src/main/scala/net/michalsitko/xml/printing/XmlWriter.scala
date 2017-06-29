@@ -38,13 +38,11 @@ abstract class CommonWriter extends XmlWriter {
 
   protected def writeNamespaces(namespaces: Seq[NamespaceDeclaration]): Unit = {
     namespaces.foreach { ns =>
-      ns.prefix match {
-        case Some(prefix) =>
-          sb.append(s""" xmlns:$prefix="${ns.uri}"""")
-        case None =>
-          sb.append(s""" xmlns="${ns.uri}"""")
+      if(ns.prefix.nonEmpty) {
+        sb.append(s""" xmlns:${ns.prefix}="${ns.uri}"""")
+      } else {
+        sb.append(s""" xmlns="${ns.uri}"""")
       }
-
     }
   }
 

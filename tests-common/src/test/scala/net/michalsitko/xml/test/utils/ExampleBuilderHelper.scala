@@ -14,7 +14,7 @@ trait ExampleBuilderHelper {
 
   def indent(level: Int): Text = Text(lineBreak + (indent * level))
 
-  def resolvedName(name: String) = ResolvedName("", None, name)
+  def resolvedName(name: String) = ResolvedName("", "", name)
 
   def labeledElement(name: String, children: Node*) =
     LabeledElement(resolvedName(name), element(children:_*))
