@@ -193,6 +193,18 @@
                         </a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="PrefixedNamespace.html" title=""></a>
+                        <a href="PrefixedNamespace.html" title="">
+                          PrefixedNamespace
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="PrefixedResolvedNameMatcher.html" title=""></a>
+                        <a href="PrefixedResolvedNameMatcher.html" title="">
+                          PrefixedResolvedNameMatcher
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="class" href="" title=""></a>
                         <a href="" title="">
                           ResolvedNameMatcher
@@ -208,6 +220,12 @@
                         <a class="trait" href="TextOptics.html" title=""></a>
                         <a href="TextOptics.html" title="">
                           TextOptics
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="trait" href="ToResolvedName.html" title=""></a>
+                        <a href="ToResolvedName.html" title="">
+                          ToResolvedName
                         </a>
                       </li>
               </ul>
@@ -232,7 +250,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">ResolvedNameMatcher</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="uri">uri: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">ResolvedNameMatcher</span><span class="params">(<span name="uri">uri: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -288,9 +306,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="net.michalsitko.xml.optics.ResolvedNameMatcher#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(prefix:String,uri:Option[String],localName:String):net.michalsitko.xml.optics.ResolvedNameMatcher"></a><a id="&lt;init&gt;:ResolvedNameMatcher"></a>
+      <a id="&lt;init&gt;(uri:String,localName:String):net.michalsitko.xml.optics.ResolvedNameMatcher"></a><a id="&lt;init&gt;:ResolvedNameMatcher"></a>
       <span class="permalink">
-      <a href="../../../../net/michalsitko/xml/optics/ResolvedNameMatcher.html#&lt;init&gt;(prefix:String,uri:Option[String],localName:String):net.michalsitko.xml.optics.ResolvedNameMatcher" title="Permalink">
+      <a href="../../../../net/michalsitko/xml/optics/ResolvedNameMatcher.html#&lt;init&gt;(uri:String,localName:String):net.michalsitko.xml.optics.ResolvedNameMatcher" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -299,7 +317,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">ResolvedNameMatcher</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="uri">uri: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+        <span class="name">ResolvedNameMatcher</span><span class="params">(<span name="uri">uri: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
       </span>
       
       
@@ -549,22 +567,6 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="net.michalsitko.xml.optics.ResolvedNameMatcher#prefix" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="prefix:String"></a>
-      <span class="permalink">
-      <a href="../../../../net/michalsitko/xml/optics/ResolvedNameMatcher.html#prefix:String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">prefix</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
@@ -581,26 +583,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="net.michalsitko.xml.optics.ResolvedNameMatcher#toResolvedName" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="toResolvedName:net.michalsitko.xml.entities.ResolvedName"></a><a id="toResolvedName:ResolvedName"></a>
-      <span class="permalink">
-      <a href="../../../../net/michalsitko/xml/optics/ResolvedNameMatcher.html#toResolvedName:net.michalsitko.xml.entities.ResolvedName" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toResolvedName</span><span class="result">: <a href="../entities/ResolvedName.html" class="extype" name="net.michalsitko.xml.entities.ResolvedName">ResolvedName</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="net.michalsitko.xml.optics.ResolvedNameMatcher">ResolvedNameMatcher</a> → <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a></dd></dl></div>
     </li><li name="net.michalsitko.xml.optics.ResolvedNameMatcher#uri" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="uri:Option[String]"></a>
+      <a id="uri:String"></a>
       <span class="permalink">
-      <a href="../../../../net/michalsitko/xml/optics/ResolvedNameMatcher.html#uri:Option[String]" title="Permalink">
+      <a href="../../../../net/michalsitko/xml/optics/ResolvedNameMatcher.html#uri:String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -609,7 +595,7 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">uri</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+        <span class="name">uri</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
       

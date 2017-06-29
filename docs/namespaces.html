@@ -1,5 +1,136 @@
 <html><head><title>xml-lens</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="xml-lens-docs" /><meta name="description" content="XML Optics library for Scala" /><meta name="og:image" content="/xml-lens/img/poster.png" /><meta name="og:title" content="xml-lens" /><meta name="og:site_name" content="xml-lens" /><meta name="og:url" content="http://note.github.io/xml-lens" /><meta name="og:type" content="website" /><meta name="og:description" content="XML Optics library for Scala" /><link rel="icon" type="image/png" href="/xml-lens/img/favicon.png" /><meta name="twitter:title" content="xml-lens" /><meta name="twitter:image" content="http://note.github.io/xml-lensimg/poster.png" /><meta name="twitter:description" content="XML Optics library for Scala" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/xml-lens/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/xml-lens/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/xml-lens/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/xml-lens/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/xml-lens/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/xml-lens/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/xml-lens/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/xml-lens/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/xml-lens/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/xml-lens/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/xml-lens/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/xml-lens/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/xml-lens/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/xml-lens/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/xml-lens/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/xml-lens/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/xml-lens/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/xml-lens/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/xml-lens/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/xml-lens/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/xml-lens/highlight/styles/default.css" /><link rel="stylesheet" href="/xml-lens/css/style.css" /><link rel="stylesheet" href="/xml-lens/css/palette.css" /><link rel="stylesheet" href="/xml-lens/css/codemirror.css" /><link rel="stylesheet" href="/xml-lens/css/kazari-style.css" /><link rel="stylesheet" href="/xml-lens/css/monokai.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><ul id="sidebar" class="sidebar-nav"><li class="sidebar-brand"><a href="/xml-lens/" class="brand"><div class="brand-wrapper"><span>xml-lens</span></div></a></li> <li><a href="/xml-lens/index.html#quick_start" class="">Quick start</a></li> <li><a href="/xml-lens/docs/cookbook.html" class="">Cookbook</a></li> <li><a href="/xml-lens/docs/modularity.html" class="">Modularity</a></li> <li><a href="/xml-lens/docs/parsing_printing.html" class="">Parsing/Printing</a></li> <li><a href="/xml-lens/docs/namespaces.html" class=" active ">Namespaces</a></li></ul></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li id="gh-eyes-item" class="hidden-xs"><a href="https://github.com/note/xml-lens"><i class="fa fa-eye"></i><span>WATCH<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs"><a href="https://github.com/note/xml-lens"><i class="fa fa-star-o"></i><span>STARS<span id="stars" class="label label-default">--</span></span></a></li><li><a href="#" onclick="shareSiteTwitter('xml-lens XML Optics library for Scala');"><i class="fa fa-twitter"></i></a></li><li><a href="#" onclick="shareSiteFacebook('xml-lens XML Optics library for Scala');"><i class="fa fa-facebook"></i></a></li><li><a href="#" onclick="shareSiteGoogle();"><i class="fa fa-google-plus"></i></a></li></ul></div></div></div></div><div id="content" data-github-owner="note" data-github-repo="xml-lens"><div class="content-wrapper"><section><h2 id="namespaces">Namespaces</h2>
 
+<p>As long as you don’t care about namespaces in your XML you should use plain Strings when selecting for elements
+or attributes. As a consequence your code may look simple as that: <code class="highlighter-rouge">root \ "c1"</code>, where plain string <code class="highlighter-rouge">c1</code> indicates you
+want to query for <code class="highlighter-rouge">c1</code> labeled elements. In some cases such approach might be OK. That will be if your XML contains 
+elements from just one namespace or there’s no name clash between elements defined in various 
+namespaces. In other cases you should consider using full qualified names instead of local names.</p>
+
+<p>In all other sections of the documentation namespaces are ignored and therefore plain Strings are used. Mind that in case
+you want to make your code namespace sensitive you need to replace those Strings with constructs described in this section.</p>
+
+<h3 id="prefixes-vs-namespace-urls">Prefixes vs namespace URLs</h3>
+
+<p>Due to the fact the the same prefixes may refer to different namespaces, <code class="highlighter-rouge">xml-lens</code> does not to rely on them. Instead, 
+it relies on namespace’s URL. Thus, to create a namespace it suffices to:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.Namespace</span>
+<span class="c1">// import net.michalsitko.xml.optics.Namespace
+</span>
+<span class="k">val</span> <span class="n">a</span> <span class="k">=</span> <span class="nc">Namespace</span><span class="o">(</span><span class="s">"http://a.com"</span><span class="o">)</span>
+<span class="c1">// a: net.michalsitko.xml.optics.Namespace = Namespace(http://a.com)
+</span></code></pre>
+</div>
+
+<p>And now to create fully qualified name within namespace created above you need to:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"elementLabel"</span><span class="o">)</span>
+<span class="c1">// res0: net.michalsitko.xml.optics.ResolvedNameMatcher = ResolvedNameMatcher(http://a.com,elementLabel)
+</span></code></pre>
+</div>
+
+<h3 id="simple-example">Simple example</h3>
+
+<p>To see working with namespace in action, let’s consider following XML:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.parsing.XmlParser</span>
+
+<span class="k">val</span> <span class="n">input</span> <span class="k">=</span>
+    <span class="s">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+      |&lt;a xmlns="http://a.com" xmlns:b="http://b.com"&gt;
+      |   &lt;c1&gt;
+      |      &lt;f&gt;a.com&lt;/f&gt;
+      |      &lt;b:f&gt;b.com&lt;/b:f&gt;
+      |   &lt;/c1&gt;
+      |   &lt;c1 xmlns="http://c.com" xmlns:b="http://d.com"&gt;
+      |      &lt;f&gt;c.com&lt;/f&gt;
+      |      &lt;b:f&gt;d.com&lt;/b:f&gt;
+      |   &lt;/c1&gt;
+      |&lt;/a&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
+<span class="k">val</span> <span class="n">xml</span> <span class="k">=</span> <span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input</span><span class="o">).</span><span class="n">right</span><span class="o">.</span><span class="n">get</span>
+</code></pre>
+</div>
+
+<p>For sake of this example, we define helper method <code class="highlighter-rouge">withCriteria</code>:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">import</span> <span class="nn">monocle.Traversal</span>
+<span class="k">import</span> <span class="nn">net.michalsitko.xml.entities.</span><span class="o">{</span><span class="nc">Element</span><span class="o">,</span> <span class="nc">LabeledElement</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.LabeledElementOptics._</span>
+<span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.ElementOptics._</span>
+
+<span class="k">def</span> <span class="n">withCriteria</span><span class="o">(</span><span class="n">criteria</span><span class="k">:</span> <span class="kt">Traversal</span><span class="o">[</span><span class="kt">Element</span>, <span class="kt">Element</span><span class="o">])</span><span class="k">:</span> <span class="kt">Traversal</span><span class="o">[</span><span class="kt">LabeledElement</span>, <span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="n">deep</span><span class="o">(</span><span class="s">"c1"</span><span class="o">).</span><span class="n">composeTraversal</span><span class="o">(</span><span class="n">criteria</span><span class="o">).</span><span class="n">composeOptional</span><span class="o">(</span><span class="n">hasTextOnly</span><span class="o">)</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>It returns <code class="highlighter-rouge">Traversal</code> which looks for elements defined by argument <code class="highlighter-rouge">criteria</code>. We will call this method a few times 
+with different <code class="highlighter-rouge">criteria</code>.</p>
+
+<p>First, let’s analyze the output when we use plain String as element label; consequently ignoring namespaces:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">ignoreNs</span> <span class="k">=</span> <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="s">"f"</span><span class="o">))</span>
+<span class="c1">// ignoreNs: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@79158972
+</span>
+<span class="n">ignoreNs</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
+<span class="c1">// res3: List[String] = List(a.com, b.com, c.com, d.com)
+</span></code></pre>
+</div>
+
+<p>As expected, we fetched texts of all <code class="highlighter-rouge">f</code>-labeled elements.</p>
+
+<p>Now, let’s see how output changes after we query for <code class="highlighter-rouge">f</code>-labeled elements within <code class="highlighter-rouge">http://a.com</code> namespace:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">withNsA</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="k">val</span> <span class="n">ns</span> <span class="k">=</span> <span class="nc">Namespace</span><span class="o">(</span><span class="s">"http://a.com"</span><span class="o">)</span>
+  <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"f"</span><span class="o">)))</span>
+<span class="o">}</span>
+<span class="c1">// withNsA: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@3e3b2c5d
+</span>
+<span class="n">withNsA</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
+<span class="c1">// res4: List[String] = List(a.com)
+</span></code></pre>
+</div>
+
+<p>This time result contains just <code class="highlighter-rouge">"a.com"</code>.</p>
+
+<h3 id="attributes">Attributes</h3>
+
+<h3 id="default-namespace">Default namespace</h3>
+
+<p>There’s no notion of default namespace in <code class="highlighter-rouge">xml-lens</code> as such notion heavily depends on prefixes. Default namespace is 
+ambiguous because it may refer to different namespaces within a single XML document.</p>
+
+<p>While you don’t need a concept of default namespace, sometimes you may want to access elements with no namespace at all.
+Element has no namespace if a document has no default namespace or the applied namespace was declared with empty value 
+(i.e. <code class="highlighter-rouge">xmlns=""</code>).</p>
+
+<p>Let’s consider following XML:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">input2</span> <span class="k">=</span>
+    <span class="s">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+      |&lt;a xmlns:b="http://b.com"&gt;
+      |   &lt;c1&gt;
+      |      &lt;f&gt;no namespace&lt;/f&gt;
+      |      &lt;b:f&gt;b.com&lt;/b:f&gt;
+      |   &lt;/c1&gt;
+      |&lt;/a&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
+</code></pre>
+</div>
+
+<p>As you see there’s no default namespace at all. If you need to access <code class="highlighter-rouge">f</code>-labeled element without namespace (one with 
+text <code class="highlighter-rouge">no namespace</code>) you need to call <code class="highlighter-rouge">name</code> on <code class="highlighter-rouge">Namespace.empty</code>:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">defaultNs</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="k">val</span> <span class="n">ns</span> <span class="k">=</span> <span class="nc">Namespace</span><span class="o">.</span><span class="n">empty</span>
+  <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"f"</span><span class="o">)))</span>
+<span class="o">}</span>
+<span class="c1">// defaultNs: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@6f0ce818
+</span>
+<span class="n">defaultNs</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
+<span class="c1">// res5: List[String] = List()
+</span></code></pre>
+</div>
 </section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/xml-lens/highlight/highlight.pack.js"></script><script>hljs.configure({
 languages:['scala','java','bash']
 });

@@ -193,6 +193,18 @@
                         </a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="PrefixedNamespace.html" title=""></a>
+                        <a href="PrefixedNamespace.html" title="">
+                          PrefixedNamespace
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="PrefixedResolvedNameMatcher.html" title=""></a>
+                        <a href="PrefixedResolvedNameMatcher.html" title="">
+                          PrefixedResolvedNameMatcher
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="class" href="ResolvedNameMatcher.html" title=""></a>
                         <a href="ResolvedNameMatcher.html" title="">
                           ResolvedNameMatcher
@@ -208,6 +220,12 @@
                         <a class="trait" href="TextOptics.html" title=""></a>
                         <a href="TextOptics.html" title="">
                           TextOptics
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="trait" href="ToResolvedName.html" title=""></a>
+                        <a href="ToResolvedName.html" title="">
+                          ToResolvedName
                         </a>
                       </li>
               </ul>
@@ -232,7 +250,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">IgnoreNamespaceMatcher</span><span class="params">(<span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">IgnoreNamespaceMatcher</span><span class="params">(<span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a> with <a href="ToResolvedName.html" class="extype" name="net.michalsitko.xml.optics.ToResolvedName">ToResolvedName</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -241,7 +259,7 @@
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="ToResolvedName.html" class="extype" name="net.michalsitko.xml.optics.ToResolvedName">ToResolvedName</a>, <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -267,7 +285,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="net.michalsitko.xml.optics.IgnoreNamespaceMatcher"><span>IgnoreNamespaceMatcher</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="net.michalsitko.xml.optics.NameMatcher"><span>NameMatcher</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="net.michalsitko.xml.optics.IgnoreNamespaceMatcher"><span>IgnoreNamespaceMatcher</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="net.michalsitko.xml.optics.ToResolvedName"><span>ToResolvedName</span></li><li class="in" name="net.michalsitko.xml.optics.NameMatcher"><span>NameMatcher</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -580,7 +598,7 @@
         <span class="name">toResolvedName</span><span class="result">: <a href="../entities/ResolvedName.html" class="extype" name="net.michalsitko.xml.entities.ResolvedName">ResolvedName</a></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="net.michalsitko.xml.optics.IgnoreNamespaceMatcher">IgnoreNamespaceMatcher</a> → <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="net.michalsitko.xml.optics.IgnoreNamespaceMatcher">IgnoreNamespaceMatcher</a> → <a href="ToResolvedName.html" class="extype" name="net.michalsitko.xml.optics.ToResolvedName">ToResolvedName</a></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
@@ -665,6 +683,8 @@
               <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
             </div><div class="parent" name="scala.Equals">
               <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="net.michalsitko.xml.optics.ToResolvedName">
+              <h3>Inherited from <a href="ToResolvedName.html" class="extype" name="net.michalsitko.xml.optics.ToResolvedName">ToResolvedName</a></h3>
             </div><div class="parent" name="net.michalsitko.xml.optics.NameMatcher">
               <h3>Inherited from <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a></h3>
             </div><div class="parent" name="scala.AnyRef">

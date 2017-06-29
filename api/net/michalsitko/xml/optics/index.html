@@ -209,6 +209,18 @@
                         </a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="PrefixedNamespace.html" title=""></a>
+                        <a href="PrefixedNamespace.html" title="">
+                          PrefixedNamespace
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="PrefixedResolvedNameMatcher.html" title=""></a>
+                        <a href="PrefixedResolvedNameMatcher.html" title="">
+                          PrefixedResolvedNameMatcher
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="class" href="ResolvedNameMatcher.html" title=""></a>
                         <a href="ResolvedNameMatcher.html" title="">
                           ResolvedNameMatcher
@@ -224,6 +236,12 @@
                         <a class="trait" href="TextOptics.html" title=""></a>
                         <a href="TextOptics.html" title="">
                           TextOptics
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="trait" href="ToResolvedName.html" title=""></a>
+                        <a href="ToResolvedName.html" title="">
+                          ToResolvedName
                         </a>
                       </li><li name="net.michalsitko.xml.syntax" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="syntax"></a><a id="syntax:syntax"></a>
@@ -325,9 +343,9 @@
       
       
     </li><li name="net.michalsitko.xml.optics.IgnoreNamespaceMatcher" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="IgnoreNamespaceMatcherextendsNameMatcherwithProductwithSerializable"></a><a id="IgnoreNamespaceMatcher:IgnoreNamespaceMatcher"></a>
+      <a id="IgnoreNamespaceMatcherextendsNameMatcherwithToResolvedNamewithProductwithSerializable"></a><a id="IgnoreNamespaceMatcher:IgnoreNamespaceMatcher"></a>
       <span class="permalink">
-      <a href="../../../../net/michalsitko/xml/optics/index.html#IgnoreNamespaceMatcherextendsNameMatcherwithProductwithSerializable" title="Permalink">
+      <a href="../../../../net/michalsitko/xml/optics/index.html#IgnoreNamespaceMatcherextendsNameMatcherwithToResolvedNamewithProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -338,7 +356,7 @@
       <span class="symbol">
         <a title="" href="IgnoreNamespaceMatcher.html">
               <span class="name">IgnoreNamespaceMatcher</span>
-            </a><span class="params">(<span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+            </a><span class="params">(<span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a> with <a href="ToResolvedName.html" class="extype" name="net.michalsitko.xml.optics.ToResolvedName">ToResolvedName</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -392,7 +410,7 @@
       <span class="symbol">
         <a title="" href="Namespace.html">
               <span class="name">Namespace</span>
-            </a><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="uri">uri: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+            </a><span class="params">(<span name="uri">uri: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -450,6 +468,42 @@
       </span>
       
       
+    </li><li name="net.michalsitko.xml.optics.PrefixedNamespace" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PrefixedNamespaceextendsProductwithSerializable"></a><a id="PrefixedNamespace:PrefixedNamespace"></a>
+      <span class="permalink">
+      <a href="../../../../net/michalsitko/xml/optics/index.html#PrefixedNamespaceextendsProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="PrefixedNamespace.html">
+              <span class="name">PrefixedNamespace</span>
+            </a><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="uri">uri: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="net.michalsitko.xml.optics.PrefixedResolvedNameMatcher" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PrefixedResolvedNameMatcherextendsNameMatcherwithToResolvedNamewithProductwithSerializable"></a><a id="PrefixedResolvedNameMatcher:PrefixedResolvedNameMatcher"></a>
+      <span class="permalink">
+      <a href="../../../../net/michalsitko/xml/optics/index.html#PrefixedResolvedNameMatcherextendsNameMatcherwithToResolvedNamewithProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="PrefixedResolvedNameMatcher.html">
+              <span class="name">PrefixedResolvedNameMatcher</span>
+            </a><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="uri">uri: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a> with <a href="ToResolvedName.html" class="extype" name="net.michalsitko.xml.optics.ToResolvedName">ToResolvedName</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
     </li><li name="net.michalsitko.xml.optics.ResolvedNameMatcher" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="ResolvedNameMatcherextendsNameMatcherwithProductwithSerializable"></a><a id="ResolvedNameMatcher:ResolvedNameMatcher"></a>
       <span class="permalink">
@@ -464,7 +518,7 @@
       <span class="symbol">
         <a title="" href="ResolvedNameMatcher.html">
               <span class="name">ResolvedNameMatcher</span>
-            </a><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="uri">uri: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+            </a><span class="params">(<span name="uri">uri: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="localName">localName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="NameMatcher.html" class="extype" name="net.michalsitko.xml.optics.NameMatcher">NameMatcher</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -500,6 +554,24 @@
       <span class="symbol">
         <a title="" href="TextOptics.html">
               <span class="name">TextOptics</span>
+            </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      
+    </li><li name="net.michalsitko.xml.optics.ToResolvedName" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToResolvedNameextendsAnyRef"></a><a id="ToResolvedName:ToResolvedName"></a>
+      <span class="permalink">
+      <a href="../../../../net/michalsitko/xml/optics/index.html#ToResolvedNameextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="ToResolvedName.html">
+              <span class="name">ToResolvedName</span>
             </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       
