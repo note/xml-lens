@@ -2,10 +2,8 @@ import sbt._
 
 object Dependencies {
   lazy val monocleVersion  = "1.4.0"
-  lazy val scalazVersion   = "7.2.13"
   lazy val scalaXmlVersion = "1.0.6"
 
-  lazy val scalaz      = "org.scalaz"                  %% "scalaz-core"    % scalazVersion
   lazy val monocleCore = "com.github.julien-truffaut"  %% "monocle-core"   % monocleVersion
   lazy val scalaXml    = "org.scala-lang.modules"      %% "scala-xml"      % scalaXmlVersion
   lazy val monocleLaw  = "com.github.julien-truffaut"  %% "monocle-law"    % monocleVersion % "test"

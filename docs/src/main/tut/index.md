@@ -4,16 +4,22 @@ title:  "Home"
 section: "home"
 ---
 
+[![Build Status](https://api.travis-ci.org/note/xml-lens.svg)](https://travis-ci.org/note/xml-lens)
+[![codecov](https://codecov.io/gh/note/xml-lens/branch/master/graph/badge.svg)](https://codecov.io/gh/note/xml-lens)
+
 ## About
 
-XML scala libraries are kind of neglected. That stands in stark contrast to JSON for which Scala has dozens of projects.
+XML Scala libraries are kind of neglected. That stands in stark contrast to JSON for which Scala has dozens of projects.
 Of course, JSON is much more popular while XML is regarded as a legacy standard. Still, there are many situations when 
 you need to work with XML. `xml-optics` is an attempt to make this experience as painless as possible.
   
 Main focus of `xml-optics` is on traversing and transforming XML trees - something `scala-xml` is not 
-really good at. To make those operations natural concept of `Optics` has been used.
+really good at. To make those operations easy to express the concept of `Optics` has been used. 
+[Monocle](http://julien-truffaut.github.io/Monocle/) has been used as an `Optics` implementation. 
 
-## <a name="quick_start">Quick start</a>
+## <a name="quick_start"></a>Quick start
+
+`xml-lens` is available for both Scala 2.11 and 2.12.
 
 TODO: add lines needed in `build.sbt` as soon as library is published.
 
@@ -32,7 +38,7 @@ val input =
 
 We can define transformation in the following way: 
 
-```tut
+```tut:book
 import net.michalsitko.xml.syntax.OpticsBuilder.root
 
 val modify = (root \ "f").hasTextOnly.modify(_.toUpperCase)
@@ -65,6 +71,10 @@ val res = modify(parsed)
 
 Finally, we can print the result back to verify it:
 
-```tut
+```tut:book
 XmlPrinter.print(res)
 ```
+
+## License
+
+All code is available to you under the MIT license, available [here](https://github.com/note/xml-lens/blob/master/LICENSE).
