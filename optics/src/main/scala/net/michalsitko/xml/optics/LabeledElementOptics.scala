@@ -1,7 +1,8 @@
 package net.michalsitko.xml.optics
 
+import monocle.function.Index
 import monocle.{Lens, Optional, Traversal}
-import net.michalsitko.xml.entities.{Element, LabeledElement, ResolvedName}
+import net.michalsitko.xml.entities.{Element, LabeledElement, Node, ResolvedName}
 
 trait LabeledElementOptics {
   def deep(elementMatcher: NameMatcher): Traversal[LabeledElement, Element] =
@@ -38,6 +39,11 @@ trait LabeledElementOptics {
     Lens[LabeledElement, ResolvedName](_.label)(newLabel => from => from.copy(label = newLabel))
 
   val localName = label.composeLens(ResolvedNameOptics.localName)
+
+  val index: Index[LabeledElement, Int, Node] = new Index[LabeledElement, Int, Node] {
+    override def index(i: Int): Optional[LabeledElement, Node] =
+      element.composeOptional(ElementOptics.indexOptional(i))
+  }
 }
 
 object LabeledElementOptics extends LabeledElementOptics

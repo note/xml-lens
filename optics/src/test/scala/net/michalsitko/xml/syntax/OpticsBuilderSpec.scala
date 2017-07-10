@@ -1,6 +1,8 @@
 package net.michalsitko.xml.syntax
 
 import net.michalsitko.xml.entities.Attribute
+import net.michalsitko.xml.optics.ElementOptics.attribute
+import net.michalsitko.xml.optics.LabeledElementOptics.isLabeled
 import net.michalsitko.xml.optics.{LabeledElementOptics, Namespace, NodeOptics, PrefixedNamespace}
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter
@@ -132,6 +134,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       }
     }
 
+    // TODO: add to cookbook
     "renameLabel" in {
       val parsed = XmlParser.parse(input15).right.get
 
@@ -139,15 +142,41 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       XmlPrinter.print(res) should equal(output15)
     }
 
+    // TODO: add sht like this to cookbook
     "having" in {
+      import NodeOptics._
+      import LabeledElementOptics._
+
       val parsed = XmlParser.parse(input15).right.get
 
       // TODO: does not look nice
       val res = (((root \ "c1").having { node =>
-        NodeOptics.isLabeledElement.composeOptional(LabeledElementOptics.isLabeled("g")).getOption(node).isDefined
+        isLabeledElement.composeOptional(isLabeled("g")).getOption(node).isDefined
       }) \ "f").hasTextOnly.modify(_.toUpperCase)(parsed)
 
       XmlPrinter.print(res) should equal(output16)
+    }
+
+    "having 2" in {
+      import NodeOptics._
+      import LabeledElementOptics._
+      import net.michalsitko.xml.optics.ElementOptics._
+
+      val parsed = XmlParser.parse(input17).right.get
+
+      val res = (((root \ "c1").having { node =>
+        isLabeledElement.composeOptional(isLabeled("g")).composeOptional(attribute("someKey")).getOption(node).isDefined
+      }) \ "f").hasTextOnly.modify(_.toUpperCase)(parsed)
+
+      XmlPrinter.print(res) should equal(output17)
+    }
+
+    "index" in {
+      val parsed = XmlParser.parse(input17).right.get
+
+      val res = (root \ "c1" \ "f").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
+
+      XmlPrinter.print(res) should equal(output17)
     }
 
   }
@@ -393,6 +422,32 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       |   </c2>
       |   <c1>
       |      <f>item</f>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val input17 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item</f>
+      |      <g>item</g>
+      |   </c1>
+      |   <c1>
+      |      <f>item</f>
+      |      <g someKey="someValue">item</g>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val output17 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>item</f>
+      |      <g>item</g>
+      |   </c1>
+      |   <c1>
+      |      <f>ITEM</f>
+      |      <g someKey="someValue">item</g>
       |   </c1>
       |</a>""".stripMargin
 

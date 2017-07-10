@@ -2,7 +2,6 @@ package net.michalsitko.xml.syntax
 
 import monocle._
 import net.michalsitko.xml.entities._
-import net.michalsitko.xml.optics.ElementOptics.allLabeledElements
 import net.michalsitko.xml.optics._
 
 import scalaz.Applicative
@@ -48,11 +47,73 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
     val composed: Traversal[LabeledElement, Element] = current.composeTraversal(traversal)
     DeepBuilder(composed)
   }
+
+  def index(idx: Int): DeepBuilderOptional = {
+    val optional: Optional[LabeledElement, Element] = Optional.apply[LabeledElement, Element] { labeled =>
+      val all = current.getAll(labeled)
+      all.lift(idx)
+    }{ newElem => labeled =>
+      println("bazinga 1: " + labeled)
+      println("bazinga 2: " + newElem)
+      current.modify(new Indexed(idx, newElem))(labeled)
+    }
+    DeepBuilderOptional(optional)
+  }
+
+  class Indexed(idx: Int, newValue: Element) extends (Element => Element) {
+    private var counter = 0
+
+    override def apply(v1: Element): Element = {
+      val r = if (counter == idx) {
+        newValue
+      } else {
+        v1
+      }
+      counter += 1
+      r
+    }
+  }
 }
 
 object DeepBuilder {
   implicit def toTraversal(builder: DeepBuilder): Traversal[LabeledElement, Element] =
     builder.current
+}
+
+case class DeepBuilderOptional(currentOptional: Optional[LabeledElement, Element]) extends AnyRef with ElementOps {
+  override val current = currentOptional.asTraversal
+
+  def \ (nameMatcher: String): DeepBuilder = {
+    \ (NameMatcher.fromString(nameMatcher))
+  }
+
+  def \ (nameMatcher: NameMatcher): DeepBuilder = DeepBuilder (
+    current.composeTraversal(ElementOptics.deeper(nameMatcher))
+  )
+
+  def having(predicate: Node => Boolean): DeepBuilderOptional = {
+    val optional = Optional.apply[Element, Element] { element =>
+      if (element.children.exists(predicate)) {
+        Some(element)
+      } else {
+        None
+      }
+    } { newElement => element =>
+      if (element.children.exists(predicate)) {
+        newElement
+      } else {
+        element
+      }
+    }
+
+    val composed = currentOptional.composeOptional(optional)
+    DeepBuilderOptional(composed)
+  }
+}
+
+object DeepBuilderOptional {
+  implicit def toOptional(builder: DeepBuilderOptional): Optional[LabeledElement, Element] =
+    builder.currentOptional
 }
 
 case class TextBuilder(current: Traversal[LabeledElement, String])
@@ -67,62 +128,4 @@ case class AttributesBuilder(current: Traversal[LabeledElement, Seq[Attribute]])
 object AttributesBuilder {
   implicit def toTraversal(builder: AttributesBuilder): Traversal[LabeledElement, Seq[Attribute]] =
     builder.current
-}
-
-trait ElementOps {
-  def current: Traversal[LabeledElement, Element]
-
-  def attr(nameMatcher: String): TextBuilder =
-    attr(NameMatcher.fromString(nameMatcher))
-
-  def attr(nameMatcher: NameMatcher): TextBuilder = TextBuilder (
-    current.composeOptional(ElementOptics.attribute(nameMatcher))
-  )
-
-  def attrs: AttributesBuilder = AttributesBuilder (
-    current.composeLens(ElementOptics.attributes)
-  )
-
-  def replaceOrAddAttr(key: NameMatcher with ToResolvedName, newValue: String): LabeledElement => LabeledElement = { el =>
-    val modifyExisting = ElementOptics.attribute(key).modifyOption(_ => newValue)
-
-    val addNs: (Element) => Element = key match {
-      case matcher: PrefixedResolvedNameMatcher if matcher.uri.nonEmpty =>
-        ElementOptics.namespaces.modify(ns => ns :+ NamespaceDeclaration(matcher.prefix, matcher.uri))
-      case _ =>
-        identity[Element]_
-    }
-
-    current.modify { elem =>
-      modifyExisting(elem) match {
-        case Some(changedElem) =>
-          changedElem
-        case None =>
-          val changed = ElementOptics.attributes.modify(attrs => attrs :+ Attribute(key.toResolvedName, newValue))(elem)
-          addNs(changed)
-      }
-    }(el)
-  }
-
-  def renameLabel(oldLabel: NameMatcher with ToResolvedName, newLabel: NameMatcher with ToResolvedName): LabeledElement => LabeledElement = { labeledElement =>
-    current.modify { element =>
-      allLabeledElements.modify { el =>
-        if (oldLabel.matches(el.label)) {
-          LabeledElementOptics.label.set(newLabel.toResolvedName)(el)
-        } else {
-          el
-        }
-      }(element)
-    }(labeledElement)
-  }
-
-  def renameLabel(oldLabel: String, newLabel: String): LabeledElement => LabeledElement =
-    renameLabel(NameMatcher.fromString(oldLabel), NameMatcher.fromString(newLabel))
-
-  def replaceOrAddAttr(key: String, newValue: String): LabeledElement => LabeledElement =
-    replaceOrAddAttr(NameMatcher.fromString(key), newValue)
-
-  def hasTextOnly: TextBuilder = TextBuilder (
-    current.composeOptional(ElementOptics.hasTextOnly)
-  )
 }

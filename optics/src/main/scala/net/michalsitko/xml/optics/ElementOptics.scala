@@ -1,5 +1,6 @@
 package net.michalsitko.xml.optics
 
+import monocle.function.Index
 import monocle.{Lens, Optional, Traversal}
 import net.michalsitko.xml.entities._
 
@@ -64,6 +65,19 @@ trait ElementOptics {
 
   // TODO: test lawfulness
   val allLabeledElements: Traversal[Element, LabeledElement] = allChildren.composePrism(NodeOptics.isLabeledElement)
+
+  def index: Index[Element, Int, Node] = new Index[Element, Int, Node] {
+    override def index(i: Int): Optional[Element, Node] = indexOptional(i)
+  }
+
+  private [optics] def indexOptional(i: Int) = Optional.apply[Element, Node] { element =>
+    element.children.lift(i)
+  } { newNode => element =>
+    element.children.lift(i) match {
+      case Some(_) => children.modify(_.patch(i, Seq(newNode), 1))(element)
+      case None    => element
+    }
+  }
 
   private def onlyChild(element: Element): Option[Node] = {
     if (element.children.size == 1) {
