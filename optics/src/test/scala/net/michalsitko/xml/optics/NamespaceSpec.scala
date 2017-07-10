@@ -1,6 +1,6 @@
 package net.michalsitko.xml.optics
 
-import monocle.{PTraversal, Traversal}
+import monocle.Traversal
 import net.michalsitko.xml.entities.{Element, LabeledElement}
 import net.michalsitko.xml.parsing.XmlParser
 import org.scalatest.{Matchers, WordSpec}
