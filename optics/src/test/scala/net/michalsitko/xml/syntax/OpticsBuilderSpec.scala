@@ -1,7 +1,7 @@
 package net.michalsitko.xml.syntax
 
 import net.michalsitko.xml.entities.Attribute
-import net.michalsitko.xml.optics.PrefixedNamespace
+import net.michalsitko.xml.optics.{Namespace, PrefixedNamespace}
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.syntax.OpticsBuilder._
@@ -67,70 +67,70 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       XmlPrinter.print(res) should equal(expectedRes6)
     }
 
-//    "modify attribute for ResolvedNameMatcher" in {
-//      val parsed = XmlParser.parse(input7).right.get
-//
-//      val ns = Namespace("http://a.com")
-//      val traversal = (root \ "c1" \ "f").attr(ns.name("someKey"))
-//
-//      val res = traversal.modify(_.toUpperCase)(parsed)
-//      XmlPrinter.print(res) should equal(expectedRes7)
-//    }
-//
-//    "modify attribute for IgnoreNamespaceMatcher" in {
-//      val parsed = XmlParser.parse(input7).right.get
-//
-//      val traversal = (root \ "c1" \ "f").attr("someKey")
-//
-//      val res = traversal.modify(_.toUpperCase)(parsed)
-//      XmlPrinter.print(res) should equal(expectedRes8)
-//    }
-//
-//    "modify attribute for ResolvedNameMatcher2" in {
-//      val parsed = XmlParser.parse(input7).right.get
-//
-//      val ns = Namespace("")
-//      val traversal = (root \ "c1" \ "f").attr(ns.name("someKey"))
-//
-//      val res = traversal.modify(_.toUpperCase)(parsed)
-//      XmlPrinter.print(res) should equal(expectedRes9)
-//    }
-//
-//    "modify attribute in root element" in {
-//      val parsed = XmlParser.parse(input10).right.get
-//
-//      val traversal = root.attr("someKey")
-//
-//      val res = traversal.set("newValue")(parsed)
-//      XmlPrinter.print(res) should equal(expectedRes10)
-//    }
-//
-//    "modify text in root element" in {
-//      val parsed = XmlParser.parse(input10).right.get
-//
-//      val res = root.hasTextOnly.set("hello")(parsed)
-//      XmlPrinter.print(res) should equal(expectedRes11)
-//    }
-//
-//    "add attribute in root element" in {
-//      val parsed = XmlParser.parse(input10).right.get
-//
-//      val res = root.attrs.modify(attrs => attrs :+ Attribute.unprefixed("anotherKey", "newValue"))(parsed)
-//      XmlPrinter.print(res) should equal(expectedRes12)
-//    }
-//
-//    "replaceOrAddAttr in root element" in {
-//      {
-//        val parsed = XmlParser.parse(input13).right.get
-//        val res = root.replaceOrAddAttr("anotherKey", "newValue")(parsed)
-//        XmlPrinter.print(res) should equal(expectedRes12)
-//      }
-//      {
-//        val parsed = XmlParser.parse(input14).right.get
-//        val res = root.replaceOrAddAttr("anotherKey", "newValue")(parsed)
-//        XmlPrinter.print(res) should equal(expectedRes12)
-//      }
-//    }
+    "modify attribute for ResolvedNameMatcher" in {
+      val parsed = XmlParser.parse(input7).right.get
+
+      val ns = Namespace("http://a.com")
+      val traversal = (root \ "c1" \ "f").attr(ns.name("someKey"))
+
+      val res = traversal.modify(_.toUpperCase)(parsed)
+      XmlPrinter.print(res) should equal(expectedRes7)
+    }
+
+    "modify attribute for IgnoreNamespaceMatcher" in {
+      val parsed = XmlParser.parse(input7).right.get
+
+      val traversal = (root \ "c1" \ "f").attr("someKey")
+
+      val res = traversal.modify(_.toUpperCase)(parsed)
+      XmlPrinter.print(res) should equal(expectedRes8)
+    }
+
+    "modify attribute for ResolvedNameMatcher2" in {
+      val parsed = XmlParser.parse(input7).right.get
+
+      val ns = Namespace("")
+      val traversal = (root \ "c1" \ "f").attr(ns.name("someKey"))
+
+      val res = traversal.modify(_.toUpperCase)(parsed)
+      XmlPrinter.print(res) should equal(expectedRes9)
+    }
+
+    "modify attribute in root element" in {
+      val parsed = XmlParser.parse(input10).right.get
+
+      val traversal = root.attr("someKey")
+
+      val res = traversal.set("newValue")(parsed)
+      XmlPrinter.print(res) should equal(expectedRes10)
+    }
+
+    "modify text in root element" in {
+      val parsed = XmlParser.parse(input10).right.get
+
+      val res = root.hasTextOnly.set("hello")(parsed)
+      XmlPrinter.print(res) should equal(expectedRes11)
+    }
+
+    "add attribute in root element" in {
+      val parsed = XmlParser.parse(input10).right.get
+
+      val res = root.attrs.modify(attrs => attrs :+ Attribute.unprefixed("anotherKey", "newValue"))(parsed)
+      XmlPrinter.print(res) should equal(expectedRes12)
+    }
+
+    "replaceOrAddAttr in root element" in {
+      {
+        val parsed = XmlParser.parse(input13).right.get
+        val res = root.replaceOrAddAttr("anotherKey", "newValue")(parsed)
+        XmlPrinter.print(res) should equal(expectedRes12)
+      }
+      {
+        val parsed = XmlParser.parse(input14).right.get
+        val res = root.replaceOrAddAttr("anotherKey", "newValue")(parsed)
+        XmlPrinter.print(res) should equal(expectedRes12)
+      }
+    }
 
   }
 

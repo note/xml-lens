@@ -15,6 +15,19 @@ Library is in an early state of initial development.
 
 ## Various
 
+#### How to generate documentation
+
+```
+sbt docs/makeMicrosite
+```
+
+After docs has been successfully generated you serve it with:
+
+```
+cd docs/target/site
+jekyll serve
+```
+
 #### How to run JMH benchmark
  
 Example:

@@ -91,8 +91,6 @@ withNsA.getAll(xml)
 
 This time result contains just `"a.com"`.
 
-### Attributes
-
 ### Default namespace
 
 There's no notion of default namespace in `xml-lens` as such notion heavily depends on prefixes. Default namespace is 
@@ -113,6 +111,7 @@ val input2 =
       |      <b:f>b.com</b:f>
       |   </c1>
       |</a>""".stripMargin
+val xml = XmlParser.parse(input2).right.get
 ```
 
 As you see there's no default namespace at all. If you need to access `f`-labeled element without namespace (one with 
@@ -126,3 +125,55 @@ val defaultNs = {
 
 defaultNs.getAll(xml)
 ```
+
+### Attributes namespaces
+
+When it comes to namespaces attributes the API is the same - `Namespace` is an entry point for creating namespace 
+sensitive matchers.
+
+There are 2 peculiarities you may come across when working with namespace sensitive matchers for attributes. 
+Firstly, it should be noted here that as long as attribute itself has not been prefixed it is not in any namespace.
+Secondly, some operations needs `PrefixedNamespace` instead of simple `Namespace`. Those operations are
+that ones that, except of accessing attributes, create new attributes. That's why `PrefixedNamespace` need one more field - 
+`prefix`.
+
+Let's move to the example that will explain aforementioned considerations. Following code defines operation of replacing
+given attribute value or adding attribute if it's not present: 
+
+```tut:silent
+import net.michalsitko.xml.syntax.OpticsBuilder._
+import net.michalsitko.xml.optics.PrefixedNamespace
+
+val traversal = (root \ "c1" \ "f")
+
+val ns = PrefixedNamespace("a", "http://a.com")
+val replaceOrAddAttr = traversal.replaceOrAddAttr(ns.name("someKey"), "newValue")
+```
+
+Let's run it against such XML:
+
+```tut:silent
+val input3 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a xmlns:a="http://a.com" xmlns:b="http://b.com">
+      |   <c1>
+      |      <f a:someKey="oldValue">item1</f>
+      |      <f someKey="oldValue">item2</f>
+      |      <a:f someKey="oldValue">item1</a:f>
+      |      <f b:someKey="oldValue">item2</f>
+      |   </c1>
+      |</a>""".stripMargin
+val xml = XmlParser.parse(input).right.get
+```
+
+```tut:book
+import net.michalsitko.xml.printing.XmlPrinter
+
+XmlPrinter.print(replaceOrAddAttr(xml))
+```
+
+As you can see if attribute cannot be found then it's added withing desired namespace and with prefix passed as
+first argument to `PrefixedNamespace.apply`.
+
+It may be non-obvous why for `<a:f>` new attribute is added instead of being modified. For explanation for this 
+look (here)[https://stackoverflow.com/questions/41561/xml-namespaces-and-attributes].
