@@ -10,7 +10,6 @@ trait LabeledElementOptics {
   def deep(label: String): Traversal[LabeledElement, Element] =
     deep(NameMatcher.fromString(label))
 
-  // TODO: check lawfulness
   def isLabeled(elementMatcher: NameMatcher): Optional[LabeledElement, Element] =
     Optional[LabeledElement, Element]{ labeled =>
       if (elementMatcher.matches(labeled.label)) {
