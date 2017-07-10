@@ -171,6 +171,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       XmlPrinter.print(res) should equal(output17)
     }
 
+    // TODO: add info to cookbook, comment difference with another index methods (in optics)
     "index" in {
       val parsed = XmlParser.parse(input17).right.get
 
