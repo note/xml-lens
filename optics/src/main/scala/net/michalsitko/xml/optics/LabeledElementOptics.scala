@@ -18,7 +18,13 @@ trait LabeledElementOptics {
       } else {
         None
       }
-    }(newElem => labeled => labeled.copy(element = newElem))
+    }{ newElem => labeled =>
+      if(elementMatcher.matches(labeled.label)) {
+        labeled.copy(element = newElem)
+      } else {
+        labeled
+      }
+    }
 
   def isLabeled(label: String): Optional[LabeledElement, Element] =
     isLabeled(NameMatcher.fromString(label))

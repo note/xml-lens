@@ -1,6 +1,6 @@
 package net.michalsitko.xml.optics.laws
 
-import monocle.law.discipline.TraversalTests
+import monocle.law.discipline.{OptionalTests, TraversalTests}
 import net.michalsitko.xml.test.utils.{ArbitraryElementConfig, ArbitraryInstances, CogenInstances}
 import org.scalacheck.Arbitrary
 import org.scalatest.Matchers
@@ -15,7 +15,9 @@ class LabeledElementOpticsLawsSpec extends LawsSpec with Matchers with Arbitrary
     Arbitrary(labeledElementGen(ArbitraryElementConfig(1, 2, None, Some("someAttr"))).map(_.element))
 
   val deepTest = TraversalTests(deep("abc"))
+  val isLabeledTest = OptionalTests(isLabeled("abc"))
 
   checkLaws("deep Traversal", deepTest)
+  checkLaws("isLabeled Optional", isLabeledTest)
 }
 
