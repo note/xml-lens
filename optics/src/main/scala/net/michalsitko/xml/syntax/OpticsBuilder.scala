@@ -1,9 +1,11 @@
 package net.michalsitko.xml.syntax
 
 import monocle._
-import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement, NamespaceDeclaration}
+import net.michalsitko.xml.entities._
 import net.michalsitko.xml.optics.ElementOptics.allLabeledElements
 import net.michalsitko.xml.optics._
+
+import scalaz.Applicative
 
 object OpticsBuilder {
   def root = new RootBuilder
@@ -30,6 +32,22 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
   def \ (nameMatcher: NameMatcher): DeepBuilder = DeepBuilder (
     current.composeTraversal(ElementOptics.deeper(nameMatcher))
   )
+
+  def having(predicate: Node => Boolean): DeepBuilder = {
+    // TODO: extract it to optics
+    val traversal = new Traversal[Element, Element] {
+      override final def modifyF[F[_]: Applicative](f: (Element) => F[Element])(from: Element): F[Element] = {
+        if(from.children.exists(predicate)) {
+          f(from)
+        } else {
+          Applicative[F].pure(from)
+        }
+      }
+    }
+
+    val composed: Traversal[LabeledElement, Element] = current.composeTraversal(traversal)
+    DeepBuilder(composed)
+  }
 }
 
 object DeepBuilder {

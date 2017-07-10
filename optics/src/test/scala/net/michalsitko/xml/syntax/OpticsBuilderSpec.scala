@@ -1,7 +1,7 @@
 package net.michalsitko.xml.syntax
 
 import net.michalsitko.xml.entities.Attribute
-import net.michalsitko.xml.optics.{Namespace, PrefixedNamespace}
+import net.michalsitko.xml.optics.{LabeledElementOptics, Namespace, NodeOptics, PrefixedNamespace}
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.syntax.OpticsBuilder._
@@ -137,6 +137,17 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
 
       val res = (root \ "c1").renameLabel("f", "xyz")(parsed)
       XmlPrinter.print(res) should equal(output15)
+    }
+
+    "having" in {
+      val parsed = XmlParser.parse(input15).right.get
+
+      // TODO: does not look nice
+      val res = (((root \ "c1").having { node =>
+        NodeOptics.isLabeledElement.composeOptional(LabeledElementOptics.isLabeled("g")).getOption(node).isDefined
+      }) \ "f").hasTextOnly.modify(_.toUpperCase)(parsed)
+
+      XmlPrinter.print(res) should equal(output16)
     }
 
   }
@@ -344,14 +355,14 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1>
-      |      <f>new</f>
-      |      <g>item2</g>
+      |      <f>item</f>
+      |      <g>item</g>
       |   </c1>
       |   <c2>
-      |      <f>new</f>
+      |      <f>item</f>
       |   </c2>
       |   <c1>
-      |      <f>new</f>
+      |      <f>item</f>
       |   </c1>
       |</a>""".stripMargin
 
@@ -359,14 +370,29 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1>
-      |      <xyz>new</xyz>
-      |      <g>item2</g>
+      |      <xyz>item</xyz>
+      |      <g>item</g>
       |   </c1>
       |   <c2>
-      |      <f>new</f>
+      |      <f>item</f>
       |   </c2>
       |   <c1>
-      |      <xyz>new</xyz>
+      |      <xyz>item</xyz>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val output16 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>ITEM</f>
+      |      <g>item</g>
+      |   </c1>
+      |   <c2>
+      |      <f>item</f>
+      |   </c2>
+      |   <c1>
+      |      <f>item</f>
       |   </c1>
       |</a>""".stripMargin
 
