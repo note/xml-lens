@@ -62,6 +62,7 @@ trait ElementOptics {
     }
   }
 
+  // TODO: test lawfulness
   val allLabeledElements: Traversal[Element, LabeledElement] = allChildren.composePrism(NodeOptics.isLabeledElement)
 
   private def onlyChild(element: Element): Option[Node] = {

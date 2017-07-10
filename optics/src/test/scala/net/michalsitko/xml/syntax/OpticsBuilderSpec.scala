@@ -132,6 +132,13 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       }
     }
 
+    "renameLabel" in {
+      val parsed = XmlParser.parse(input15).right.get
+
+      val res = (root \ "c1").renameLabel("f", "xyz")(parsed)
+      XmlPrinter.print(res) should equal(output15)
+    }
+
   }
 
   // TODO: get rid of code duplication
@@ -333,5 +340,34 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       |<a someKey="oldValue" anotherKey="oldValue">
       |</a>""".stripMargin
 
+  val input15 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>new</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c2>
+      |      <f>new</f>
+      |   </c2>
+      |   <c1>
+      |      <f>new</f>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val output15 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <xyz>new</xyz>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c2>
+      |      <f>new</f>
+      |   </c2>
+      |   <c1>
+      |      <xyz>new</xyz>
+      |   </c1>
+      |</a>""".stripMargin
 
 }
