@@ -166,6 +166,8 @@ val input3 =
 val xml = XmlParser.parse(input).right.get
 ```
 
+Take a look at printed XML:
+
 ```tut:book
 import net.michalsitko.xml.printing.XmlPrinter
 

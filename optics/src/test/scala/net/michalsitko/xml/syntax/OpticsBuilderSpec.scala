@@ -180,6 +180,14 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       XmlPrinter.print(res) should equal(output17)
     }
 
+    "index and then index" in {
+      val parsed = XmlParser.parse(input19).right.get
+
+      val res = ((root \ "c1" \ "f").index(1) \ "h" \ "i").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
+
+      XmlPrinter.print(res) should equal(output19)
+    }
+
     "childAt" in {
       import net.michalsitko.xml.syntax.node._
       val parsed = XmlParser.parse(input18).right.get.minimize
@@ -491,6 +499,44 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       |    <f>
       |      <h>abc</h>
       |      <i>TO BE SELECTED</i>
+      |    </f>
+      |  </c1>
+      |</a>""".stripMargin
+
+  val input19 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |  <c1>
+      |    <f>
+      |      <h>
+      |        <i>item</i>
+      |        <i>to be selected</i>
+      |      </h>
+      |    </f>
+      |    <f>
+      |      <h>
+      |        <i>item</i>
+      |        <i>to be selected</i>
+      |      </h>
+      |    </f>
+      |  </c1>
+      |</a>""".stripMargin
+
+  val output19 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |  <c1>
+      |    <f>
+      |      <h>
+      |        <i>item</i>
+      |        <i>to be selected</i>
+      |      </h>
+      |    </f>
+      |    <f>
+      |      <h>
+      |        <i>item</i>
+      |        <i>TO BE SELECTED</i>
+      |      </h>
       |    </f>
       |  </c1>
       |</a>""".stripMargin

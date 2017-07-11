@@ -28,6 +28,16 @@ cd docs/target/site
 jekyll serve
 ```
 
+#### Pushing documentation to github page
+
+You can push generated documentation with:
+
+```
+docs/ghpagesPushSite
+```
+
+Mind that you have to have access to push to repository defined in `build.sbt` to make above snippet work.
+
 #### How to run JMH benchmark
  
 Example:
