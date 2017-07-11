@@ -5,7 +5,7 @@ import net.michalsitko.xml.optics.ElementOptics.attribute
 import net.michalsitko.xml.optics.LabeledElementOptics.isLabeled
 import net.michalsitko.xml.optics.{LabeledElementOptics, Namespace, NodeOptics, PrefixedNamespace}
 import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.XmlPrinter
+import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
 import net.michalsitko.xml.syntax.OpticsBuilder._
 import net.michalsitko.xml.test.utils.ExampleInputs
 import org.scalatest.{Matchers, WordSpec}
@@ -178,6 +178,15 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       val res = (root \ "c1" \ "f").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
       XmlPrinter.print(res) should equal(output17)
+    }
+
+    "childAt" in {
+      import net.michalsitko.xml.syntax.node._
+      val parsed = XmlParser.parse(input18).right.get.minimize
+
+      val res = (root \ "c1" \ "f").childAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
+
+      XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(output18)
     }
 
   }
@@ -450,6 +459,40 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       |      <f>ITEM</f>
       |      <g someKey="someValue">item</g>
       |   </c1>
+      |</a>""".stripMargin
+
+  val input18 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f>
+      |        <h>abc</h>
+      |      </f>
+      |      <f>
+      |        <h>abc</h>
+      |      </f>
+      |      <f>
+      |        <h>abc</h>
+      |        <i>to be selected</i>
+      |      </f>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val output18 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |  <c1>
+      |    <f>
+      |      <h>abc</h>
+      |    </f>
+      |    <f>
+      |      <h>abc</h>
+      |    </f>
+      |    <f>
+      |      <h>abc</h>
+      |      <i>TO BE SELECTED</i>
+      |    </f>
+      |  </c1>
       |</a>""".stripMargin
 
 }

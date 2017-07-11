@@ -53,27 +53,33 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
       val all = current.getAll(labeled)
       all.lift(idx)
     }{ newElem => labeled =>
-      println("bazinga 1: " + labeled)
-      println("bazinga 2: " + newElem)
       current.modify(new Indexed(idx, newElem))(labeled)
     }
     DeepBuilderOptional(optional)
   }
 
-  class Indexed(idx: Int, newValue: Element) extends (Element => Element) {
-    private var counter = 0
-
-    override def apply(v1: Element): Element = {
-      val r = if (counter == idx) {
-        newValue
-      } else {
-        v1
-      }
-      counter += 1
-      r
-    }
+  def childAt(idx: Int): DeepBuilder = {
+    val index = ElementOptics.index
+    val optional = index.index(idx)
+    val newTraversal = current.composeOptional(optional).composePrism(NodeOptics.isLabeledElement).composeLens(LabeledElementOptics.element)
+    DeepBuilder(newTraversal)
   }
 }
+
+private [syntax] class Indexed(idx: Int, newValue: Element) extends (Element => Element) {
+  private var counter = 0
+
+  override def apply(v1: Element): Element = {
+    val r = if (counter == idx) {
+      newValue
+    } else {
+      v1
+    }
+    counter += 1
+    r
+  }
+}
+
 
 object DeepBuilder {
   implicit def toTraversal(builder: DeepBuilder): Traversal[LabeledElement, Element] =
