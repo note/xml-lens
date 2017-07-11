@@ -97,24 +97,12 @@ case class DeepBuilderOptional(currentOptional: Optional[LabeledElement, Element
     current.composeTraversal(ElementOptics.deeper(nameMatcher))
   )
 
-  def having(predicate: Node => Boolean): DeepBuilderOptional = {
-    val optional = Optional.apply[Element, Element] { element =>
-      if (element.children.exists(predicate)) {
-        Some(element)
-      } else {
-        None
-      }
-    } { newElement => element =>
-      if (element.children.exists(predicate)) {
-        newElement
-      } else {
-        element
-      }
-    }
-
-    val composed = currentOptional.composeOptional(optional)
-    DeepBuilderOptional(composed)
-  }
+  // DeepBuilderOptional intentionally does not have `having` method
+  // It would be useful only for such constructs:
+  // (root \ "some").having(predicate1).having(predicate2)
+  // Namely, only while one `having` follows directly another `having`
+  // It's not needed as we can express abovementioned snippet with:
+  // (root \ "some").having(n => predicate1(n) && predicate2(n))
 }
 
 object DeepBuilderOptional {

@@ -1,8 +1,6 @@
 package net.michalsitko.xml.syntax
 
 import net.michalsitko.xml.entities.Attribute
-import net.michalsitko.xml.optics.ElementOptics.attribute
-import net.michalsitko.xml.optics.LabeledElementOptics.isLabeled
 import net.michalsitko.xml.optics.{LabeledElementOptics, Namespace, NodeOptics, PrefixedNamespace}
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
@@ -136,10 +134,10 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
 
     // TODO: add to cookbook
     "renameLabel" in {
-      val parsed = XmlParser.parse(input15).right.get
+      val parsed = XmlParser.parse(example15("f")).right.get
 
       val res = (root \ "c1").renameLabel("f", "xyz")(parsed)
-      XmlPrinter.print(res) should equal(output15)
+      XmlPrinter.print(res) should equal(example15("xyz"))
     }
 
     // TODO: add sht like this to cookbook
@@ -147,7 +145,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       import NodeOptics._
       import LabeledElementOptics._
 
-      val parsed = XmlParser.parse(input15).right.get
+      val parsed = XmlParser.parse(example15("f")).right.get
 
       // TODO: does not look nice
       val res = (((root \ "c1").having { node =>
@@ -162,39 +160,39 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       import LabeledElementOptics._
       import net.michalsitko.xml.optics.ElementOptics._
 
-      val parsed = XmlParser.parse(input17).right.get
+      val parsed = XmlParser.parse(example17("item")).right.get
 
       val res = (((root \ "c1").having { node =>
         isLabeledElement.composeOptional(isLabeled("g")).composeOptional(attribute("someKey")).getOption(node).isDefined
       }) \ "f").hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res) should equal(output17)
+      XmlPrinter.print(res) should equal(example17("ITEM"))
     }
 
     // TODO: add info to cookbook, comment difference with another index methods (in optics)
     "index" in {
-      val parsed = XmlParser.parse(input17).right.get
+      val parsed = XmlParser.parse(example17("item")).right.get
 
       val res = (root \ "c1" \ "f").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res) should equal(output17)
+      XmlPrinter.print(res) should equal(example17("ITEM"))
     }
 
     "index and then index" in {
-      val parsed = XmlParser.parse(input19).right.get
+      val parsed = XmlParser.parse(example19("item")).right.get
 
       val res = ((root \ "c1" \ "f").index(1) \ "h" \ "i").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res) should equal(output19)
+      XmlPrinter.print(res) should equal(example19("ITEM"))
     }
 
     "childAt" in {
       import net.michalsitko.xml.syntax.node._
-      val parsed = XmlParser.parse(input18).right.get.minimize
+      val parsed = XmlParser.parse(example18("item")).right.get.minimize
 
       val res = (root \ "c1" \ "f").childAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(output18)
+      XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(example18("ITEM"))
     }
 
   }
@@ -398,33 +396,18 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       |<a someKey="oldValue" anotherKey="oldValue">
       |</a>""".stripMargin
 
-  val input15 =
-    """<?xml version="1.0" encoding="UTF-8"?>
+  def example15(toReplace: String) =
+    s"""<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1>
-      |      <f>item</f>
+      |      <$toReplace>item</$toReplace>
       |      <g>item</g>
       |   </c1>
       |   <c2>
       |      <f>item</f>
       |   </c2>
       |   <c1>
-      |      <f>item</f>
-      |   </c1>
-      |</a>""".stripMargin
-
-  val output15 =
-    """<?xml version="1.0" encoding="UTF-8"?>
-      |<a>
-      |   <c1>
-      |      <xyz>item</xyz>
-      |      <g>item</g>
-      |   </c1>
-      |   <c2>
-      |      <f>item</f>
-      |   </c2>
-      |   <c1>
-      |      <xyz>item</xyz>
+      |      <$toReplace>item</$toReplace>
       |   </c1>
       |</a>""".stripMargin
 
@@ -443,68 +426,36 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       |   </c1>
       |</a>""".stripMargin
 
-  val input17 =
-    """<?xml version="1.0" encoding="UTF-8"?>
+  def example17(toReplace: String) =
+    s"""<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |   <c1>
       |      <f>item</f>
       |      <g>item</g>
       |   </c1>
       |   <c1>
-      |      <f>item</f>
+      |      <f>$toReplace</f>
       |      <g someKey="someValue">item</g>
       |   </c1>
       |</a>""".stripMargin
 
-  val output17 =
-    """<?xml version="1.0" encoding="UTF-8"?>
-      |<a>
-      |   <c1>
-      |      <f>item</f>
-      |      <g>item</g>
-      |   </c1>
-      |   <c1>
-      |      <f>ITEM</f>
-      |      <g someKey="someValue">item</g>
-      |   </c1>
-      |</a>""".stripMargin
-
-  val input18 =
-    """<?xml version="1.0" encoding="UTF-8"?>
-      |<a>
-      |   <c1>
-      |      <f>
-      |        <h>abc</h>
-      |      </f>
-      |      <f>
-      |        <h>abc</h>
-      |      </f>
-      |      <f>
-      |        <h>abc</h>
-      |        <i>to be selected</i>
-      |      </f>
-      |   </c1>
-      |</a>""".stripMargin
-
-  val output18 =
-    """<?xml version="1.0" encoding="UTF-8"?>
+  def example18(toReplace: String) =
+    s"""<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |  <c1>
+      |    <f></f>
       |    <f>
       |      <h>abc</h>
       |    </f>
       |    <f>
       |      <h>abc</h>
-      |    </f>
-      |    <f>
-      |      <h>abc</h>
-      |      <i>TO BE SELECTED</i>
+      |      <i>$toReplace</i>
       |    </f>
       |  </c1>
       |</a>""".stripMargin
 
-  val input19 =
-    """<?xml version="1.0" encoding="UTF-8"?>
+  def example19(toReplace: String) =
+    s"""<?xml version="1.0" encoding="UTF-8"?>
       |<a>
       |  <c1>
       |    <f>
@@ -516,26 +467,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       |    <f>
       |      <h>
       |        <i>item</i>
-      |        <i>to be selected</i>
-      |      </h>
-      |    </f>
-      |  </c1>
-      |</a>""".stripMargin
-
-  val output19 =
-    """<?xml version="1.0" encoding="UTF-8"?>
-      |<a>
-      |  <c1>
-      |    <f>
-      |      <h>
-      |        <i>item</i>
-      |        <i>to be selected</i>
-      |      </h>
-      |    </f>
-      |    <f>
-      |      <h>
-      |        <i>item</i>
-      |        <i>TO BE SELECTED</i>
+      |        <i>$toReplace</i>
       |      </h>
       |    </f>
       |  </c1>
