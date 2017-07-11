@@ -70,7 +70,7 @@ with different <code class="highlighter-rouge">criteria</code>.</p>
 <p>First, let’s analyze the output when we use plain String as element label; consequently ignoring namespaces:</p>
 
 <div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">ignoreNs</span> <span class="k">=</span> <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="s">"f"</span><span class="o">))</span>
-<span class="c1">// ignoreNs: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@79158972
+<span class="c1">// ignoreNs: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@35bcb333
 </span>
 <span class="n">ignoreNs</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
 <span class="c1">// res3: List[String] = List(a.com, b.com, c.com, d.com)
@@ -85,7 +85,7 @@ with different <code class="highlighter-rouge">criteria</code>.</p>
   <span class="k">val</span> <span class="n">ns</span> <span class="k">=</span> <span class="nc">Namespace</span><span class="o">(</span><span class="s">"http://a.com"</span><span class="o">)</span>
   <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"f"</span><span class="o">)))</span>
 <span class="o">}</span>
-<span class="c1">// withNsA: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@3e3b2c5d
+<span class="c1">// withNsA: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@70942e37
 </span>
 <span class="n">withNsA</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
 <span class="c1">// res4: List[String] = List(a.com)
@@ -93,8 +93,6 @@ with different <code class="highlighter-rouge">criteria</code>.</p>
 </div>
 
 <p>This time result contains just <code class="highlighter-rouge">"a.com"</code>.</p>
-
-<h3 id="attributes">Attributes</h3>
 
 <h3 id="default-namespace">Default namespace</h3>
 
@@ -115,6 +113,7 @@ Element has no namespace if a document has no default namespace or the applied n
       |      &lt;b:f&gt;b.com&lt;/b:f&gt;
       |   &lt;/c1&gt;
       |&lt;/a&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
+<span class="k">val</span> <span class="n">xml</span> <span class="k">=</span> <span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input2</span><span class="o">).</span><span class="n">right</span><span class="o">.</span><span class="n">get</span>
 </code></pre>
 </div>
 
@@ -125,12 +124,77 @@ text <code class="highlighter-rouge">no namespace</code>) you need to call <code
   <span class="k">val</span> <span class="n">ns</span> <span class="k">=</span> <span class="nc">Namespace</span><span class="o">.</span><span class="n">empty</span>
   <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"f"</span><span class="o">)))</span>
 <span class="o">}</span>
-<span class="c1">// defaultNs: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@6f0ce818
+<span class="c1">// defaultNs: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@25fa0d5c
 </span>
 <span class="n">defaultNs</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
-<span class="c1">// res5: List[String] = List()
+<span class="c1">// res5: List[String] = List(no namespace)
 </span></code></pre>
 </div>
+
+<h3 id="attributes-namespaces">Attributes namespaces</h3>
+
+<p>When it comes to namespaces attributes the API is the same - <code class="highlighter-rouge">Namespace</code> is an entry point for creating namespace 
+sensitive matchers.</p>
+
+<p>There are 2 peculiarities you may come across when working with namespace sensitive matchers for attributes. 
+Firstly, it should be noted here that as long as attribute itself has not been prefixed it is not in any namespace.
+Secondly, some operations needs <code class="highlighter-rouge">PrefixedNamespace</code> instead of simple <code class="highlighter-rouge">Namespace</code>. Those operations are
+that ones that, except of accessing attributes, create new attributes. That’s why <code class="highlighter-rouge">PrefixedNamespace</code> need one more field - 
+<code class="highlighter-rouge">prefix</code>.</p>
+
+<p>Let’s move to the example that will explain aforementioned considerations. Following code defines operation of replacing
+given attribute value or adding attribute if it’s not present:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.syntax.OpticsBuilder._</span>
+<span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.PrefixedNamespace</span>
+
+<span class="k">val</span> <span class="n">traversal</span> <span class="k">=</span> <span class="o">(</span><span class="n">root</span> <span class="o">\</span> <span class="s">"c1"</span> <span class="o">\</span> <span class="s">"f"</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="n">ns</span> <span class="k">=</span> <span class="nc">PrefixedNamespace</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span> <span class="s">"http://a.com"</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">replaceOrAddAttr</span> <span class="k">=</span> <span class="n">traversal</span><span class="o">.</span><span class="n">replaceOrAddAttr</span><span class="o">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"someKey"</span><span class="o">),</span> <span class="s">"newValue"</span><span class="o">)</span>
+</code></pre>
+</div>
+
+<p>Let’s run it against such XML:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">input3</span> <span class="k">=</span>
+    <span class="s">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+      |&lt;a xmlns:a="http://a.com" xmlns:b="http://b.com"&gt;
+      |   &lt;c1&gt;
+      |      &lt;f a:someKey="oldValue"&gt;item1&lt;/f&gt;
+      |      &lt;f someKey="oldValue"&gt;item2&lt;/f&gt;
+      |      &lt;a:f someKey="oldValue"&gt;item1&lt;/a:f&gt;
+      |      &lt;f b:someKey="oldValue"&gt;item2&lt;/f&gt;
+      |   &lt;/c1&gt;
+      |&lt;/a&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
+<span class="k">val</span> <span class="n">xml</span> <span class="k">=</span> <span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input</span><span class="o">).</span><span class="n">right</span><span class="o">.</span><span class="n">get</span>
+</code></pre>
+</div>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.printing.XmlPrinter</span>
+<span class="c1">// import net.michalsitko.xml.printing.XmlPrinter
+</span>
+<span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">replaceOrAddAttr</span><span class="o">(</span><span class="n">xml</span><span class="o">))</span>
+<span class="c1">// res8: String =
+// &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+// &lt;a xmlns="http://a.com" xmlns:b="http://b.com"&gt;
+//    &lt;c1&gt;
+//       &lt;f xmlns:a="http://a.com" a:someKey="newValue"&gt;a.com&lt;/f&gt;
+//       &lt;b:f xmlns:a="http://a.com" a:someKey="newValue"&gt;b.com&lt;/b:f&gt;
+//    &lt;/c1&gt;
+//    &lt;c1 xmlns="http://c.com" xmlns:b="http://d.com"&gt;
+//       &lt;f xmlns:a="http://a.com" a:someKey="newValue"&gt;c.com&lt;/f&gt;
+//       &lt;b:f xmlns:a="http://a.com" a:someKey="newValue"&gt;d.com&lt;/b:f&gt;
+//    &lt;/c1&gt;
+// &lt;/a&gt;
+</span></code></pre>
+</div>
+
+<p>As you can see if attribute cannot be found then it’s added withing desired namespace and with prefix passed as
+first argument to <code class="highlighter-rouge">PrefixedNamespace.apply</code>.</p>
+
+<p>It may be non-obvous why for <code class="highlighter-rouge">&lt;a:f&gt;</code> new attribute is added instead of being modified. For explanation for this 
+look (here)[https://stackoverflow.com/questions/41561/xml-namespaces-and-attributes].</p>
 </section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/xml-lens/highlight/highlight.pack.js"></script><script>hljs.configure({
 languages:['scala','java','bash']
 });
