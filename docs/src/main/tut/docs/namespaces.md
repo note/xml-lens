@@ -177,5 +177,5 @@ XmlPrinter.print(replaceOrAddAttr(xml))
 As you can see if attribute cannot be found then it's added withing desired namespace and with prefix passed as
 first argument to `PrefixedNamespace.apply`.
 
-It may be non-obvous why for `<a:f>` new attribute is added instead of being modified. For explanation for this 
-look (here)[https://stackoverflow.com/questions/41561/xml-namespaces-and-attributes].
+It may be non-obvious why for `<a:f>` new attribute is added instead of being modified. For explanation for this 
+look [here](https://stackoverflow.com/questions/41561/xml-namespaces-and-attributes).
