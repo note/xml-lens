@@ -70,7 +70,7 @@ with different <code class="highlighter-rouge">criteria</code>.</p>
 <p>First, let’s analyze the output when we use plain String as element label; consequently ignoring namespaces:</p>
 
 <div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">ignoreNs</span> <span class="k">=</span> <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="s">"f"</span><span class="o">))</span>
-<span class="c1">// ignoreNs: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@2587d6cf
+<span class="c1">// ignoreNs: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@38f802ea
 </span>
 <span class="n">ignoreNs</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
 <span class="c1">// res3: List[String] = List(a.com, b.com, c.com, d.com)
@@ -85,7 +85,7 @@ with different <code class="highlighter-rouge">criteria</code>.</p>
   <span class="k">val</span> <span class="n">ns</span> <span class="k">=</span> <span class="nc">Namespace</span><span class="o">(</span><span class="s">"http://a.com"</span><span class="o">)</span>
   <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"f"</span><span class="o">)))</span>
 <span class="o">}</span>
-<span class="c1">// withNsA: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@ea1e2ef
+<span class="c1">// withNsA: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@451a151a
 </span>
 <span class="n">withNsA</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
 <span class="c1">// res4: List[String] = List(a.com)
@@ -124,7 +124,7 @@ text <code class="highlighter-rouge">no namespace</code>) you need to call <code
   <span class="k">val</span> <span class="n">ns</span> <span class="k">=</span> <span class="nc">Namespace</span><span class="o">.</span><span class="n">empty</span>
   <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"f"</span><span class="o">)))</span>
 <span class="o">}</span>
-<span class="c1">// defaultNs: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@600218f5
+<span class="c1">// defaultNs: monocle.Traversal[net.michalsitko.xml.entities.LabeledElement,String] = monocle.PTraversal$$anon$2@4fe9be8f
 </span>
 <span class="n">defaultNs</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
 <span class="c1">// res5: List[String] = List(no namespace)
