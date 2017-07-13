@@ -21,7 +21,7 @@ Library is in an early state of initial development.
 sbt docs/makeMicrosite
 ```
 
-After docs has been successfully generated you serve it with:
+After docs has been successfully generated you can serve it with:
 
 ```
 cd docs/target/site

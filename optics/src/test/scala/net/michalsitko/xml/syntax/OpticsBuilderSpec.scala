@@ -203,8 +203,6 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
 
       val res = (root \ "c1" \ "f").elementAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      println("bazinga: " + XmlPrinter.print(res))
-
       XmlPrinter.print(res) should equal(example18("ITEM"))
     }
 
@@ -464,8 +462,27 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       |      <h>abc</h>
       |      <i>$toReplace</i>
       |    </f>
+      |    <f>
+      |      <h>abc</h>
+      |      <i>$toReplace</i>
+      |      <i>abc</i>
+      |    </f>
       |  </c1>
       |</a>""".stripMargin
+
+val input =
+  s"""<?xml version="1.0" encoding="UTF-8"?>
+     |<a>
+     |  <f></f>
+     |  <f>
+     |    <h>abc</h>
+     |    <i>toReplace</i>
+     |  </f>
+     |  <f>
+     |    <h>abc</h>
+     |    <i>toReplace</i>
+     |  </f>
+     |</a>""".stripMargin
 
   def example19(toReplace: String) =
     s"""<?xml version="1.0" encoding="UTF-8"?>

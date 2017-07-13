@@ -3,7 +3,6 @@ package net.michalsitko.xml.optics
 import monocle.function.Index
 import monocle.{Lens, Optional, Traversal}
 import net.michalsitko.xml.entities._
-import net.michalsitko.xml.syntax.IndexedPredicateUpdater
 
 import scalaz.Applicative
 import scalaz.std.list._
@@ -112,3 +111,22 @@ trait ElementOptics {
 }
 
 object ElementOptics extends ElementOptics
+
+// feels hacky, try to get rid of it
+private [optics] class IndexedPredicateUpdater[T](idx: Int, updatePF: PartialFunction[T, T]) extends (T => T) {
+  private var counter = 0
+
+  override def apply(v1: T): T = {
+    if(updatePF.isDefinedAt(v1)) {
+      val res = if(counter == idx) {
+        updatePF.apply(v1)
+      } else {
+        v1
+      }
+      counter += 1
+      res
+    } else {
+      v1
+    }
+  }
+}

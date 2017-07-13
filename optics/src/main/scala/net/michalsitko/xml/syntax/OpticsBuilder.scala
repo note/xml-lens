@@ -48,25 +48,25 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
     DeepBuilder(composed)
   }
 
-  def index(idx: Int): DeepBuilderOptional = {
+  def index(n: Int): DeepBuilderOptional = {
     val optional: Optional[LabeledElement, Element] = Optional.apply[LabeledElement, Element] { root =>
       val all = current.getAll(root)
-      all.lift(idx)
+      all.lift(n)
     }{ updatedElem => root =>
-      current.modify(new Indexed(idx, updatedElem))(root)
+      current.modify(new Indexed(n, updatedElem))(root)
     }
     DeepBuilderOptional(optional)
   }
 
-  def childAt(idx: Int): DeepBuilder = {
+  def childAt(n: Int): DeepBuilder = {
     val index = ElementOptics.index
-    val optional: Optional[Element, Node] = index.index(idx)
+    val optional: Optional[Element, Node] = index.index(n)
     val newTraversal = current.composeOptional(optional).composePrism(NodeOptics.isLabeledElement).composeLens(LabeledElementOptics.element)
     DeepBuilder(newTraversal)
   }
 
-  def elementAt(idx: Int): DeepBuilder = {
-    val optional = ElementOptics.indexElementOptional(idx)
+  def elementAt(n: Int): DeepBuilder = {
+    val optional = ElementOptics.indexElementOptional(n)
     val newTraversal = {
       current.composeOptional(optional).composeLens(LabeledElementOptics.element)
     }
@@ -74,28 +74,7 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
   }
 }
 
-
-class IndexedPredicateUpdater[T](idx: Int, updatePF: PartialFunction[T, T]) extends (T => T) {
-  private var counter = 0
-
-  override def apply(v1: T): T = {
-    if(updatePF.isDefinedAt(v1)) {
-      val res = if(counter == idx) {
-        updatePF.apply(v1)
-      } else {
-        v1
-      }
-      counter += 1
-      res
-    } else {
-      v1
-    }
-  }
-}
-
-
-// TODO: make it private
-class Indexed(idx: Int, newValue: Element) extends (Element => Element) {
+private [syntax] class Indexed(idx: Int, newValue: Element) extends (Element => Element) {
   private var counter = 0
 
   override def apply(v1: Element): Element = {
