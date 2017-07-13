@@ -3,6 +3,7 @@ package net.michalsitko.xml.optics
 import monocle.function.Index
 import monocle.{Lens, Optional, Traversal}
 import net.michalsitko.xml.entities._
+import net.michalsitko.xml.syntax.IndexedPredicateUpdater
 
 import scalaz.Applicative
 import scalaz.std.list._
@@ -63,8 +64,9 @@ trait ElementOptics {
     }
   }
 
-  // TODO: test lawfulness
   val allLabeledElements: Traversal[Element, LabeledElement] = allChildren.composePrism(NodeOptics.isLabeledElement)
+
+  val allTexts: Traversal[Element, Text] = allChildren.composePrism(NodeOptics.isText)
 
   def index: Index[Element, Int, Node] = new Index[Element, Int, Node] {
     override def index(i: Int): Optional[Element, Node] = indexOptional(i)
@@ -77,6 +79,18 @@ trait ElementOptics {
       case Some(_) => children.modify(_.patch(i, Seq(newNode), 1))(element)
       case None    => element
     }
+  }
+
+  def indexElementOptional(i: Int) = Optional.apply[Element, LabeledElement] { element =>
+    element.children.collect {
+      case el: LabeledElement => el
+    }.lift(i)
+  } { newElement => parent =>
+    val updater = new IndexedPredicateUpdater[Node](i, {
+      case el: LabeledElement => newElement
+    })
+    val newChildren = parent.children.map(updater)
+    parent.copy(children = newChildren)
   }
 
   private def onlyChild(element: Element): Option[Node] = {

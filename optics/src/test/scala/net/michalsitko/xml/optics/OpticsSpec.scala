@@ -125,7 +125,7 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       val nameMatcher = NameMatcher.fromString("f")
 
       val renameLabel = { element: Element =>
-        allLabeledElements.modify { el =>
+        ElementOptics.allLabeledElements.modify { el =>
           if (nameMatcher.matches(el.label)) {
             localName.set("xyz")(el)
           } else {

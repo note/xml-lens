@@ -60,13 +60,43 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
 
   def childAt(idx: Int): DeepBuilder = {
     val index = ElementOptics.index
-    val optional = index.index(idx)
+    val optional: Optional[Element, Node] = index.index(idx)
     val newTraversal = current.composeOptional(optional).composePrism(NodeOptics.isLabeledElement).composeLens(LabeledElementOptics.element)
+    DeepBuilder(newTraversal)
+  }
+
+  def elementAt(idx: Int): DeepBuilder = {
+//    val index = ElementOptics.indexElementOptional _
+    val optional = ElementOptics.indexElementOptional(idx)
+    val newTraversal = {
+      current.composeOptional(optional).composeLens(LabeledElementOptics.element)
+    }
     DeepBuilder(newTraversal)
   }
 }
 
-private [syntax] class Indexed(idx: Int, newValue: Element) extends (Element => Element) {
+
+class IndexedPredicateUpdater[T](idx: Int, updatePF: PartialFunction[T, T]) extends (T => T) {
+  private var counter = 0
+
+  override def apply(v1: T): T = {
+    if(updatePF.isDefinedAt(v1)) {
+      val res = if(counter == idx) {
+        updatePF.apply(v1)
+      } else {
+        v1
+      }
+      counter += 1
+      res
+    } else {
+      v1
+    }
+  }
+}
+
+
+// TODO: make it private
+class Indexed(idx: Int, newValue: Element) extends (Element => Element) {
   private var counter = 0
 
   override def apply(v1: Element): Element = {

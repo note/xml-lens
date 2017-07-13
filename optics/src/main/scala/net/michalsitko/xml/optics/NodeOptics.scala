@@ -1,6 +1,6 @@
 package net.michalsitko.xml.optics
 
-import monocle.{PPrism, Prism, Traversal}
+import monocle.{Prism, Traversal}
 import net.michalsitko.xml.entities.{LabeledElement, Node, Text}
 
 import scalaz.Applicative
@@ -12,7 +12,7 @@ trait NodeOptics {
     case text: Text => text
   }(identity)
 
-  val isTextS: PPrism[Node, Node, String, String] = isText.composeIso(TextOptics.textIso)
+  val isTextS: Prism[Node, String] = isText.composeIso(TextOptics.textIso)
 
   val isLabeledElement: Prism[Node, LabeledElement] = Prism.partial[Node, LabeledElement]{
     case elem: LabeledElement => elem

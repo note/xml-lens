@@ -188,11 +188,24 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
 
     "childAt" in {
       import net.michalsitko.xml.syntax.node._
+      // we need to minimize as unneccessary Text nodes (caused just by the fact that input string is formatted)
+      // would interfere with `childAt`
       val parsed = XmlParser.parse(example18("item")).right.get.minimize
 
       val res = (root \ "c1" \ "f").childAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
       XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(example18("ITEM"))
+    }
+
+    "elementAt" in {
+      // contrary to `childAt` we don't need to minimize as Text elements will be ignored
+      val parsed = XmlParser.parse(example18("item")).right.get
+
+      val res = (root \ "c1" \ "f").elementAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
+
+      println("bazinga: " + XmlPrinter.print(res))
+
+      XmlPrinter.print(res) should equal(example18("ITEM"))
     }
 
   }
