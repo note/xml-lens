@@ -51,7 +51,7 @@ XmlPrinter.print(res)
 Crucial observation here is that we have not created a new focus (e.g. one going deeper) but just chosen
 one item of current focus.
 
-### How to access n-th children of current focus
+### How to deepen focus to n-th elements of current focus
 
 In the following XML you're interested only in the second `<f>` element (i.e. one containing `item2`):
 
