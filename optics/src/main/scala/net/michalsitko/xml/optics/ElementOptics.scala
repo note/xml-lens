@@ -87,7 +87,7 @@ trait ElementOptics {
     }.lift(i)
   } { newElement => parent =>
     val updater = new IndexedPredicateUpdater[Node](i, {
-      case el: LabeledElement => newElement
+      case _: LabeledElement => newElement
     })
     val newChildren = parent.children.map(updater)
     parent.copy(children = newChildren)

@@ -12,6 +12,20 @@ class ElementOpticsSpec extends WordSpec with Matchers with ExampleBuilderHelper
       indexOptional(2).getOption(input.element) should equal (Some(expected))
     }
 
+    "be able to set text Node" in {
+      val expectedOutput: LabeledElement =
+        labeledElement("a",
+          Text("NEW"),
+          labeledElement("b",
+            Text("world"),
+            Text("abc")
+          ),
+          expected
+        )
+
+      indexOptional(0).set(Text("NEW"))(input.element) should equal (expectedOutput.element)
+    }
+
     "return None if node with given index does not exist" in {
       indexOptional(3).getOption(input.element) should equal (None)
     }

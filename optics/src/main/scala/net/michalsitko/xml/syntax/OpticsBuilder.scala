@@ -49,11 +49,11 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
   }
 
   def index(idx: Int): DeepBuilderOptional = {
-    val optional: Optional[LabeledElement, Element] = Optional.apply[LabeledElement, Element] { labeled =>
-      val all = current.getAll(labeled)
+    val optional: Optional[LabeledElement, Element] = Optional.apply[LabeledElement, Element] { root =>
+      val all = current.getAll(root)
       all.lift(idx)
-    }{ newElem => labeled =>
-      current.modify(new Indexed(idx, newElem))(labeled)
+    }{ updatedElem => root =>
+      current.modify(new Indexed(idx, updatedElem))(root)
     }
     DeepBuilderOptional(optional)
   }
@@ -66,7 +66,6 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
   }
 
   def elementAt(idx: Int): DeepBuilder = {
-//    val index = ElementOptics.indexElementOptional _
     val optional = ElementOptics.indexElementOptional(idx)
     val newTraversal = {
       current.composeOptional(optional).composeLens(LabeledElementOptics.element)
