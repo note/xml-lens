@@ -105,10 +105,10 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
         |<a><c1><f name="abc" name2="something else">item1</f><g>item2</g></c1><c1 name=""><f>item1</f><h>item2</h></c1></a>""".stripMargin,
       labeledElement("a",
         labeledElement("c1",
-          LabeledElement(ResolvedName.unprefixed("f"), Element(fAttributes, List(Text("item1")), Seq.empty)),
+          LabeledElement.unprefixed("f", Element(fAttributes, List(Text("item1")), Seq.empty)),
           labeledElement("g", Text("item2"))
         ),
-        LabeledElement(ResolvedName.unprefixed("c1"), Element(c1Attributes, List(
+        LabeledElement.unprefixed("c1", Element(c1Attributes, List(
           labeledElement("f", Text("item1")),
           labeledElement("h", Text("item2"))
         ), Seq.empty))
@@ -159,7 +159,7 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
     Example("""<?xml version="1.0" encoding="UTF-8"?>
         |<a xmlns=""></a>
       """.stripMargin,
-      LabeledElement(ResolvedName.unprefixed("a"), Element(namespaceDeclarations = Seq(NamespaceDeclaration("", ""))))
+      LabeledElement.unprefixed("a", Element(namespaceDeclarations = Seq(NamespaceDeclaration("", ""))))
     )
 
   val malformedXmlStrings = List(

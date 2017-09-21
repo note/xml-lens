@@ -13,5 +13,5 @@ trait ExampleBuilderHelper {
   def indent(level: Int): Text = Text(lineBreak + (indent * level))
 
   def labeledElement(name: String, children: Node*) =
-    LabeledElement(ResolvedName.unprefixed(name), element(children:_*))
+    LabeledElement.unprefixed(name, element(children:_*))
 }

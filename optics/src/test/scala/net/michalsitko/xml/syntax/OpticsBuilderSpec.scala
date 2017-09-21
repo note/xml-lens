@@ -1,6 +1,6 @@
 package net.michalsitko.xml.syntax
 
-import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement, ResolvedName}
+import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement}
 import net.michalsitko.xml.optics.{LabeledElementOptics, Namespace, NodeOptics, PrefixedNamespace}
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
@@ -142,8 +142,8 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
 
     // TODO: add sht like this to cookbook
     "having" in {
-      import NodeOptics._
       import LabeledElementOptics._
+      import NodeOptics._
 
       val parsed = XmlParser.parse(example15("f")).right.get
 
@@ -156,8 +156,8 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "having 2" in {
-      import NodeOptics._
       import LabeledElementOptics._
+      import NodeOptics._
       import net.michalsitko.xml.optics.ElementOptics._
 
       val parsed = XmlParser.parse(example17("item")).right.get
@@ -211,7 +211,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       val parsed = XmlParser.parse(minimalInput).right.get
 
       // TODO: better factory methods needed instead of this
-      val newElement = LabeledElement(ResolvedName.unprefixed("new"), Element())
+      val newElement = LabeledElement.unprefixed("new", Element())
       val res = (root \ "f").children.modify( ch => newElement +: ch)(parsed)
 
       XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(example20)
@@ -221,7 +221,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       val parsed = XmlParser.parse(minimalInput).right.get
 
       // TODO: better factory methods needed instead of this
-      val newElement = LabeledElement(ResolvedName.unprefixed("new"), Element())
+      val newElement = LabeledElement.unprefixed("new", Element())
       val res = (root \ "f").children.modify( ch => ch :+ newElement)(parsed)
 
       XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(example21)
