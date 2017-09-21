@@ -17,6 +17,14 @@ sealed trait Node
   */
 case class LabeledElement(label: ResolvedName, element: Element) extends Node
 
+object LabeledElement {
+  def unprefixed(localName: String, element: Element): LabeledElement =
+    LabeledElement(ResolvedName.unprefixed(localName), element)
+
+  def unprefixedEmpty(localName: String): LabeledElement =
+    LabeledElement.unprefixed(localName, Element())
+}
+
 case class Text(text: String) extends Node
 
 case class Comment(comment: String) extends Node

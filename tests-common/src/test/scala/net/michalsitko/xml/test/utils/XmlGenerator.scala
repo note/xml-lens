@@ -1,6 +1,6 @@
 package net.michalsitko.xml.test.utils
 
-import net.michalsitko.xml.entities.{Element, LabeledElement, ResolvedName, Text}
+import net.michalsitko.xml.entities.{Element, LabeledElement, Text}
 
 import scala.annotation.tailrec
 
@@ -11,11 +11,11 @@ trait XmlGenerator {
       if (n == 0) {
         child
       } else {
-        val current = LabeledElement(ResolvedName.unprefixed("abcd"), Element(List.empty, List(child), List.empty))
+        val current = LabeledElement.unprefixed("abcd", Element(children = List(child)))
         loop(n - 1, current)
       }
     }
 
-    loop(depth - 1, LabeledElement(ResolvedName.unprefixed("abcd"), Element(List.empty, List(Text("some text")), List.empty)))
+    loop(depth - 1, LabeledElement.unprefixed("abcd", Element(children = List(Text("some text")))))
   }
 }
