@@ -61,9 +61,14 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
   def childAt(n: Int): DeepBuilder = {
     val index = ElementOptics.index
     val optional: Optional[Element, Node] = index.index(n)
-    val newTraversal = current.composeOptional(optional).composePrism(NodeOptics.isLabeledElement).composeLens(LabeledElementOptics.element)
+    val newTraversal = current
+      .composeOptional(optional)
+      .composePrism(NodeOptics.isLabeledElement)
+      .composeLens(LabeledElementOptics.element)
     DeepBuilder(newTraversal)
   }
+
+  val children = current.composeLens(ElementOptics.children)
 
   def elementAt(n: Int): DeepBuilder = {
     val optional = ElementOptics.indexElementOptional(n)

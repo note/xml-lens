@@ -51,7 +51,7 @@ trait ElementOptics {
   val namespaces: Lens[Element, Seq[NamespaceDeclaration]] =
     Lens[Element, Seq[NamespaceDeclaration]](_.namespaceDeclarations)(newNs => from => from.copy(namespaceDeclarations = newNs))
 
-  val children: Lens[Element, Seq[Node]] = Lens[Element, Seq[Node]](_.children){ newChildren =>from =>
+  val children: Lens[Element, Seq[Node]] = Lens[Element, Seq[Node]](_.children){ newChildren => from =>
     from.copy(children = newChildren)
   }
 

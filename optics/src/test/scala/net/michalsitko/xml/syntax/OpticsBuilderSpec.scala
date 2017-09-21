@@ -1,6 +1,6 @@
 package net.michalsitko.xml.syntax
 
-import net.michalsitko.xml.entities.Attribute
+import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement, ResolvedName}
 import net.michalsitko.xml.optics.{LabeledElementOptics, Namespace, NodeOptics, PrefixedNamespace}
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
@@ -10,7 +10,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
   "OpticsBuilder" should {
-    "work" in {
+    "set text for chosen path" in {
       val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
 
       val traversal = (root \ "c1" \ "f").hasTextOnly
@@ -19,7 +19,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       XmlPrinter.print(res) should equal(expectedRes)
     }
 
-    "modify text" in {
+    "modify text for chosen path" in {
       val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
 
       val traversal = (root \ "c1" \ "f").hasTextOnly
@@ -204,6 +204,27 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       val res = (root \ "c1" \ "f").elementAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
       XmlPrinter.print(res) should equal(example18("ITEM"))
+    }
+
+    // TODO: may be a nice addition to cookbook
+    "insert new node as the first node" in {
+      val parsed = XmlParser.parse(minimalInput).right.get
+
+      // TODO: better factory methods needed instead of this
+      val newElement = LabeledElement(ResolvedName.unprefixed("new"), Element())
+      val res = (root \ "f").children.modify( ch => newElement +: ch)(parsed)
+
+      XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(example20)
+    }
+
+    "insert new node as the last node" in {
+      val parsed = XmlParser.parse(minimalInput).right.get
+
+      // TODO: better factory methods needed instead of this
+      val newElement = LabeledElement(ResolvedName.unprefixed("new"), Element())
+      val res = (root \ "f").children.modify( ch => ch :+ newElement)(parsed)
+
+      XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(example21)
     }
 
   }
@@ -470,19 +491,19 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       |  </c1>
       |</a>""".stripMargin
 
-val input =
-  s"""<?xml version="1.0" encoding="UTF-8"?>
-     |<a>
-     |  <f></f>
-     |  <f>
-     |    <h>abc</h>
-     |    <i>toReplace</i>
-     |  </f>
-     |  <f>
-     |    <h>abc</h>
-     |    <i>toReplace</i>
-     |  </f>
-     |</a>""".stripMargin
+  val input =
+    s"""<?xml version="1.0" encoding="UTF-8"?>
+       |<a>
+       |  <f></f>
+       |  <f>
+       |    <h>abc</h>
+       |    <i>toReplace</i>
+       |  </f>
+       |  <f>
+       |    <h>abc</h>
+       |    <i>toReplace</i>
+       |  </f>
+       |</a>""".stripMargin
 
   def example19(toReplace: String) =
     s"""<?xml version="1.0" encoding="UTF-8"?>
@@ -502,5 +523,31 @@ val input =
       |    </f>
       |  </c1>
       |</a>""".stripMargin
+
+  val minimalInput =
+    s"""<?xml version="1.0" encoding="UTF-8"?>
+       |<a>
+       |  <f>
+       |    <g>some text</g>
+       |  </f>
+       |</a>""".stripMargin
+
+  val example20 =
+    s"""<?xml version="1.0" encoding="UTF-8"?>
+       |<a>
+       |  <f>
+       |    <new></new>
+       |    <g>some text</g>
+       |  </f>
+       |</a>""".stripMargin
+
+  val example21 =
+    s"""<?xml version="1.0" encoding="UTF-8"?>
+       |<a>
+       |  <f>
+       |    <g>some text</g>
+       |    <new></new>
+       |  </f>
+       |</a>""".stripMargin
 
 }
