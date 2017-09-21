@@ -1,6 +1,6 @@
 package net.michalsitko.xml.syntax
 
-import net.michalsitko.xml.entities.{LabeledElement, Text}
+import net.michalsitko.xml.entities.Text
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.syntax.node._
@@ -45,8 +45,7 @@ class NodeOpsSpec extends WordSpec with Matchers with ExampleInputs with Example
         """<?xml version="1.0" encoding="UTF-8"?>
           |<a><c1><f>item1</f><g>item2</g></c1><c1><f>item1</f><h>item2</h></c1></a>""".stripMargin
 
-      // TODO: get rid of asInstanceOf
-      XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal(expectedRes)
+      XmlPrinter.print(res) should equal(expectedRes)
     }
 
     "respect comments" in {
@@ -54,7 +53,7 @@ class NodeOpsSpec extends WordSpec with Matchers with ExampleInputs with Example
 
       val res = input.minimize
 
-      XmlPrinter.print(res.asInstanceOf[LabeledElement]) should equal(outputWithComments)
+      XmlPrinter.print(res) should equal(outputWithComments)
     }
   }
 }

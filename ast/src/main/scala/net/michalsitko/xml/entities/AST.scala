@@ -23,7 +23,7 @@ case class Comment(comment: String) extends Node
 
 // TODO: think if Seq[Attribute] is a good choice taking into account that attribute names have to be unique within
 // single element and printing with XmlStreamWriter a non-unique Attribute will throw an exception
-case class Element(attributes: Seq[Attribute], children: Seq[Node], namespaceDeclarations: Seq[NamespaceDeclaration])
+case class Element(attributes: Seq[Attribute] = Seq.empty, children: Seq[Node] = Seq.empty, namespaceDeclarations: Seq[NamespaceDeclaration] = Seq.empty)
 
 // when no prefix in XML then: prefix == ""
 // TODO: investigate why in scala-xml Attribute value is defined as `value: Seq[Node]`

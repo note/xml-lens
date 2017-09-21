@@ -29,7 +29,7 @@ final case class IgnoreNamespaceMatcher(localName: String) extends NameMatcher w
   // we want to add attribute without namespace
   // TODO: add documentation about it
   override def toResolvedName: ResolvedName =
-    ResolvedName("", "", localName)
+    ResolvedName.unprefixed(localName)
 }
 
 // TODO: probably should be package-private
