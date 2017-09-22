@@ -2,7 +2,7 @@ package net.michalsitko.xml.test.utils
 
 import net.michalsitko.xml.entities.{LabeledElement, _}
 
-case class Example(stringRepr: String, expectedRes: LabeledElement)
+case class Example(stringRepr: String, node: LabeledElement)
 
 trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
   val noNamespaceExample = Example(

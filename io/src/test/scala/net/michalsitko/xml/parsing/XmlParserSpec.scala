@@ -50,7 +50,7 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
 
   def checkCorrectInput(specificExample: Example): Unit = {
     val res = XmlParser.parse(specificExample.stringRepr)
-    res.right.get should equal(specificExample.expectedRes)
+    res.right.get should equal(specificExample.node)
   }
 
 }

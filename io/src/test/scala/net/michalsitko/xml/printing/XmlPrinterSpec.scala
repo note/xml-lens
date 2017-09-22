@@ -33,7 +33,7 @@ class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs with XmlG
   }
 
   def check(specificExample: Example): Unit = {
-    val res = XmlPrinter.print(specificExample.expectedRes)
+    val res = XmlPrinter.print(specificExample.node)
 
     // TODO: we don't guarantee preserving whitespace outside of root element
     // decide if it's a good decision

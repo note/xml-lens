@@ -29,6 +29,12 @@ class ParserPrinterSpec extends WordSpec with Matchers {
       val printed = XmlPrinter.prettyPrint(xml, PrinterConfig(Some("  ")))
       printed should equal(prettyXmlString2)
     }
+
+    "PrinterConfig is taken into account" in {
+      val xml = XmlParser.parse(uglyXmlString).right.get
+      val printed = XmlPrinter.prettyPrint(xml, PrinterConfig(Some(" ")))
+      printed should equal(prettyXmlStringIntendedWithOneSpace)
+    }
   }
 
   val exampleXmlString =
@@ -53,22 +59,22 @@ class ParserPrinterSpec extends WordSpec with Matchers {
   val uglyXmlString =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a><c1><f>item  </f>
-      |      <g>
+      |<g>
       |          item</g>
       |   </c1>
       |   <c1>
       |      <f>  </f>
       |      <h>
       |
-      |      </h>
+      |</h>
       |   </c1>
       |   <c1>
       |      <f>item</f>
       |   </c1>
-      |   <c1>
+      |<c1>
       |      item
-      |      <f>item</f>
-      |   </c1>
+      |      <f>item </f>
+      | </c1>
       |</a>""".stripMargin
 
   val prettyXmlString =
@@ -89,9 +95,32 @@ class ParserPrinterSpec extends WordSpec with Matchers {
       |  <c1>
       |      item
       |      
-      |    <f>item</f>
+      |    <f>item </f>
       |  </c1>
       |</a>""".stripMargin
+
+  val prettyXmlStringIntendedWithOneSpace =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      | <c1>
+      |  <f>item  </f>
+      |  <g>
+      |          item</g>
+      | </c1>
+      | <c1>
+      |  <f></f>
+      |  <h></h>
+      | </c1>
+      | <c1>
+      |  <f>item</f>
+      | </c1>
+      | <c1>
+      |      item
+      |      
+      |  <f>item </f>
+      | </c1>
+      |</a>""".stripMargin
+
 
   val uglyXmlString2 =
     """<?xml version="1.0" encoding="UTF-8"?>
