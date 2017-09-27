@@ -27,6 +27,8 @@ object LabeledElement {
 
 case class Text(text: String) extends Node
 
+case class Dtd(text: String) extends Node
+
 case class Comment(comment: String) extends Node
 
 // TODO: think if Seq[Attribute] is a good choice taking into account that attribute names have to be unique within

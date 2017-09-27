@@ -1,20 +1,36 @@
 package net.michalsitko.xml.parsing
 
-import java.io.{ByteArrayInputStream, IOException, InputStream}
-import java.nio.charset.StandardCharsets
+import java.io.{ByteArrayInputStream, InputStream}
+import java.nio.charset.{Charset, StandardCharsets}
 import javax.xml.stream.XMLStreamConstants._
-import javax.xml.stream.{XMLInputFactory, XMLStreamReader}
+import javax.xml.stream.{XMLInputFactory, XMLResolver, XMLStreamReader}
 
+import net.michalsitko.xml.XmlDeclaration
 import net.michalsitko.xml.entities._
 
-import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
 // TODO: create proper hierarchy of errors
 case class ParsingException(message: String, cause: Throwable) extends Exception(message, cause)
 
-private [parsing] class LabeledElementBuilder(val label: ResolvedName, val attributes: Seq[Attribute], var children: ArrayBuffer[Node], val namespaceDeclarations: Seq[NamespaceDeclaration]) {
+private [parsing] trait NodeBuilder {
+  def addChild(node: Node): Unit
+}
+
+private [parsing] class TopNodesBuilder extends NodeBuilder {
+  private val children = ArrayBuffer.empty[Node]
+
+  def addChild(node: Node): Unit = {
+    children += node
+  }
+
+  def build: Seq[Node] =
+    children.toList
+}
+
+// TODO: those vals and vars on constructor level are unneccessary
+private [parsing] class LabeledElementBuilder(val label: ResolvedName, val attributes: Seq[Attribute], var children: ArrayBuffer[Node], val namespaceDeclarations: Seq[NamespaceDeclaration]) extends NodeBuilder {
   def addChild(node: Node): Unit = {
     children += (node)
   }
@@ -24,52 +40,50 @@ private [parsing] class LabeledElementBuilder(val label: ResolvedName, val attri
   }
 }
 
+private [parsing] class BlankingResolver extends XMLResolver {
+  override def resolveEntity(publicID: String, systemID: String, baseURI: String, namespace: String): AnyRef = {
+    new ByteArrayInputStream("".getBytes)
+  }
+}
+
 object XmlParser {
-  def parse(input: String): Either[ParsingException, LabeledElement] = {
-    // TODO: is it ok to hardcode UTF 8?
-    val stream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
+  // TODO: think about making return type Either[ParsingException, Node]. Current version use an (unneccessary?) assumption
+  def parse(input: String, charset: Charset = StandardCharsets.UTF_8): Either[ParsingException, Seq[Node]] = {
+    val stream = new ByteArrayInputStream(input.getBytes(charset))
     parse(stream)
   }
 
-  def parse(inputStream: InputStream): Either[ParsingException, LabeledElement] = {
+  def parseWithDeclaration(input: String, charset: Charset = StandardCharsets.UTF_8): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
+    val stream = new ByteArrayInputStream(input.getBytes(charset))
+    parseWithDeclaration(stream)
+  }
+
+  def parse(inputStream: InputStream): Either[ParsingException, Seq[Node]] = {
+    import net.michalsitko.xml.parsing.utils.TryOps._
+
+    Try(read(inputStream)).map(_._2).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
+  }
+
+  def parseWithDeclaration(inputStream: InputStream): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
     import net.michalsitko.xml.parsing.utils.TryOps._
 
     Try(read(inputStream)).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
   }
 
-  private def read(inputStream: InputStream): LabeledElement = {
+  private def read(inputStream: InputStream) = {
     val xmlInFact = XMLInputFactory.newInstance()
+    xmlInFact.setXMLResolver(new BlankingResolver)
     val reader = xmlInFact.createXMLStreamReader(inputStream)
 
-    firstElement(reader) match {
-      case Some(resolvedName) =>
-        val nsDeclarations = getNamespaceDeclarations(reader)
-        val attrs = getAttributes(reader)
-        val root = new LabeledElementBuilder(resolvedName, attrs, ArrayBuffer.empty[Node], nsDeclarations)
-        readNext(root, reader)
-        root.build
-      case None => // should not really happen - XMLStreamReader takes care of it
-        throw new IOException("No root element in XML document")
-    }
+    val xmlDeclaration = getDeclaration(reader)
+    val topNodesBuilder = new TopNodesBuilder()
+    readNext(topNodesBuilder, reader)
+
+    (xmlDeclaration, topNodesBuilder.build)
   }
 
-  @tailrec
-  def firstElement(reader: XMLStreamReader): Option[ResolvedName] = {
-    if(reader.hasNext()) {
-      if(reader.next() == START_ELEMENT) {
-        Some(getName(reader))
-      } else {
-        firstElement(reader)
-      }
-    } else {
-      None
-    }
-  }
-
-  // TODO: this may be slow - check it with JMH after optimizations
-  def readNext(parent: LabeledElementBuilder, reader: XMLStreamReader): Unit = {
+  private def readNext(root: NodeBuilder, reader: XMLStreamReader) = {
     var elementStack = List.empty[LabeledElementBuilder]
-    elementStack = parent :: elementStack
 
     while(reader.hasNext) {
       reader.next() match {
@@ -87,13 +101,20 @@ object XmlParser {
 
         case END_ELEMENT =>
           val current = elementStack.head
-          elementStack.tail.headOption.map(_.addChild(current.build))
+          elementStack.tail.headOption.getOrElse(root).addChild(current.build)
           elementStack = elementStack.tail
 
         case COMMENT =>
-          val parent = elementStack.head
+          // `headOption` because COMMENT can be top level Node
+          val parent = elementStack.headOption.getOrElse(root)
           val commentText = reader.getText()
           parent.addChild(Comment(commentText))
+
+        case DTD =>
+          // `headOption` because DTD can be top level Node
+          val parent = elementStack.headOption.getOrElse(root)
+          val commentText = reader.getText()
+          parent.addChild(Dtd(commentText))
 
         case _ =>
           // ignore for now
@@ -101,7 +122,13 @@ object XmlParser {
     }
   }
 
-  private def getName(reader: XMLStreamReader): ResolvedName = {
+  private def getDeclaration(reader: XMLStreamReader) = {
+    Option(reader.getVersion).map { version =>
+      XmlDeclaration(version, Option(reader.getCharacterEncodingScheme))
+    }
+  }
+
+  private def getName(reader: XMLStreamReader) = {
     val prefix = reader.getPrefix()
     val uri = getString(reader.getNamespaceURI())
     val localName = reader.getLocalName()
@@ -109,14 +136,14 @@ object XmlParser {
     ResolvedName(prefix, uri, localName)
   }
 
-  private def getNamespaceDeclarations(reader: XMLStreamReader): Seq[NamespaceDeclaration] =
+  private def getNamespaceDeclarations(reader: XMLStreamReader) =
     for {
       i       <- 0 until reader.getNamespaceCount
       prefix  = getString(reader.getNamespacePrefix(i))
       uri     = reader.getNamespaceURI(i)
     } yield NamespaceDeclaration(prefix, getString(uri))
 
-  private def getAttributes(reader: XMLStreamReader): Seq[Attribute] = {
+  private def getAttributes(reader: XMLStreamReader) = {
     for {
       i         <- 0 until reader.getAttributeCount
       prefix    = reader.getAttributePrefix(i)
@@ -127,7 +154,7 @@ object XmlParser {
     } yield Attribute(resolved, value)
   }
 
-  private def getString(input: String): String = {
+  private def getString(input: String) = {
     if(input != null) {
       input
     } else {

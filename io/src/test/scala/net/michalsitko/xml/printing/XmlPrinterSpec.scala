@@ -28,12 +28,12 @@ class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs with XmlG
     "deal with very deep XML" in {
       val deepXml = elementOfDepth(4000)
 
-      XmlPrinter.print(deepXml)
+      XmlPrinter.print(List(deepXml))
     }
   }
 
   def check(specificExample: Example): Unit = {
-    val res = XmlPrinter.print(specificExample.node)
+    val res = XmlPrinter.print(specificExample.nodes)
 
     // TODO: we don't guarantee preserving whitespace outside of root element
     // decide if it's a good decision

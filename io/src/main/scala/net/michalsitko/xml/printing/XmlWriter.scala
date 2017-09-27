@@ -1,137 +1,111 @@
 package net.michalsitko.xml.printing
 
+import java.io.Writer
+import javax.xml.stream.XMLOutputFactory
+
 import net.michalsitko.xml.entities._
 
+// all methods returns Unit as it's designed to work over some mutable Writer-like type (like java.io.Writer or OutputStream)
 trait XmlWriter {
-  def build: String
-
   def writeLabeled(elem: LabeledElement): Unit
 
   def writeText(text: Text): Unit
 
   def writeComment(comment: Comment): Unit
 
-  def writeEndElement(elem: LabeledElement): Unit
+  def writeDtd(dtd: Dtd): Unit
+
+  def writeEndElement(): Unit
 }
 
-abstract class CommonWriter extends XmlWriter {
-  protected val sb: StringBuilder
+//class PrettyXmlWriter (cfg: PrinterConfig) extends CommonWriter {
+//  private var nestedLevel: Int = 0
+//
+//  // TODO: assumes XML version 1.0 and utf-8, make it works with different values (change in XmlParser required)
+//  writeInvocation("1.0", "UTF-8")
+//
+//  val ident: Int => Unit = cfg.identWith match {
+//    case Some(identWith) => identLevel =>
+//      sw.writeCharacters(EOL)
+//      for (i <- 0 until identLevel) {
+//        sw.writeCharacters(identWith)
+//      }
+//    case None =>
+//      _ => ()
+//  }
+//
+//  def writeLabeled(elem: LabeledElement): Unit = {
+//    ident(nestedLevel)
+//
+//    sw.writeStartElement(elem.label.prefix, elem.label.localName, elem.label.uri)
+//    elem.element.namespaceDeclarations.foreach { ns =>
+//      sw.writeNamespace(ns.prefix, ns.uri)
+//    }
+//    elem.element.attributes.foreach { attr =>
+//      sw.writeAttribute(attr.key.prefix, attr.key.uri, attr.key.localName, attr.value)
+//    }
+//
+//    nestedLevel += 1
+//  }
+//
+//  def writeText(text: Text): Unit = {
+//    if(cfg.identWith.isDefined && text.text.forall(_.isWhitespace)) {
+//
+//    } else {
+//      sw.writeCharacters(text.text)
+//    }
+//  }
+//
+//
+//  def writeEndElement(elem: LabeledElement): Unit = {
+//    val hasChildren = elem.element.children.exists {
+//      case el: LabeledElement =>
+//        true
+//      case _ =>
+//        false
+//    }
+//    nestedLevel -= 1
+//    if(hasChildren) {
+//      ident(nestedLevel)
+//    }
+//    sw.writeEndElement()
+//  }
+//
+//}
+
+class JavaXmlWriter(output: Writer) extends XmlWriter {
+  private val EOL = System.getProperty("line.separator")
+  private val sw = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
+
+  private def writeInvocation(version: String, encoding: String) = {
+    sw.writeStartDocument(encoding, version)
+    sw.writeCharacters(EOL)
+  }
 
   // TODO: assumes XML version 1.0 and utf-8, make it works with different values (change in XmlParser required)
-  protected val xmlInvocation = """<?xml version="1.0" encoding="UTF-8"?>"""
-
-  protected val EOL = System.getProperty("line.separator")
-
-  def build: String =
-    sb.toString
-
-  def writeComment(comment: Comment): Unit = {
-    sb.append("<!--")
-    sb.append(comment.comment)
-    sb.append("-->")
-  }
-
-  protected def writeElementLabel(resolvedName: ResolvedName): Unit = {
-    sb.append("<")
-    sb.append(resolvedNameToString(resolvedName))
-  }
-
-  protected def writeNamespaces(namespaces: Seq[NamespaceDeclaration]): Unit = {
-    namespaces.foreach { ns =>
-      if(ns.prefix.nonEmpty) {
-        sb.append(s""" xmlns:${ns.prefix}="${ns.uri}"""")
-      } else {
-        sb.append(s""" xmlns="${ns.uri}"""")
-      }
-    }
-  }
-
-  protected def writeAttributes(attributes: Seq[Attribute]): Unit = {
-    attributes.foreach { attr =>
-      sb.append(s""" ${resolvedNameToString(attr.key)}="${attr.value}"""")
-    }
-  }
-
-  protected def resolvedNameToString(r: ResolvedName): String = {
-    if(r.prefix.isEmpty) {
-      r.localName
-    } else {
-      r.prefix + ":" + r.localName
-    }
-  }
-}
-
-class PrettyXmlWriter (cfg: PrinterConfig) extends CommonWriter {
-  val sb = new StringBuilder
-
-  private var nestedLevel: Int = 0
-
-  sb.append(xmlInvocation)
-
-  val ident: Int => Unit = cfg.identWith match {
-    case Some(identWith) => identLevel =>
-      sb.append(EOL)
-      for (i <- 0 until identLevel) {
-        sb.append(identWith)
-      }
-    case None =>
-      _ => ()
-  }
+  writeInvocation("1.0" ,"UTF-8")
 
   def writeLabeled(elem: LabeledElement): Unit = {
-    ident(nestedLevel)
-    writeElementLabel(elem.label)
-    writeNamespaces(elem.element.namespaceDeclarations)
-    writeAttributes(elem.element.attributes)
-    sb.append(">")
-    nestedLevel += 1
-  }
-
-  def writeText(text: Text): Unit = {
-    if(cfg.identWith.isDefined && text.text.forall(_.isWhitespace)) {
-
-    } else {
-      sb.append(text.text)
+    sw.writeStartElement(elem.label.prefix, elem.label.localName, elem.label.uri)
+    elem.element.namespaceDeclarations.foreach { ns =>
+      sw.writeNamespace(ns.prefix, ns.uri)
+    }
+    elem.element.attributes.foreach { attr =>
+      sw.writeAttribute(attr.key.prefix, attr.key.uri, attr.key.localName, attr.value)
     }
   }
 
+  def writeText(text: Text): Unit =
+    sw.writeCharacters(text.text)
 
-  def writeEndElement(elem: LabeledElement): Unit = {
-    val hasChildren = elem.element.children.exists {
-      case el: LabeledElement =>
-        true
-      case _ =>
-        false
-    }
-    nestedLevel -= 1
-    if(hasChildren) {
-      ident(nestedLevel)
-    }
-    sb.append(s"</${resolvedNameToString(elem.label)}>")
-  }
+  def writeEndElement(): Unit =
+    sw.writeEndElement()
 
-}
+  def writeComment(comment: Comment): Unit =
+    sw.writeComment(comment.comment)
 
-class SimpleXmlWriter extends CommonWriter {
-  val sb = new StringBuilder
-
-  sb.append(xmlInvocation)
-  sb.append(EOL)
-
-  def writeLabeled(elem: LabeledElement): Unit = {
-    writeElementLabel(elem.label)
-    writeNamespaces(elem.element.namespaceDeclarations)
-    writeAttributes(elem.element.attributes)
-    sb.append(">")
-  }
-
-  def writeText(text: Text): Unit = {
-    sb.append(text.text)
-  }
-
-  def writeEndElement(elem: LabeledElement): Unit = {
-    sb.append(s"</${resolvedNameToString(elem.label)}>")
-  }
+  def writeDtd(dtd: Dtd): Unit =
+    sw.writeDTD(dtd.text)
 }
 
 case class PrinterConfig(identWith: Option[String])

@@ -7,7 +7,7 @@ import org.scalatest.{Matchers, WordSpec}
 class ParserPrinterSpec extends WordSpec with Matchers {
   "XmlParser and XmlPrinter" should {
     "preserve comments" in {
-      val examples = List(exampleXmlString, exampleXmlString2)
+      val examples = List(exampleXmlString, exampleXmlString2, exampleXmlString3)
 
       examples.foreach { example =>
         val parsed = XmlParser.parse(example)
@@ -17,6 +17,25 @@ class ParserPrinterSpec extends WordSpec with Matchers {
         printed should equal(example)
       }
     }
+
+    "preserve empty element" in {
+      val examples = List(xmlWithSelfClosingTag, xmlWithEmptyElement)
+
+      examples.foreach { example =>
+        val parsed = XmlParser.parse(example)
+        val parsedXml = parsed.right.get
+        val printed = XmlPrinter.print(parsedXml)
+
+        printed should equal(xmlWithEmptyElement)
+      }
+    }
+
+//    "preserve entities" in {
+//      val parsed = XmlParser.parse(xmlWithEntity)
+//      println("bazinga: " + parsed)
+//      val printed = XmlPrinter.print(parsed.right.get)
+//      printed should equal(xmlWithEntity)
+//    }
 
     "pretty print" in {
       val xml = XmlParser.parse(uglyXmlString).right.get
@@ -52,9 +71,62 @@ class ParserPrinterSpec extends WordSpec with Matchers {
       |     </band>
       |</detail>""".stripMargin
 
+  val xmlWithSelfClosingTag =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<detail>
+      |    <band height="20" />
+      |</detail>""".stripMargin
+
+  val xmlWithEmptyElement =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<detail>
+      |    <band height="20"></band>
+      |</detail>""".stripMargin
+
+  val xmlWithEntity =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<html>
+      |<head>
+      |    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8"/>
+      |    <title>Entities in XML</title>
+      |</head>
+      |</html>""".stripMargin
+
+
+//    val xmlWithEntity =
+//    """<?xml version="1.0" encoding="UTF-8"?>
+//      |<!DOCTYPE html
+//      |    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+//      |    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+//      |[
+//      |    <!ENTITY test-entity "This <em>is</em> an entity.">
+//      |]>
+//      |<html xmlns="http://www.w3.org/1999/xhtml">
+//      |<head>
+//      |    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8"/>
+//      |    <title>Entities in XML</title>
+//      |</head>
+//      |<body>
+//      |    <h1>Entities in XML</h1>
+//      |    <p>&test-entity;</p>
+//      |    <p>You can use it anywhere you'd use a standard XHTML entity:</p>
+//      |    <pre>&test-entity;</pre>
+//      |</body>
+//      |</html>"""
+
   val exampleXmlString2 =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<detail><band height="20"><!-- hello --></band></detail>""".stripMargin
+
+  val exampleXmlString3 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<!DOCTYPE note SYSTEM "Note.dtd">
+      |<note>
+      |<to>Tove</to>
+      |<from>Jani</from>
+      |<heading>Reminder</heading>
+      |<body>Don't forget me this weekend!</body>
+      |</note>""".stripMargin
 
   val uglyXmlString =
     """<?xml version="1.0" encoding="UTF-8"?>
