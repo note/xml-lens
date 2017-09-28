@@ -31,6 +31,8 @@ case class Dtd(text: String) extends Node
 
 case class ProcessingInstruction(target: String, data: String) extends Node
 
+case class CData(text: String) extends Node
+
 case class Comment(comment: String) extends Node
 
 // TODO: think if Seq[Attribute] is a good choice taking into account that attribute names have to be unique within

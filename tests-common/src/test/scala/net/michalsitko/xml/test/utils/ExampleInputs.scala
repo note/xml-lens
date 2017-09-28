@@ -161,6 +161,25 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
     )
   }
 
+  val xmlWithCData = {
+    val cdataContent = """
+                         |    I can use all sorts of reserved characters
+                         |    like > < " and &
+                         |    or write things like
+                         |    <foo></bar>
+                         |    but my document is still well formed!
+                         |""".stripMargin
+
+    val str =
+      s"""<?xml version="1.0" encoding="UTF-8"?>
+        |<note>something<![CDATA[$cdataContent]]>else</note>""".stripMargin
+
+    Example(
+      str,
+      List(labeledElement("note", Text("something"), CData(cdataContent), Text("else")))
+    )
+  }
+
   val attributesWithNsXmlStringExample = {
     val defaultNs = "http://www.a.com"
     val bNs = "http://www.b.com"

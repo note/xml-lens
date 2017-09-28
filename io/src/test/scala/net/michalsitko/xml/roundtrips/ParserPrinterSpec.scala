@@ -2,9 +2,10 @@ package net.michalsitko.xml.roundtrips
 
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
+import net.michalsitko.xml.test.utils.ExampleInputs
 import org.scalatest.{Matchers, WordSpec}
 
-class ParserPrinterSpec extends WordSpec with Matchers {
+class ParserPrinterSpec extends WordSpec with Matchers with ExampleInputs {
   def testForInputs(inputs: String*): Unit = {
     inputs.foreach { example =>
       val parsed = XmlParser.parse(example)
@@ -24,8 +25,12 @@ class ParserPrinterSpec extends WordSpec with Matchers {
       testForInputs(exampleXmlWithDtd, exampleXmlWithDtd2)
     }
 
-    "presever Processing Instructions" in {
+    "preseve Processing Instructions" in {
       testForInputs(exampleWithPI)
+    }
+
+    "preserve CData" in {
+      testForInputs(xmlWithCData.stringRepr)
     }
 
     "preserve empty element" in {

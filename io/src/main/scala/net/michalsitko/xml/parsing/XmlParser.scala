@@ -73,6 +73,9 @@ object XmlParser {
   private def read(inputStream: InputStream) = {
     val xmlInFact = XMLInputFactory.newInstance()
     xmlInFact.setXMLResolver(BlankingResolver)
+
+    // https://stackoverflow.com/questions/8591644/need-a-cdata-event-notifying-stax-parser-for-java
+    xmlInFact.setProperty("http://java.sun.com/xml/stream/properties/report-cdata-event", true)
     val reader = xmlInFact.createXMLStreamReader(inputStream)
 
     val xmlDeclaration = getDeclaration(reader)
@@ -116,10 +119,14 @@ object XmlParser {
           parent.addChild(pi)
 
         case DTD =>
-          // `headOption` because DTD can be top level Node
           val parent = elementStack.headOption.getOrElse(root)
           val commentText = reader.getText()
           parent.addChild(Dtd(commentText))
+
+        case CDATA =>
+          val parent = elementStack.head
+          val commentText = reader.getText()
+          parent.addChild(CData(commentText))
 
         case _ =>
           // ignore for now

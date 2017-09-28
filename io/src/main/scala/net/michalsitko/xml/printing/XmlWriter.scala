@@ -18,6 +18,8 @@ trait XmlWriter {
   def writeEndElement(): Unit
 
   def writeProcessingInstruction(pi: ProcessingInstruction): Unit
+
+  def writeCData(cdata: CData): Unit
 }
 
 //class PrettyXmlWriter (cfg: PrinterConfig) extends CommonWriter {
@@ -111,6 +113,9 @@ class JavaXmlWriter(output: Writer) extends XmlWriter {
 
   def writeProcessingInstruction(pi: ProcessingInstruction): Unit =
     sw.writeProcessingInstruction(pi.target, pi.data)
+
+  def writeCData(cdata: CData): Unit =
+    sw.writeCData(cdata.text)
 }
 
 case class PrinterConfig(identWith: Option[String])

@@ -34,6 +34,9 @@ object XmlPrinter {
 
       case pi: ProcessingInstruction =>
         writer.writeProcessingInstruction(pi)
+
+      case cdata: CData =>
+        writer.writeCData(cdata)
     }
 
     val res = stringOutput.toString()
@@ -80,6 +83,9 @@ object XmlPrinter {
 
         case pi: ProcessingInstruction =>
           writer.writeProcessingInstruction(pi)
+
+        case cdata: CData =>
+          writer.writeCData(cdata)
 
         case null =>
           writer.writeEndElement()
