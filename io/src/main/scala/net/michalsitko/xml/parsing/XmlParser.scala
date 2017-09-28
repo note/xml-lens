@@ -40,7 +40,7 @@ private [parsing] class LabeledElementBuilder(val label: ResolvedName, val attri
   }
 }
 
-private [parsing] class BlankingResolver extends XMLResolver {
+private [parsing] object BlankingResolver extends XMLResolver {
   override def resolveEntity(publicID: String, systemID: String, baseURI: String, namespace: String): AnyRef = {
     new ByteArrayInputStream("".getBytes)
   }
@@ -72,7 +72,7 @@ object XmlParser {
 
   private def read(inputStream: InputStream) = {
     val xmlInFact = XMLInputFactory.newInstance()
-    xmlInFact.setXMLResolver(new BlankingResolver)
+    xmlInFact.setXMLResolver(BlankingResolver)
     val reader = xmlInFact.createXMLStreamReader(inputStream)
 
     val xmlDeclaration = getDeclaration(reader)
@@ -109,6 +109,11 @@ object XmlParser {
           val parent = elementStack.headOption.getOrElse(root)
           val commentText = reader.getText()
           parent.addChild(Comment(commentText))
+
+        case PROCESSING_INSTRUCTION =>
+          val parent = elementStack.headOption.getOrElse(root)
+          val pi = ProcessingInstruction(reader.getPITarget(), reader.getPIData())
+          parent.addChild(pi)
 
         case DTD =>
           // `headOption` because DTD can be top level Node

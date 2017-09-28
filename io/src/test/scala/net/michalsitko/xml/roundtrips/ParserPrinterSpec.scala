@@ -5,17 +5,27 @@ import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
 import org.scalatest.{Matchers, WordSpec}
 
 class ParserPrinterSpec extends WordSpec with Matchers {
+  def testForInputs(inputs: String*): Unit = {
+    inputs.foreach { example =>
+      val parsed = XmlParser.parse(example)
+      val parsedXml = parsed.right.get
+      val printed = XmlPrinter.print(parsedXml)
+
+      printed should equal(example)
+    }
+  }
+
   "XmlParser and XmlPrinter" should {
     "preserve comments" in {
-      val examples = List(exampleXmlString, exampleXmlString2, exampleXmlString3)
+      testForInputs(exampleXmlString, exampleXmlString2)
+    }
 
-      examples.foreach { example =>
-        val parsed = XmlParser.parse(example)
-        val parsedXml = parsed.right.get
-        val printed = XmlPrinter.print(parsedXml)
+    "preserve DTD" in {
+      testForInputs(exampleXmlWithDtd, exampleXmlWithDtd2)
+    }
 
-        printed should equal(example)
-      }
+    "presever Processing Instructions" in {
+      testForInputs(exampleWithPI)
     }
 
     "preserve empty element" in {
@@ -118,15 +128,28 @@ class ParserPrinterSpec extends WordSpec with Matchers {
     """<?xml version="1.0" encoding="UTF-8"?>
       |<detail><band height="20"><!-- hello --></band></detail>""".stripMargin
 
-  val exampleXmlString3 =
+  val exampleXmlWithDtd =
     """<?xml version="1.0" encoding="UTF-8"?>
-      |<!DOCTYPE note SYSTEM "Note.dtd">
-      |<note>
+      |<!DOCTYPE note SYSTEM "Note.dtd"><note>
       |<to>Tove</to>
       |<from>Jani</from>
       |<heading>Reminder</heading>
       |<body>Don't forget me this weekend!</body>
       |</note>""".stripMargin
+
+  val exampleXmlWithDtd2 =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<!DOCTYPE html
+      |    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      |    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+      |[
+      |    <!ENTITY test-entity "This <em>is</em> an entity.">
+      |]><note></note>""".stripMargin
+
+  // TODO: would fail if we add new lines between top-level Processing instructions
+  val exampleWithPI =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<?xml-stylesheet type="text/xsl" href="style.xsl"?><?welcome to pg = 10 of tutorials point?><?welcome ?><note>something<?mso-application progid="Excel.Sheet"?>else</note>""".stripMargin
 
   val uglyXmlString =
     """<?xml version="1.0" encoding="UTF-8"?>

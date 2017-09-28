@@ -37,9 +37,13 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
       commentsExamples.foreach(checkCorrectInput)
     }
 
-//    "parse DTD" in {
-//      checkCorrectInput(xmlWithDtd)
-//    }
+    "parse DTD" in {
+      checkCorrectInput(xmlWithDtd)
+    }
+
+    "parse Processing Instructions" in {
+      checkCorrectInput(xmlWithPI)
+    }
 
     "fail for malformed inputs" in {
       malformedXmlStrings.foreach { example =>

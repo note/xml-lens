@@ -126,6 +126,7 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
                 |]>
                 |<note></note>""".stripMargin
 
+    // Note, that there are 2 top level elements: Dtd and LabeledElements, end of line after the Dtd is ignored
     Example(
       str,
       List(
@@ -136,6 +137,26 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
               |    <!ENTITY test-entity "This <em>is</em> an entity.">
               |]>""".stripMargin),
         labeledElement("note")
+      )
+    )
+  }
+
+  val xmlWithPI = {
+    val str =
+      """<?xml version="1.0" encoding="UTF-8"?>
+        |<?xml-stylesheet type="text/xsl" href="style.xsl"?>
+        |<?welcome  to pg = 10 of tutorials point?>
+        |<?welcome?>
+        |<note>something<?mso-application progid="Excel.Sheet"?>else</note>
+      """.stripMargin
+
+    Example(
+      str,
+      List(
+        ProcessingInstruction("xml-stylesheet", """type="text/xsl" href="style.xsl""""),
+        ProcessingInstruction("welcome", "to pg = 10 of tutorials point"),
+        ProcessingInstruction("welcome", ""),
+        labeledElement("note", Text("something"), ProcessingInstruction("mso-application", """progid="Excel.Sheet""""), Text("else"))
       )
     )
   }
