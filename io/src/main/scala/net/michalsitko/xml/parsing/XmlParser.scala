@@ -46,37 +46,44 @@ private [parsing] object BlankingResolver extends XMLResolver {
   }
 }
 
+case class XmlParserConfig(replaceEntityReferences: Boolean)
+
 object XmlParser {
+  val DefaultXmlParserConfig = XmlParserConfig(false)
+
   // TODO: think about making return type Either[ParsingException, Node]. Current version use an (unneccessary?) assumption
-  def parse(input: String, charset: Charset = StandardCharsets.UTF_8): Either[ParsingException, Seq[Node]] = {
+  def parse(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: XmlParserConfig = DefaultXmlParserConfig): Either[ParsingException, Seq[Node]] = {
     val stream = new ByteArrayInputStream(input.getBytes(charset))
     parse(stream)
   }
 
-  def parseWithDeclaration(input: String, charset: Charset = StandardCharsets.UTF_8): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
+  def parseWithDeclaration(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: XmlParserConfig = DefaultXmlParserConfig): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
     val stream = new ByteArrayInputStream(input.getBytes(charset))
     parseWithDeclaration(stream)
   }
 
-  def parse(inputStream: InputStream): Either[ParsingException, Seq[Node]] = {
+  def parse(inputStream: InputStream)(implicit config: XmlParserConfig = DefaultXmlParserConfig): Either[ParsingException, Seq[Node]] = {
     import net.michalsitko.xml.parsing.utils.TryOps._
 
-    Try(read(inputStream)).map(_._2).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
+    Try(read(inputStream, config)).map(_._2).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
   }
 
-  def parseWithDeclaration(inputStream: InputStream): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
+  def parseWithDeclaration(inputStream: InputStream)(implicit config: XmlParserConfig = DefaultXmlParserConfig): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
     import net.michalsitko.xml.parsing.utils.TryOps._
 
-    Try(read(inputStream)).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
+    Try(read(inputStream, config)).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
   }
 
-  private def read(inputStream: InputStream) = {
-    val xmlInFact = XMLInputFactory.newInstance()
-    xmlInFact.setXMLResolver(BlankingResolver)
+  private def read(inputStream: InputStream, config: XmlParserConfig) = {
+    val reader = {
+      val xmlInFact = XMLInputFactory.newInstance()
+      xmlInFact.setXMLResolver(BlankingResolver)
+      xmlInFact.setProperty("javax.xml.stream.isReplacingEntityReferences", config.replaceEntityReferences)
 
-    // https://stackoverflow.com/questions/8591644/need-a-cdata-event-notifying-stax-parser-for-java
-    xmlInFact.setProperty("http://java.sun.com/xml/stream/properties/report-cdata-event", true)
-    val reader = xmlInFact.createXMLStreamReader(inputStream)
+      // https://stackoverflow.com/questions/8591644/need-a-cdata-event-notifying-stax-parser-for-java
+      xmlInFact.setProperty("http://java.sun.com/xml/stream/properties/report-cdata-event", true)
+      xmlInFact.createXMLStreamReader(inputStream)
+    }
 
     val xmlDeclaration = getDeclaration(reader)
     val topNodesBuilder = new TopNodesBuilder()
