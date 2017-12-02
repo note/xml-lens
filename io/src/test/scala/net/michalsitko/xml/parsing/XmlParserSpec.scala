@@ -6,6 +6,8 @@ import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
 import org.scalatest.{Matchers, WordSpec}
 
 class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGenerator {
+  implicit val parserConfig = XmlParser.DefaultParserConfig
+  implicit val printerConfig = XmlPrinter.DefaultPrinterConfig
 
   "parse" should {
     def checkCorrectInput(specificExample: Example): Unit = {

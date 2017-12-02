@@ -1,11 +1,14 @@
 package net.michalsitko.xml.roundtrips
 
 import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
+import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.test.utils.ExampleInputs
 import org.scalatest.{Matchers, WordSpec}
 
 class ParserPrinterSpec extends WordSpec with Matchers with ExampleInputs {
+  implicit val parserConfig = XmlParser.DefaultParserConfig
+  implicit val printerConfig = XmlPrinter.DefaultPrinterConfig.copy(identWith = None)
+
   def testForInputs(inputs: String*): Unit = {
     inputs.foreach { example =>
       val parsed = XmlParser.parse(example)
@@ -54,19 +57,20 @@ class ParserPrinterSpec extends WordSpec with Matchers with ExampleInputs {
 
     "pretty print" in {
       val xml = XmlParser.parse(uglyXmlString).right.get
-      val printed = XmlPrinter.prettyPrint(xml, PrinterConfig(Some("  ")))
+      val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig)
+      println("hello: " + printed)
       printed should equal(prettyXmlString)
     }
 
     "pretty print with comments" in {
       val xml = XmlParser.parse(uglyXmlString2).right.get
-      val printed = XmlPrinter.prettyPrint(xml, PrinterConfig(Some("  ")))
+      val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig)
       printed should equal(prettyXmlString2)
     }
 
     "PrinterConfig is taken into account" in {
       val xml = XmlParser.parse(uglyXmlString).right.get
-      val printed = XmlPrinter.prettyPrint(xml, PrinterConfig(Some(" ")))
+      val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig.copy(identWith = Some(" ")))
       printed should equal(prettyXmlStringIntendedWithOneSpace)
     }
   }

@@ -5,11 +5,13 @@ import java.io.StringWriter
 import org.scalatest.{Matchers, WordSpec}
 
 class JavaXmlWriterSpec extends WordSpec with Matchers {
+  val printerConfig = XmlPrinter.DefaultPrinterConfig
+
   "should contain invocation" in {
 
   }
 
   trait Context {
-    val writer = new JavaXmlWriter(new StringWriter())
+    val writer = new JavaXmlWriter(new StringWriter(), printerConfig)
   }
 }

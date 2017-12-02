@@ -4,6 +4,8 @@ import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
 import org.scalatest.{Matchers, WordSpec}
 
 class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs with XmlGenerator {
+  implicit val printerConfig = XmlPrinter.DefaultPrinterConfig.copy(identWith = None)
+
   "XmlPrinter" should {
     "work for basic example" in {
       check(noNamespaceExample)

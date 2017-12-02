@@ -46,35 +46,30 @@ private [parsing] object BlankingResolver extends XMLResolver {
   }
 }
 
-case class XmlParserConfig(replaceEntityReferences: Boolean)
+case class ParserConfig(replaceEntityReferences: Boolean)
 
 object XmlParser {
-  val DefaultXmlParserConfig = XmlParserConfig(false)
+  val DefaultParserConfig = ParserConfig(replaceEntityReferences = false)
 
   // TODO: think about making return type Either[ParsingException, Node]. Current version use an (unneccessary?) assumption
-  def parse(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: XmlParserConfig = DefaultXmlParserConfig): Either[ParsingException, Seq[Node]] = {
-    val stream = new ByteArrayInputStream(input.getBytes(charset))
-    parse(stream)
-  }
+  def parse(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: ParserConfig): Either[ParsingException, Seq[Node]] =
+    parseWithDeclaration(input, charset).right.map(_._2)
 
-  def parseWithDeclaration(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: XmlParserConfig = DefaultXmlParserConfig): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
+  def parseWithDeclaration(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: ParserConfig): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
     val stream = new ByteArrayInputStream(input.getBytes(charset))
     parseWithDeclaration(stream)
   }
 
-  def parse(inputStream: InputStream)(implicit config: XmlParserConfig = DefaultXmlParserConfig): Either[ParsingException, Seq[Node]] = {
-    import net.michalsitko.xml.parsing.utils.TryOps._
+  def parse(inputStream: InputStream)(implicit config: ParserConfig): Either[ParsingException, Seq[Node]] =
+    parseWithDeclaration(inputStream).right.map(_._2)
 
-    Try(read(inputStream, config)).map(_._2).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
-  }
-
-  def parseWithDeclaration(inputStream: InputStream)(implicit config: XmlParserConfig = DefaultXmlParserConfig): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
+  def parseWithDeclaration(inputStream: InputStream)(implicit config: ParserConfig): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
     import net.michalsitko.xml.parsing.utils.TryOps._
 
     Try(read(inputStream, config)).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
   }
 
-  private def read(inputStream: InputStream, config: XmlParserConfig) = {
+  private def read(inputStream: InputStream, config: ParserConfig) = {
     val reader = {
       val xmlInFact = XMLInputFactory.newInstance()
       xmlInFact.setXMLResolver(BlankingResolver)

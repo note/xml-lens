@@ -2,6 +2,7 @@ package net.michalsitko.xml.printing
 
 import java.io.StringWriter
 
+import net.michalsitko.xml.XmlDeclaration
 import net.michalsitko.xml.entities._
 
 // Printers assumes that javax.xml.stream.isRepairingNamespaces is set to false.
@@ -14,9 +15,14 @@ import net.michalsitko.xml.entities._
 // which is not true in general. User can manipulate AST in any way, so we should take care of undefined namespaces' prefixes,
 // isRepairingNamespaces, escaping special characters
 object XmlPrinter {
-  def print(nodes: Seq[Node]): String = {
+  val DefaultPrinterConfig = PrinterConfig(Some("  "), XmlDeclaration("1.0", Some("UTF-8")))
+
+  def print(nodes: Seq[Node])(implicit cfg: PrinterConfig): String = {
     val stringOutput = new StringWriter()
-    val writer = new JavaXmlWriter(stringOutput)
+    val writer = cfg.identWith match {
+      case Some(ident)  => new PrettyXmlWriter(stringOutput, cfg)
+      case None         => new JavaXmlWriter(stringOutput, cfg)
+    }
 
     // TODO: code duplication
     nodes.foreach {
@@ -55,13 +61,9 @@ object XmlPrinter {
 //    res
 //  }
 
-  // TODO: should be removed and print should take config
-  def prettyPrint(nodes: Seq[Node], config: PrinterConfig): String = {
-    ???
-  }
-
   private def writeLabeledElement(root: LabeledElement, writer: XmlWriter): Unit = {
     var toVisit = List[Node](root)
+    var toEnd = List.empty[LabeledElement]
 
     while(toVisit.nonEmpty) {
       val current = toVisit.head
@@ -71,6 +73,7 @@ object XmlPrinter {
           writer.writeLabeled(elem)
           val toAdd = elem.element.children
           toVisit = toAdd.toList ++ (null.asInstanceOf[Node] +: toVisit)
+          toEnd = elem :: toEnd
 
         case text: Text =>
           writer.writeText(text)
@@ -88,7 +91,8 @@ object XmlPrinter {
           writer.writeCData(cdata)
 
         case null =>
-          writer.writeEndElement()
+          writer.writeEndElement(toEnd.head)
+          toEnd = toEnd.tail
       }
     }
   }
