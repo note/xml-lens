@@ -8,6 +8,8 @@ import org.scalatest.{Matchers, WordSpec}
 class NamespaceSpec extends WordSpec with Matchers {
   import ElementOptics._
 
+  implicit val parserConfig = XmlParser.DefaultParserConfig
+
   "Optics" should {
     "should respect namespaces" in new Context {
       val xml = XmlParser.parse(input).right.get

@@ -1,6 +1,13 @@
 package net.michalsitko.xml.entities
 
+// content according to https://www.w3.org/TR/xml/#NT-content
 sealed trait Node
+
+// as defined here https://www.w3.org/TR/xml/#NT-Misc it is:
+// Misc	   ::=   	Comment | PI | S
+// In this implementation have only two subtypes of Misc (Comment and processing instruction)
+// that means that we do not preserve whitespaces at top level of XML document
+sealed trait Misc
 
 /** First - why we need different entities than plain scala-xml ones?
   *
@@ -25,15 +32,17 @@ object LabeledElement {
     LabeledElement.unprefixed(localName, Element())
 }
 
+// CharData according to https://www.w3.org/TR/xml/#NT-CharData
 case class Text(text: String) extends Node
 
-case class Dtd(text: String) extends Node
+// Processing instruction according to https://www.w3.org/TR/xml/#NT-PI
+case class ProcessingInstruction(target: String, data: String) extends Node with Misc
 
-case class ProcessingInstruction(target: String, data: String) extends Node
-
+// TDSect according to https://www.w3.org/TR/xml/#NT-CDSect
 case class CData(text: String) extends Node
 
-case class Comment(comment: String) extends Node
+// Comment according to https://www.w3.org/TR/xml/#NT-Comment
+case class Comment(comment: String) extends Node with Misc
 
 // TODO: think if Seq[Attribute] is a good choice taking into account that attribute names have to be unique within
 // single element and printing with XmlStreamWriter a non-unique Attribute will throw an exception
@@ -64,6 +73,17 @@ object ResolvedName {
     ResolvedName("", "", localName)
 }
 
+// https://www.w3.org/TR/xml-names/#ns-decl
+// `prefix` is empty for default namespace
 case class NamespaceDeclaration(prefix: String, uri: String)
 
-// TODO: hierarchy is not comprehensive - it misses PCDATA, Entity References among the others
+// https://www.w3.org/TR/xml/#NT-prolog
+case class Prolog(xmlDeclaration: Option[XmlDeclaration], miscs: Seq[Misc], doctypeDeclaration: Option[(DoctypeDeclaration, Seq[Misc])])
+
+// https://www.w3.org/TR/xml/#NT-XMLDecl
+case class XmlDeclaration(version: String, encoding: Option[String])
+
+// Document type declaration according to https://www.w3.org/TR/xml/#NT-doctypedecl
+case class DoctypeDeclaration(text: String)
+
+case class XmlDocument(prolog: Prolog, root: LabeledElement)

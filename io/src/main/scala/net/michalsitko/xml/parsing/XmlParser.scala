@@ -4,8 +4,6 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.{Charset, StandardCharsets}
 import javax.xml.stream.XMLStreamConstants._
 import javax.xml.stream.{XMLInputFactory, XMLResolver, XMLStreamReader}
-
-import net.michalsitko.xml.XmlDeclaration
 import net.michalsitko.xml.entities._
 
 import scala.collection.mutable.ArrayBuffer
@@ -49,27 +47,20 @@ private [parsing] object BlankingResolver extends XMLResolver {
 case class ParserConfig(replaceEntityReferences: Boolean)
 
 object XmlParser {
+  import net.michalsitko.xml.parsing.utils.TryOps._
+
   val DefaultParserConfig = ParserConfig(replaceEntityReferences = false)
 
   // TODO: think about making return type Either[ParsingException, Node]. Current version use an (unneccessary?) assumption
-  def parse(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: ParserConfig): Either[ParsingException, Seq[Node]] =
-    parseWithDeclaration(input, charset).right.map(_._2)
-
-  def parseWithDeclaration(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: ParserConfig): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
+  def parse(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: ParserConfig = DefaultParserConfig): Either[ParsingException, XmlDocument] = {
     val stream = new ByteArrayInputStream(input.getBytes(charset))
-    parseWithDeclaration(stream)
+    parse(stream)
   }
 
-  def parse(inputStream: InputStream)(implicit config: ParserConfig): Either[ParsingException, Seq[Node]] =
-    parseWithDeclaration(inputStream).right.map(_._2)
-
-  def parseWithDeclaration(inputStream: InputStream)(implicit config: ParserConfig): Either[ParsingException, (Option[XmlDeclaration], Seq[Node])] = {
-    import net.michalsitko.xml.parsing.utils.TryOps._
-
+  def parse(inputStream: InputStream)(implicit config: ParserConfig): Either[ParsingException, XmlDocument] =
     Try(read(inputStream, config)).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
-  }
 
-  private def read(inputStream: InputStream, config: ParserConfig) = {
+  private def read(inputStream: InputStream, config: ParserConfig): XmlDocument = {
     val reader = {
       val xmlInFact = XMLInputFactory.newInstance()
       xmlInFact.setXMLResolver(BlankingResolver)
@@ -82,16 +73,51 @@ object XmlParser {
 
     val xmlDeclaration = getDeclaration(reader)
     val topNodesBuilder = new TopNodesBuilder()
-    readNext(topNodesBuilder, reader)
+    val (l1, decl) = readNext(topNodesBuilder, reader)
+    val prolog = Prolog(xmlDeclaration, l1, decl)
 
-    (xmlDeclaration, topNodesBuilder.build)
+    XmlDocument(prolog, topNodesBuilder.build.head.asInstanceOf[LabeledElement]) // TODO: it's quite terrible
   }
 
-  private def readNext(root: NodeBuilder, reader: XMLStreamReader) = {
+  private def readNext(root: NodeBuilder, reader: XMLStreamReader): (Vector[Misc], Option[(DoctypeDeclaration, Vector[Misc])]) = {
     var elementStack = List.empty[LabeledElementBuilder]
 
-    while(reader.hasNext) {
-      reader.next() match {
+    var f1 = Vector.empty[Misc]
+    var f2 = Vector.empty[Misc]
+    var doctypeDecl = Option.empty[DoctypeDeclaration]
+
+    var curr = if (reader.hasNext) reader.next else null
+    // TODO: test it thoroughly
+    while(curr != null && curr != START_ELEMENT) {
+      curr match {
+        case COMMENT =>
+          val comment = Comment(reader.getText())
+          doctypeDecl match {
+            case Some(_) =>
+              f1 = f1 :+ comment
+            case None =>
+              f2 = f2 :+ comment
+          }
+
+        case PROCESSING_INSTRUCTION =>
+          val pi = ProcessingInstruction(reader.getPITarget(), reader.getPIData())
+          doctypeDecl match {
+            case Some(_) =>
+              f1 = f1 :+ pi
+            case None =>
+              f2 = f2 :+ pi
+          }
+
+        case DTD =>
+          val decl = DoctypeDeclaration(reader.getText())
+          doctypeDecl = Some(decl)
+      }
+
+      curr = if (reader.hasNext) reader.next else null
+    }
+
+    while(curr != null) {
+      curr match {
         case START_ELEMENT =>
           val nsDeclarations = getNamespaceDeclarations(reader)
           val attrs = getAttributes(reader)
@@ -120,11 +146,6 @@ object XmlParser {
           val pi = ProcessingInstruction(reader.getPITarget(), reader.getPIData())
           parent.addChild(pi)
 
-        case DTD =>
-          val parent = elementStack.headOption.getOrElse(root)
-          val commentText = reader.getText()
-          parent.addChild(Dtd(commentText))
-
         case CDATA =>
           val parent = elementStack.head
           val commentText = reader.getText()
@@ -133,7 +154,11 @@ object XmlParser {
         case _ =>
           // ignore for now
       }
+
+      curr = if (reader.hasNext) reader.next else null
     }
+
+    (f1, doctypeDecl.map(decl => (decl, f2)))
   }
 
   private def getDeclaration(reader: XMLStreamReader) = {

@@ -48,17 +48,16 @@ class ParserPrinterSpec extends WordSpec with Matchers with ExampleInputs {
       }
     }
 
-//    "preserve entities" in {
-//      val parsed = XmlParser.parse(xmlWithEntity)
-//      println("bazinga: " + parsed)
-//      val printed = XmlPrinter.print(parsed.right.get)
-//      printed should equal(xmlWithEntity)
-//    }
+    "preserve entities" in {
+      val parsed = XmlParser.parse(xmlWithEntity)
+      println("bazinga: " + parsed)
+      val printed = XmlPrinter.print(parsed.right.get)
+      printed should equal(xmlWithEntity)
+    }
 
     "pretty print" in {
       val xml = XmlParser.parse(uglyXmlString).right.get
       val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig)
-      println("hello: " + printed)
       printed should equal(prettyXmlString)
     }
 
@@ -102,36 +101,40 @@ class ParserPrinterSpec extends WordSpec with Matchers with ExampleInputs {
       |    <band height="20"></band>
       |</detail>""".stripMargin
 
-  val xmlWithEntity =
-    """<?xml version="1.0" encoding="UTF-8"?>
-      |<html>
-      |<head>
-      |    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8"/>
-      |    <title>Entities in XML</title>
-      |</head>
-      |</html>""".stripMargin
-
-
-//    val xmlWithEntity =
+//  val xmlWithEntity =
 //    """<?xml version="1.0" encoding="UTF-8"?>
-//      |<!DOCTYPE html
-//      |    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-//      |    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
-//      |[
-//      |    <!ENTITY test-entity "This <em>is</em> an entity.">
-//      |]>
-//      |<html xmlns="http://www.w3.org/1999/xhtml">
+//      |<html>
 //      |<head>
 //      |    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8"/>
 //      |    <title>Entities in XML</title>
 //      |</head>
-//      |<body>
-//      |    <h1>Entities in XML</h1>
-//      |    <p>&test-entity;</p>
-//      |    <p>You can use it anywhere you'd use a standard XHTML entity:</p>
-//      |    <pre>&test-entity;</pre>
-//      |</body>
-//      |</html>"""
+//      |</html>""".stripMargin
+
+//  val xmlWithEntity =
+//    """<?xml version="1.0" encoding="UTF-8"?>
+//      |<detail>
+//      |</detail>""".stripMargin
+
+
+    val xmlWithEntity =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<!DOCTYPE html
+      |    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      |    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+      |[
+      |    <!ENTITY test-entity "This <em>is</em> an entity.">
+      |]><html xmlns="http://www.w3.org/1999/xhtml">
+      |<head>
+      |    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8"/>
+      |    <title>Entities in XML</title>
+      |</head>
+      |<body>
+      |    <h1>Entities in XML</h1>
+      |    <p>&test-entity;</p>
+      |    <p>You can use it anywhere you'd use a standard XHTML entity:</p>
+      |    <pre>&test-entity;</pre>
+      |</body>
+      |</html>""".stripMargin
 
   val exampleXmlString2 =
     """<?xml version="1.0" encoding="UTF-8"?>

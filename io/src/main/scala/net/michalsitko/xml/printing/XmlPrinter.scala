@@ -1,8 +1,6 @@
 package net.michalsitko.xml.printing
 
 import java.io.StringWriter
-
-import net.michalsitko.xml.XmlDeclaration
 import net.michalsitko.xml.entities._
 
 // Printers assumes that javax.xml.stream.isRepairingNamespaces is set to false.
@@ -15,35 +13,17 @@ import net.michalsitko.xml.entities._
 // which is not true in general. User can manipulate AST in any way, so we should take care of undefined namespaces' prefixes,
 // isRepairingNamespaces, escaping special characters
 object XmlPrinter {
-  val DefaultPrinterConfig = PrinterConfig(Some("  "), XmlDeclaration("1.0", Some("UTF-8")))
+  val DefaultPrinterConfig = PrinterConfig(Some("  "))
 
-  def print(nodes: Seq[Node])(implicit cfg: PrinterConfig): String = {
+  def print(doc: XmlDocument)(implicit cfg: PrinterConfig): String = {
     val stringOutput = new StringWriter()
     val writer = cfg.identWith match {
       case Some(ident)  => new PrettyXmlWriter(stringOutput, cfg)
       case None         => new JavaXmlWriter(stringOutput, cfg)
     }
 
-    // TODO: code duplication
-    nodes.foreach {
-      case elem: LabeledElement =>
-        writeLabeledElement(elem, writer)
-
-      case text: Text =>
-        writer.writeText(text)
-
-      case comment: Comment =>
-        writer.writeComment(comment)
-
-      case dtd: Dtd =>
-        writer.writeDtd(dtd)
-
-      case pi: ProcessingInstruction =>
-        writer.writeProcessingInstruction(pi)
-
-      case cdata: CData =>
-        writer.writeCData(cdata)
-    }
+    writer.writeProlog(doc.prolog)
+    writeLabeledElement(doc.root, writer)
 
     val res = stringOutput.toString()
     stringOutput.close() // has no effect because of nature of StringWriter, but let's keep it in case of change
@@ -81,7 +61,7 @@ object XmlPrinter {
         case comment: Comment =>
           writer.writeComment(comment)
 
-        case dtd: Dtd =>
+        case dtd: DoctypeDeclaration =>
           writer.writeDtd(dtd)
 
         case pi: ProcessingInstruction =>

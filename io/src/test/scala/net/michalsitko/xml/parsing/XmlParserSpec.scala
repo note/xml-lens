@@ -1,18 +1,20 @@
 package net.michalsitko.xml.parsing
 
-import net.michalsitko.xml.XmlDeclaration
+import net.michalsitko.xml.entities.{LabeledElement, Prolog, XmlDeclaration, XmlDocument}
 import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
+import net.michalsitko.xml.utils.XmlDocumentFactory
+import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.{Matchers, WordSpec}
 
-class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGenerator {
+class XmlParserSpec extends WordSpec with Matchers with TypeCheckedTripleEquals with ExampleInputs with XmlGenerator {
   implicit val parserConfig = XmlParser.DefaultParserConfig
   implicit val printerConfig = XmlPrinter.DefaultPrinterConfig
 
   "parse" should {
     def checkCorrectInput(specificExample: Example): Unit = {
       val res = XmlParser.parse(specificExample.stringRepr)
-      res.right.get should equal(specificExample.nodes)
+      res.right.get should === (specificExample.document)
     }
 
     "return proper Element for XML without any namespaces declared and with no whitespaces" in {
@@ -53,14 +55,14 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
 
     "fail for malformed inputs" in {
       malformedXmlStrings.foreach { example =>
-        XmlParser.parse(example).isLeft should equal(true)
+        XmlParser.parse(example).isLeft should === (true)
       }
     }
 
     "deal with very deep XML" in {
-      val input = XmlPrinter.print(List(elementOfDepth(4000)))
+      val input = XmlPrinter.print(XmlDocumentFactory.root(elementOfDepth(4000)))
 
-      XmlParser.parse(input).isRight should equal(true)
+      XmlParser.parse(input).isRight should === (true)
     }
 
     "deal with empty XMLNS value" in {
@@ -70,8 +72,8 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
 
   "parseWithDeclaration" should {
     def checkCorrectInput(specificExample: Example): Unit = {
-      val res = XmlParser.parseWithDeclaration(specificExample.stringRepr)
-      res.right.get._2 should equal(specificExample.nodes)
+      val res = XmlParser.parse(specificExample.stringRepr)
+      res.right.get should === (specificExample.document)
     }
 
     "pass the same tests as parse does" in {
@@ -89,11 +91,8 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
             |<a></a>
           """.stripMargin
 
-        val res = XmlParser.parseWithDeclaration(xml).right.get
-        res should equal(
-          (Some(XmlDeclaration("1.0", Some(encoding))),
-            List(labeledElement("a")))
-        )
+        val res = XmlParser.parse(xml).right.get
+        res should === (xmlDocument("1.0", Some(encoding), labeledElement("a")))
       }
 
       test("UTF-8")
@@ -106,11 +105,8 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
           |<a></a>
         """.stripMargin
 
-      val res = XmlParser.parseWithDeclaration(xml).right.get
-      res should equal(
-        (Some(XmlDeclaration("1.0", None)),
-          List(labeledElement("a")))
-      )
+      val res = XmlParser.parse(xml).right.get
+      res should === (xmlDocument("1.0", None, labeledElement("a")))
     }
 
     "fail to parse for XML Declaration with empty encoding" in {
@@ -119,7 +115,7 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
           |<a></a>
         """.stripMargin
 
-      XmlParser.parseWithDeclaration(xml).isLeft should equal(true)
+      XmlParser.parse(xml).isLeft should === (true)
     }
 
     "parse XML without Declaration" in {
@@ -127,8 +123,8 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
         """<a></a>
         """.stripMargin
 
-      val res = XmlParser.parseWithDeclaration(xml).right.get
-      res should equal((None, List(labeledElement("a"))))
+      val res = XmlParser.parse(xml).right.get
+      res should === (XmlDocumentFactory.root(labeledElement("a")))
     }
 
     "fail to parse XML with Declaration with no XML version specified" in {
@@ -137,7 +133,7 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
           """<?xml ?><a></a>
           """.stripMargin
 
-        XmlParser.parseWithDeclaration(xml).isLeft should equal(true)
+        XmlParser.parse(xml).isLeft should === (true)
       }
 
       {
@@ -145,11 +141,13 @@ class XmlParserSpec extends WordSpec with Matchers with ExampleInputs with XmlGe
           """<?xml encoding="UTF-8" ?><a></a>
           """.stripMargin
 
-        XmlParser.parseWithDeclaration(xml).isLeft should equal(true)
+        XmlParser.parse(xml).isLeft should === (true)
       }
     }
   }
 
-
+  // TODO: move somewhere:
+  def xmlDocument(version: String, encoding: Option[String], root: LabeledElement) =
+    XmlDocument(Prolog(Some(XmlDeclaration(version, encoding)), List.empty, None), root)
 
 }

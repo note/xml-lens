@@ -2,19 +2,19 @@ package net.michalsitko.xml.printing
 
 import java.io.Writer
 import javax.xml.stream.{XMLOutputFactory, XMLStreamWriter}
-
-import net.michalsitko.xml.XmlDeclaration
 import net.michalsitko.xml.entities._
 
 // all methods returns Unit as it's designed to work over some mutable Writer-like type (like java.io.Writer or OutputStream)
 trait XmlWriter {
+  def writeProlog(prolog: Prolog): Unit
+
   def writeLabeled(elem: LabeledElement): Unit
 
   def writeText(text: Text): Unit
 
   def writeComment(comment: Comment): Unit
 
-  def writeDtd(dtd: Dtd): Unit
+  def writeDtd(doctypeDeclaration: DoctypeDeclaration): Unit
 
   def writeEndElement(elem: LabeledElement): Unit
 
@@ -35,11 +35,26 @@ abstract class CommonWriter extends XmlWriter {
     sw.writeCharacters(EOL)
   }
 
+  protected def writeMisc(misc: Misc): Unit = misc match {
+    case c: Comment                 => writeComment(c)
+    case pi: ProcessingInstruction  => writeProcessingInstruction(pi)
+  }
+
+  def writeProlog(prolog: Prolog): Unit = {
+    prolog.xmlDeclaration.foreach(writeInvocation)
+    prolog.miscs.foreach(writeMisc)
+    prolog.doctypeDeclaration.foreach {
+      case (doctypeDecl, miscs) =>
+        writeDtd(doctypeDecl)
+        miscs.foreach(writeMisc)
+    }
+  }
+
   def writeComment(comment: Comment): Unit =
     sw.writeComment(comment.comment)
 
-  def writeDtd(dtd: Dtd): Unit =
-    sw.writeDTD(dtd.text)
+  def writeDtd(doctypeDeclaration: DoctypeDeclaration): Unit =
+    sw.writeDTD(doctypeDeclaration.text)
 
   def writeProcessingInstruction(pi: ProcessingInstruction): Unit =
     sw.writeProcessingInstruction(pi.target, pi.data)
@@ -52,8 +67,6 @@ abstract class CommonWriter extends XmlWriter {
 class PrettyXmlWriter (output: Writer, cfg: PrinterConfig) extends CommonWriter {
   private var nestedLevel: Int = 0
   protected val sw = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
-
-  writeInvocation(cfg.declaration)
 
   val ident: Int => Unit = cfg.identWith match {
     case Some(identWith) => identLevel =>
@@ -110,8 +123,6 @@ class PrettyXmlWriter (output: Writer, cfg: PrinterConfig) extends CommonWriter 
 class JavaXmlWriter(output: Writer, cfg: PrinterConfig) extends CommonWriter {
   protected val sw = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
 
-  writeInvocation(cfg.declaration)
-
   def writeLabeled(elem: LabeledElement): Unit = {
     sw.writeStartElement(elem.label.prefix, elem.label.localName, elem.label.uri)
     elem.element.namespaceDeclarations.foreach { ns =>
@@ -131,4 +142,4 @@ class JavaXmlWriter(output: Writer, cfg: PrinterConfig) extends CommonWriter {
 }
 
 // TODO: document and test the difference between identWith = None and identWith = Some("")
-case class PrinterConfig(identWith: Option[String], declaration: XmlDeclaration)
+case class PrinterConfig(identWith: Option[String])

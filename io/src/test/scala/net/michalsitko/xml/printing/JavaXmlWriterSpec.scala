@@ -4,6 +4,7 @@ import java.io.StringWriter
 
 import org.scalatest.{Matchers, WordSpec}
 
+// TODO: is it even needed?
 class JavaXmlWriterSpec extends WordSpec with Matchers {
   val printerConfig = XmlPrinter.DefaultPrinterConfig
 
