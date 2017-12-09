@@ -125,7 +125,7 @@ class ParserPrinterSpec extends WordSpec with Matchers with ExampleInputs {
       |    <!ENTITY test-entity "This <em>is</em> an entity.">
       |]><html xmlns="http://www.w3.org/1999/xhtml">
       |<head>
-      |    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8"/>
+      |    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8"></meta>
       |    <title>Entities in XML</title>
       |</head>
       |<body>

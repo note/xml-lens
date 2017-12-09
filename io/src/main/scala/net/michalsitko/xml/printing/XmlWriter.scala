@@ -21,6 +21,8 @@ trait XmlWriter {
   def writeProcessingInstruction(pi: ProcessingInstruction): Unit
 
   def writeCData(cdata: CData): Unit
+
+  def writeEntityReference(entityReference: EntityReference): Unit
 }
 
 abstract class CommonWriter extends XmlWriter {
@@ -61,6 +63,9 @@ abstract class CommonWriter extends XmlWriter {
 
   def writeCData(cdata: CData): Unit =
     sw.writeCData(cdata.text)
+
+  def writeEntityReference(entityReference: EntityReference): Unit =
+    sw.writeEntityRef(entityReference.name)
 
 }
 

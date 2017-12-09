@@ -70,6 +70,9 @@ object XmlPrinter {
         case cdata: CData =>
           writer.writeCData(cdata)
 
+        case entityRef: EntityReference =>
+          writer.writeEntityReference(entityRef)
+
         case null =>
           writer.writeEndElement(toEnd.head)
           toEnd = toEnd.tail

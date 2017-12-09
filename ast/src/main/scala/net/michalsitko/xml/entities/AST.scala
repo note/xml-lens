@@ -41,6 +41,8 @@ case class ProcessingInstruction(target: String, data: String) extends Node with
 // TDSect according to https://www.w3.org/TR/xml/#NT-CDSect
 case class CData(text: String) extends Node
 
+case class EntityReference(name: String, replacement: String) extends Node
+
 // Comment according to https://www.w3.org/TR/xml/#NT-Comment
 case class Comment(comment: String) extends Node with Misc
 

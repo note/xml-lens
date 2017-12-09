@@ -63,8 +63,10 @@ object XmlParser {
   private def read(inputStream: InputStream, config: ParserConfig): XmlDocument = {
     val reader = {
       val xmlInFact = XMLInputFactory.newInstance()
+
+      // TODO: do we really need to set those properties? Understand them better and either remove or document it better here
+      xmlInFact.setProperty("javax.xml.stream.isReplacingEntityReferences", false)
       xmlInFact.setXMLResolver(BlankingResolver)
-      xmlInFact.setProperty("javax.xml.stream.isReplacingEntityReferences", config.replaceEntityReferences)
 
       // https://stackoverflow.com/questions/8591644/need-a-cdata-event-notifying-stax-parser-for-java
       xmlInFact.setProperty("http://java.sun.com/xml/stream/properties/report-cdata-event", true)
@@ -93,18 +95,18 @@ object XmlParser {
         case COMMENT =>
           val comment = Comment(reader.getText())
           doctypeDecl match {
-            case Some(_) =>
-              f1 = f1 :+ comment
             case None =>
+              f1 = f1 :+ comment
+            case Some(_) =>
               f2 = f2 :+ comment
           }
 
         case PROCESSING_INSTRUCTION =>
           val pi = ProcessingInstruction(reader.getPITarget(), reader.getPIData())
           doctypeDecl match {
-            case Some(_) =>
-              f1 = f1 :+ pi
             case None =>
+              f1 = f1 :+ pi
+            case Some(_) =>
               f2 = f2 :+ pi
           }
 
@@ -150,6 +152,11 @@ object XmlParser {
           val parent = elementStack.head
           val commentText = reader.getText()
           parent.addChild(CData(commentText))
+
+        case ENTITY_REFERENCE =>
+          val parent = elementStack.head
+          val ref = EntityReference(reader.getLocalName(), reader.getText())
+          parent.addChild(ref)
 
         case _ =>
           // ignore for now
