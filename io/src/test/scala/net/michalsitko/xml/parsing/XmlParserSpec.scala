@@ -1,8 +1,7 @@
 package net.michalsitko.xml.parsing
 
-import net.michalsitko.xml.BaseSpec
 import net.michalsitko.xml.printing.XmlPrinter
-import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
+import net.michalsitko.xml.test.utils.{BaseSpec, Example, ExampleInputs, XmlGenerator}
 import net.michalsitko.xml.utils.XmlDocumentFactory
 
 class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {

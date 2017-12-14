@@ -1,9 +1,8 @@
 package net.michalsitko.xml.roundtrips
 
-import net.michalsitko.xml.BaseSpec
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter
-import net.michalsitko.xml.test.utils.ExampleInputs
+import net.michalsitko.xml.test.utils.{BaseSpec, ExampleInputs}
 
 class ParserPrinterSpec extends BaseSpec with ExampleInputs {
   implicit val parserConfig = XmlParser.DefaultParserConfig

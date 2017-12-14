@@ -1,4 +1,4 @@
-package net.michalsitko.xml
+package net.michalsitko.xml.test.utils
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.{Matchers, WordSpec}

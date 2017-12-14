@@ -1,7 +1,6 @@
 package net.michalsitko.xml.printing
 
-import net.michalsitko.xml.BaseSpec
-import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
+import net.michalsitko.xml.test.utils.{BaseSpec, Example, ExampleInputs, XmlGenerator}
 import net.michalsitko.xml.utils.XmlDocumentFactory
 
 class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator {

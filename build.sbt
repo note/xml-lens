@@ -1,4 +1,4 @@
-import sbt.Keys.{libraryDependencies, scalacOptions, version, _}
+import sbt.Keys.{libraryDependencies, scalacOptions, _}
 import Common._
 import Dependencies._
 
@@ -12,15 +12,14 @@ lazy val testsCommon = (project in file("tests-common"))
   .commonSettings
   .settings(
     name := "xml-lens-tests-common",
-    libraryDependencies ++= Seq(monocleLaw) // TODO: change to scalacheck if possible
+    libraryDependencies ++= Seq(scalacheck, scalaTest)
   )
   .dependsOn(ast)
 
 lazy val io = (project in file("io"))
   .commonSettings
   .settings(
-    name := "xml-lens-io",
-    libraryDependencies ++= Seq(scalaTest)
+    name := "xml-lens-io"
   )
   .dependsOn(ast, testsCommon % "test->test")
 
@@ -28,7 +27,7 @@ lazy val optics = (project in file("optics"))
   .commonSettings
   .settings(
     name := "xml-lens-optics",
-    libraryDependencies ++= Seq(monocleCore, monocleLaw, scalaTest)
+    libraryDependencies ++= Seq(monocleCore, monocleLaw)
   )
   .dependsOn(ast, testsCommon % "test->test", io % "test->test")
 
