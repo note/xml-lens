@@ -27,8 +27,7 @@ private [parsing] class TopNodesBuilder extends NodeBuilder {
     children.toList
 }
 
-// TODO: those vals and vars on constructor level are unneccessary
-private [parsing] class LabeledElementBuilder(val label: ResolvedName, val attributes: Seq[Attribute], var children: ArrayBuffer[Node], val namespaceDeclarations: Seq[NamespaceDeclaration]) extends NodeBuilder {
+private [parsing] class LabeledElementBuilder(label: ResolvedName, attributes: Seq[Attribute], children: ArrayBuffer[Node], namespaceDeclarations: Seq[NamespaceDeclaration]) extends NodeBuilder {
   def addChild(node: Node): Unit = {
     children += (node)
   }

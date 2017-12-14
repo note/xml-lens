@@ -31,7 +31,7 @@ class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator {
     "deal with very deep XML" in {
       val deepXml = elementOfDepth(4000)
 
-      val doc = XmlDocumentFactory.root(deepXml)
+      val doc = XmlDocumentFactory.noProlog(deepXml)
       XmlPrinter.print(doc)
     }
   }

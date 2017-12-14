@@ -51,8 +51,7 @@ case class Comment(comment: String) extends Node with Misc
 case class Element(attributes: Seq[Attribute] = Seq.empty, children: Seq[Node] = Seq.empty, namespaceDeclarations: Seq[NamespaceDeclaration] = Seq.empty)
 
 // when no prefix in XML then: prefix == ""
-// TODO: investigate why in scala-xml Attribute value is defined as `value: Seq[Node]`
-// also, take a look at: https://www.w3.org/TR/xml/#NT-AttValue
+// take a look at: https://www.w3.org/TR/xml/#NT-AttValue
 case class Attribute(key: ResolvedName, value: String) {
   // TODO: should it stay here?
   def sameKey(anotherKey: ResolvedName): Boolean = {

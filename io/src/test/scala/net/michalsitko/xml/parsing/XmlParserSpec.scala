@@ -1,7 +1,6 @@
 package net.michalsitko.xml.parsing
 
 import net.michalsitko.xml.BaseSpec
-import net.michalsitko.xml.entities.{LabeledElement, Prolog, XmlDeclaration, XmlDocument}
 import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
 import net.michalsitko.xml.utils.XmlDocumentFactory
@@ -59,7 +58,7 @@ class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
     }
 
     "deal with very deep XML" in {
-      val input = XmlPrinter.print(XmlDocumentFactory.root(elementOfDepth(4000)))
+      val input = XmlPrinter.print(XmlDocumentFactory.noProlog(elementOfDepth(4000)))
 
       XmlParser.parse(input).isRight should === (true)
     }
@@ -91,7 +90,7 @@ class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
           """.stripMargin
 
         val res = XmlParser.parse(xml).right.get
-        res should === (xmlDocument("1.0", Some(encoding), labeledElement("a")))
+        res should === (XmlDocumentFactory.withProlog("1.0", Some(encoding), labeledElement("a")))
       }
 
       test("UTF-8")
@@ -105,7 +104,7 @@ class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
         """.stripMargin
 
       val res = XmlParser.parse(xml).right.get
-      res should === (xmlDocument("1.0", None, labeledElement("a")))
+      res should === (XmlDocumentFactory.withProlog("1.0", None, labeledElement("a")))
     }
 
     "fail to parse for XML Declaration with empty encoding" in {
@@ -123,7 +122,7 @@ class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
         """.stripMargin
 
       val res = XmlParser.parse(xml).right.get
-      res should === (XmlDocumentFactory.root(labeledElement("a")))
+      res should === (XmlDocumentFactory.noProlog(labeledElement("a")))
     }
 
     "fail to parse XML with Declaration with no XML version specified" in {
@@ -144,9 +143,5 @@ class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
       }
     }
   }
-
-  // TODO: move somewhere:
-  def xmlDocument(version: String, encoding: Option[String], root: LabeledElement) =
-    XmlDocument(Prolog(Some(XmlDeclaration(version, encoding)), List.empty, None), root)
 
 }

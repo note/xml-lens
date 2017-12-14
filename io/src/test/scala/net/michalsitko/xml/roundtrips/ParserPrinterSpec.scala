@@ -101,21 +101,6 @@ class ParserPrinterSpec extends BaseSpec with ExampleInputs {
       |    <band height="20"></band>
       |</detail>""".stripMargin
 
-//  val xmlWithEntity =
-//    """<?xml version="1.0" encoding="UTF-8"?>
-//      |<html>
-//      |<head>
-//      |    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8"/>
-//      |    <title>Entities in XML</title>
-//      |</head>
-//      |</html>""".stripMargin
-
-//  val xmlWithEntity =
-//    """<?xml version="1.0" encoding="UTF-8"?>
-//      |<detail>
-//      |</detail>""".stripMargin
-
-
     val xmlWithEntity =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<!DOCTYPE html
