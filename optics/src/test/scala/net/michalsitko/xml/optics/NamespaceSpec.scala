@@ -1,16 +1,15 @@
 package net.michalsitko.xml.optics
 
 import monocle.Traversal
+import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.Element
 import net.michalsitko.xml.optics.ElementOptics._
 import net.michalsitko.xml.optics.XmlDocumentOptics._
-import net.michalsitko.xml.parsing.XmlParser
-import org.scalatest.{Matchers, WordSpec}
 
-class NamespaceSpec extends WordSpec with Matchers {
+class NamespaceSpec extends BasicSpec {
   "Optics" should {
     "should respect namespaces" in new Context {
-      val xml = XmlParser.parse(input).right.get
+      val xml = parse(input)
 
       val ignoreNs = withCriteria(deeper("f"))
       val withNsA = {
@@ -33,7 +32,7 @@ class NamespaceSpec extends WordSpec with Matchers {
     }
 
     "should allow to use global namespace" in new Context {
-      val xml = XmlParser.parse(input2).right.get
+      val xml = parse(input2)
 
       val defaultNs = {
         val ns = Namespace.empty

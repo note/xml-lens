@@ -19,48 +19,39 @@ class PlatedSpec extends BasicSpec with ExampleBuilderHelper {
   }
 
   "nodePlated" should {
-    "be able to transform all Text nodes" in {
-      testPlated(
-        Plated.transform[Node] {
-          case Text(txt) => Text(txt.toUpperCase)
-          case node => node
-        },
-        input1, output1
-      )
-    }
+    "be able to transform all Text nodes" in testPlated(
+      Plated.transform[Node] {
+        case Text(txt) => Text(txt.toUpperCase)
+        case node => node
+      }, input1, output1
+    )
 
-    "be able to transform all nodes with `f` label" in {
-      testPlated(
-        Plated.transform[Node] {
-          case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
-            LabeledElementOptics.children.set(List(Text("something")))(el)
-          case node => node
-        },
-        input2, output2
-      )
-    }
+    "be able to transform all nodes with `f` label" in testPlated(
+      Plated.transform[Node] {
+        case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
+          LabeledElementOptics.children.set(List(Text("something")))(el)
+        case node => node
+      },
+      input2, output2
+    )
 
-    "be able to transform all `f` labels to `xyz`" in {
-      testPlated(
-        Plated.transform[Node] {
-          case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
-            el.copy(label = ResolvedName.unprefixed("xyz"))
-          case node => node
-        },
-        input2, output3
-      )
-    }
+    "be able to transform all `f` labels to `xyz`" in testPlated(
+      Plated.transform[Node] {
+        case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
+          el.copy(label = ResolvedName.unprefixed("xyz"))
+        case node => node
+      },
+      input2, output3
+    )
 
-    "be able to transform all `f` labels to `xyz` (even at top level)" in {
-      testPlated(
-        Plated.rewrite[Node] {
-          case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
-            Some(el.copy(label = ResolvedName.unprefixed("xyz")))
-          case node => None
-        },
-        input4, output4
-      )
-    }
+    "be able to transform all `f` labels to `xyz` (even at top level)" in testPlated(
+      Plated.rewrite[Node] {
+        case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
+          Some(el.copy(label = ResolvedName.unprefixed("xyz")))
+        case node => None
+      },
+      input4, output4
+    )
 
     // TODO: it does not work on top level.
     // Probably Plated works like this but it should be either well documented here or

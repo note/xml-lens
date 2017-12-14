@@ -1,10 +1,10 @@
 package net.michalsitko.xml.optics
 
+import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.{LabeledElement, Node, Text}
 import net.michalsitko.xml.test.utils.ExampleBuilderHelper
-import org.scalatest.{Matchers, WordSpec}
 
-class ElementOpticsSpec extends WordSpec with Matchers with ExampleBuilderHelper {
+class ElementOpticsSpec extends BasicSpec with ExampleBuilderHelper {
   import ElementOptics._
 
   "indexOptional" should {

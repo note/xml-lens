@@ -1,18 +1,17 @@
 package net.michalsitko.xml.parsing
 
+import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.printing.XmlPrinter
-import net.michalsitko.xml.test.utils.{BaseSpec, Example, ExampleInputs, XmlGenerator}
+import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
 import net.michalsitko.xml.utils.XmlDocumentFactory
 
-class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
+class XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
   implicit val parserConfig = XmlParser.DefaultParserConfig
   implicit val printerConfig = XmlPrinter.DefaultPrinterConfig
 
   "parse" should {
-    def checkCorrectInput(specificExample: Example): Unit = {
-      val res = XmlParser.parse(specificExample.stringRepr)
-      res.right.get should === (specificExample.document)
-    }
+    def checkCorrectInput(specificExample: Example): Unit =
+      parseExample(specificExample) should === (specificExample.document)
 
     "return proper Element for XML without any namespaces declared and with no whitespaces" in {
       checkCorrectInput(noNamespaceExample)
@@ -69,8 +68,7 @@ class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
 
   "parseWithDeclaration" should {
     def checkCorrectInput(specificExample: Example): Unit = {
-      val res = XmlParser.parse(specificExample.stringRepr)
-      res.right.get should === (specificExample.document)
+      parseExample(specificExample) should === (specificExample.document)
     }
 
     "pass the same tests as parse does" in {
@@ -88,8 +86,7 @@ class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
             |<a></a>
           """.stripMargin
 
-        val res = XmlParser.parse(xml).right.get
-        res should === (XmlDocumentFactory.withProlog("1.0", Some(encoding), labeledElement("a")))
+        parse(xml) should === (XmlDocumentFactory.withProlog("1.0", Some(encoding), labeledElement("a")))
       }
 
       test("UTF-8")
@@ -102,8 +99,7 @@ class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
           |<a></a>
         """.stripMargin
 
-      val res = XmlParser.parse(xml).right.get
-      res should === (XmlDocumentFactory.withProlog("1.0", None, labeledElement("a")))
+      parse(xml) should === (XmlDocumentFactory.withProlog("1.0", None, labeledElement("a")))
     }
 
     "fail to parse for XML Declaration with empty encoding" in {
@@ -120,8 +116,7 @@ class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
         """<a></a>
         """.stripMargin
 
-      val res = XmlParser.parse(xml).right.get
-      res should === (XmlDocumentFactory.noProlog(labeledElement("a")))
+      parse(xml) should === (XmlDocumentFactory.noProlog(labeledElement("a")))
     }
 
     "fail to parse XML with Declaration with no XML version specified" in {

@@ -1,20 +1,20 @@
 package net.michalsitko.xml.roundtrips
 
+import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter
-import net.michalsitko.xml.test.utils.{BaseSpec, ExampleInputs}
+import net.michalsitko.xml.test.utils.ExampleInputs
 
-class ParserPrinterSpec extends BaseSpec with ExampleInputs {
+class ParserPrinterSpec extends BasicSpec with ExampleInputs {
   implicit val parserConfig = XmlParser.DefaultParserConfig
   implicit val printerConfig = XmlPrinter.DefaultPrinterConfig.copy(identWith = None)
 
   def testForInputs(inputs: String*): Unit = {
     inputs.foreach { example =>
-      val parsed = XmlParser.parse(example)
-      val parsedXml = parsed.right.get
-      val printed = XmlPrinter.print(parsedXml)
+      val parsed = parse(example)
+      val printed = XmlPrinter.print(parsed)
 
-      printed should ===(example)
+      printed should === (example)
     }
   }
 
@@ -39,37 +39,35 @@ class ParserPrinterSpec extends BaseSpec with ExampleInputs {
       val examples = List(xmlWithSelfClosingTag, xmlWithEmptyElement)
 
       examples.foreach { example =>
-        val parsed = XmlParser.parse(example)
-        val parsedXml = parsed.right.get
-        val printed = XmlPrinter.print(parsedXml)
+        val parsed = parse(example)
+        val printed = XmlPrinter.print(parsed)
 
-        printed should ===(xmlWithEmptyElement)
+        printed should === (xmlWithEmptyElement)
       }
     }
 
     "preserve entities" in {
-      val parsed = XmlParser.parse(xmlWithEntity)
-      println("bazinga: " + parsed)
-      val printed = XmlPrinter.print(parsed.right.get)
-      printed should ===(xmlWithEntity)
+      val parsed = parse(xmlWithEntity)
+      val printed = XmlPrinter.print(parsed)
+      printed should === (xmlWithEntity)
     }
 
     "pretty print" in {
-      val xml = XmlParser.parse(uglyXmlString).right.get
+      val xml = parse(uglyXmlString)
       val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig)
-      printed should ===(prettyXmlString)
+      printed should === (prettyXmlString)
     }
 
     "pretty print with comments" in {
-      val xml = XmlParser.parse(uglyXmlString2).right.get
+      val xml = parse(uglyXmlString2)
       val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig)
-      printed should ===(prettyXmlString2)
+      printed should === (prettyXmlString2)
     }
 
     "PrinterConfig is taken into account" in {
-      val xml = XmlParser.parse(uglyXmlString).right.get
+      val xml = parse(uglyXmlString)
       val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig.copy(identWith = Some(" ")))
-      printed should ===(prettyXmlStringIntendedWithOneSpace)
+      printed should === (prettyXmlStringIntendedWithOneSpace)
     }
   }
 
