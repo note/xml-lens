@@ -1,9 +1,11 @@
 package net.michalsitko.xml.printing
 
-import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
-import org.scalatest.{Matchers, WordSpec}
+import net.michalsitko.xml.test.utils.{BaseSpec, Example, ExampleInputs, XmlGenerator}
+import net.michalsitko.xml.utils.XmlDocumentFactory
 
-class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs with XmlGenerator {
+class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator {
+  implicit val printerConfig = XmlPrinter.DefaultPrinterConfig.copy(identWith = None)
+
   "XmlPrinter" should {
     "work for basic example" in {
       check(noNamespaceExample)
@@ -28,16 +30,17 @@ class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs with XmlG
     "deal with very deep XML" in {
       val deepXml = elementOfDepth(4000)
 
-      XmlPrinter.print(deepXml)
+      val doc = XmlDocumentFactory.noProlog(deepXml)
+      XmlPrinter.print(doc)
     }
   }
 
   def check(specificExample: Example): Unit = {
-    val res = XmlPrinter.print(specificExample.expectedRes)
+    val res = XmlPrinter.print(specificExample.document)
 
     // TODO: we don't guarantee preserving whitespace outside of root element
     // decide if it's a good decision
-    res.trim should equal(specificExample.stringRepr.trim)
+    res.trim should ===(specificExample.stringRepr.trim)
   }
 
 }

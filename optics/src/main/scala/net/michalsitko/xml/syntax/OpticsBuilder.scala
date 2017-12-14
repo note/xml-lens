@@ -11,19 +11,22 @@ object OpticsBuilder {
 }
 
 class RootBuilder extends AnyRef with ElementOps {
-  val current = Lens[LabeledElement, Element](_.element)(newElement => from => from.copy(element = newElement)).asTraversal
+  import net.michalsitko.xml.optics.XmlDocumentOptics._
+  import net.michalsitko.xml.optics.LabeledElementOptics._
+
+  val current = rootLens.composeLens(element).asTraversal
 
   def \ (nameMatcher: String): DeepBuilder = {
     \ (NameMatcher.fromString(nameMatcher))
   }
 
   def \ (nameMatcher: NameMatcher): DeepBuilder = DeepBuilder (
-    LabeledElementOptics.deep(nameMatcher)
+    rootLens.composeTraversal(LabeledElementOptics.deep(nameMatcher))
   )
 
 }
 
-case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyRef with ElementOps {
+case class DeepBuilder(current: Traversal[XmlDocument, Element]) extends AnyRef with ElementOps {
   def \ (nameMatcher: String): DeepBuilder = {
     \ (NameMatcher.fromString(nameMatcher))
   }
@@ -44,12 +47,12 @@ case class DeepBuilder(current: Traversal[LabeledElement, Element]) extends AnyR
       }
     }
 
-    val composed: Traversal[LabeledElement, Element] = current.composeTraversal(traversal)
+    val composed: Traversal[XmlDocument, Element] = current.composeTraversal(traversal)
     DeepBuilder(composed)
   }
 
   def index(n: Int): DeepBuilderOptional = {
-    val optional: Optional[LabeledElement, Element] = Optional.apply[LabeledElement, Element] { root =>
+    val optional: Optional[XmlDocument, Element] = Optional.apply[XmlDocument, Element] { root =>
       val all = current.getAll(root)
       all.lift(n)
     }{ updatedElem => root =>
@@ -95,11 +98,11 @@ private [syntax] class Indexed(idx: Int, newValue: Element) extends (Element => 
 
 
 object DeepBuilder {
-  implicit def toTraversal(builder: DeepBuilder): Traversal[LabeledElement, Element] =
+  implicit def toTraversal(builder: DeepBuilder): Traversal[XmlDocument, Element] =
     builder.current
 }
 
-case class DeepBuilderOptional(currentOptional: Optional[LabeledElement, Element]) extends AnyRef with ElementOps {
+case class DeepBuilderOptional(currentOptional: Optional[XmlDocument, Element]) extends AnyRef with ElementOps {
   override val current = currentOptional.asTraversal
 
   def \ (nameMatcher: String): DeepBuilder = {
@@ -119,20 +122,20 @@ case class DeepBuilderOptional(currentOptional: Optional[LabeledElement, Element
 }
 
 object DeepBuilderOptional {
-  implicit def toOptional(builder: DeepBuilderOptional): Optional[LabeledElement, Element] =
+  implicit def toOptional(builder: DeepBuilderOptional): Optional[XmlDocument, Element] =
     builder.currentOptional
 }
 
-case class TextBuilder(current: Traversal[LabeledElement, String])
+case class TextBuilder(current: Traversal[XmlDocument, String])
 
 object TextBuilder {
-  implicit def toTraversal(builder: TextBuilder): Traversal[LabeledElement, String] =
+  implicit def toTraversal(builder: TextBuilder): Traversal[XmlDocument, String] =
     builder.current
 }
 
-case class AttributesBuilder(current: Traversal[LabeledElement, Seq[Attribute]])
+case class AttributesBuilder(current: Traversal[XmlDocument, Seq[Attribute]])
 
 object AttributesBuilder {
-  implicit def toTraversal(builder: AttributesBuilder): Traversal[LabeledElement, Seq[Attribute]] =
+  implicit def toTraversal(builder: AttributesBuilder): Traversal[XmlDocument, Seq[Attribute]] =
     builder.current
 }

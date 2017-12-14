@@ -1,55 +1,57 @@
 package net.michalsitko.xml.optics
 
 import monocle.Traversal
+import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities._
+import net.michalsitko.xml.optics.ElementOptics._
+import net.michalsitko.xml.optics.LabeledElementOptics._
+import net.michalsitko.xml.optics.XmlDocumentOptics._
 import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.XmlPrinter
+import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
 import net.michalsitko.xml.test.utils.ExampleInputs
-import org.scalatest.{Matchers, WordSpec}
 
-class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
-  import net.michalsitko.xml.optics.ElementOptics._
-  import net.michalsitko.xml.optics.LabeledElementOptics._
+class OpticsSpec extends BasicSpec with ExampleInputs {
+  implicit val printerConfig = PrinterConfig(None)
 
   "deeper" should {
     "enable to set new Text" in {
-      val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
+      val parsed = parseExample(noNamespaceXmlStringWithWsExample)
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeOptional(hasTextOnly)
+      val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeOptional(hasTextOnly))
 
       val res = traversal.set("new").apply(parsed)
-      XmlPrinter.print(res) should equal(expectedRes)
+      XmlPrinter.print(res) should ===(expectedRes)
     }
 
     "modify text" in {
-      val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
+      val parsed = parseExample(noNamespaceXmlStringWithWsExample)
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeOptional(hasTextOnly)
+      val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeOptional(hasTextOnly))
 
       val res = traversal.modify(_.toUpperCase)(parsed)
-      XmlPrinter.print(res) should equal(expectedRes2)
+      XmlPrinter.print(res) should ===(expectedRes2)
     }
 
     "modify existing attribute value" in {
-      val parsed = XmlParser.parse(input3).right.get
+      val parsed = parse(input3)
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeOptional(attribute("someKey"))
+      val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeOptional(attribute("someKey")))
 
       val res = traversal.set("newValue")(parsed)
-      XmlPrinter.print(res) should equal(expectedRes3)
+      XmlPrinter.print(res) should ===(expectedRes3)
     }
 
     "add attribute" in {
       val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(attributes)
+      val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeLens(attributes))
 
       val res = traversal.modify(attrs => attrs :+ Attribute.unprefixed("someKey", "newValue"))(parsed)
-      XmlPrinter.print(res) should equal(expectedRes4)
+      XmlPrinter.print(res) should ===(expectedRes4)
     }
 
     "modifyExistingOrAdd" in {
-      def replaceExistingAttrOrAdd(traversal: Traversal[LabeledElement, Element])(key: String, newValue: String): (LabeledElement) => LabeledElement = {
+      def replaceExistingAttrOrAdd(traversal: Traversal[XmlDocument, Element])(key: String, newValue: String): (XmlDocument) => XmlDocument = {
         val keyMatcher = NameMatcher.fromString(key)
         val replaceIfExists = traversal.composeOptional((attribute(keyMatcher)))
         val f1 = replaceIfExists.modify(_ => newValue)
@@ -64,45 +66,45 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
         f1 andThen f2
       }
 
-      val parsed = XmlParser.parse(input4).right.get
+      val parsed = parse(input4)
 
-      val traversal = deep("c1").composeTraversal(deeper("f"))
+      val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")))
 
       val res = replaceExistingAttrOrAdd(traversal)("someKey", "newValue")(parsed)
-      XmlPrinter.print(res) should equal(expectedRes5)
+      XmlPrinter.print(res) should ===(expectedRes5)
     }
 
     "delete all attributes" in {
-      val parsed = XmlParser.parse(input5).right.get
+      val parsed = parse(input5)
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(attributes)
+      val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeLens(attributes))
 
       val res = traversal.modify(_ => List.empty)(parsed)
-      XmlPrinter.print(res) should equal(expectedRes6)
+      XmlPrinter.print(res) should ===(expectedRes6)
     }
 
     "delete single attribute" in {
-      val parsed = XmlParser.parse(input5).right.get
+      val parsed = parse(input5)
 
-      val traversal = deep("c1").composeTraversal(deeper("f")).composeLens(attributes)
+      val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeLens(attributes))
 
       val res = traversal.modify(attrs => attrs.filter(_.key != ResolvedName.unprefixed("someKey")))(parsed)
-      XmlPrinter.print(res) should equal(expectedRes7)
+      XmlPrinter.print(res) should ===(expectedRes7)
     }
 
     "delete children" in {
-      val parsed = XmlParser.parse(input4).right.get
+      val parsed = parse(input4)
 
-      val traversal = deep("c1")
+      val traversal = rootLens.composeTraversal(deep("c1"))
 
       val res = traversal.modify(el => el.copy(children = List.empty))(parsed)
-      XmlPrinter.print(res) should equal(expectedRes8)
+      XmlPrinter.print(res) should ===(expectedRes8)
     }
 
     "delete specific child" in {
-      val parsed = XmlParser.parse(input4).right.get
+      val parsed = parse(input4)
 
-      val traversal = deep("c1")
+      val traversal = rootLens.composeTraversal(deep("c1"))
 
       // TODO: it's not terrible, but let's try to think of better way to do it...
       val removeF: Element => Element = { element =>
@@ -117,11 +119,11 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
       }
 
       val res = traversal.modify(removeF)(parsed)
-      XmlPrinter.print(res) should equal(expectedRes9)
+      XmlPrinter.print(res) should ===(expectedRes9)
     }
 
     "rename element label" in {
-      val parsed = XmlParser.parse(input9).right.get
+      val parsed = parse(input9)
       val nameMatcher = NameMatcher.fromString("f")
 
       val renameLabel = { element: Element =>
@@ -134,14 +136,14 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
         }(element)
       }
 
-      val traversal = deep("c1")
+      val traversal = rootLens.composeTraversal(deep("c1"))
 
       val res = traversal.modify(renameLabel)(parsed)
-      XmlPrinter.print(res) should equal(expectedRes10)
+      XmlPrinter.print(res) should ===(expectedRes10)
     }
 
     "modify element's child node based on existence of another child" in {
-      val parsed = XmlParser.parse(input11).right.get
+      val parsed = parse(input11)
 
       val modFun: Element => Element = { el =>
         deeper("h").composeOptional(hasTextOnly).headOption(el).map { textInH =>
@@ -149,20 +151,20 @@ class OpticsSpec extends WordSpec with Matchers with ExampleInputs {
         }.getOrElse(el)
       }
 
-      val res = deep("c1").modify(modFun)(parsed)
-      XmlPrinter.print(res) should equal(output11)
+      val res = rootLens.composeTraversal(deep("c1")).modify(modFun)(parsed)
+      XmlPrinter.print(res) should ===(output11)
     }
 
     "do a few modifications" in {
-      val parsed = XmlParser.parse(input12).right.get
+      val parsed = parse(input12)
 
       val addAttr = attributes.modify(attrs => attrs :+ Attribute(ResolvedName.unprefixed("someKey"), "someValue"))
       val modifyText = hasTextOnly.modify(_.toUpperCase)
 
-      val traversal = deep("c1").composeTraversal(deeper("f"))
+      val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")))
       val res = traversal.modify(addAttr andThen modifyText)(parsed)
 
-      XmlPrinter.print(res) should equal(output12)
+      XmlPrinter.print(res) should ===(output12)
     }
 
   }

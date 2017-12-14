@@ -2,7 +2,27 @@ package net.michalsitko.xml.test.utils
 
 import net.michalsitko.xml.entities.{LabeledElement, _}
 
-case class Example(stringRepr: String, expectedRes: LabeledElement)
+case class Example(stringRepr: String, document: XmlDocument)
+
+object Example {
+  private val defaultDecl = XmlDeclaration("1.0", Some("UTF-8"))
+
+  def apply(stringRepr: String, root: LabeledElement): Example = {
+    val prolog = Prolog(Some(defaultDecl), List.empty, None)
+    Example(stringRepr, XmlDocument(prolog, root))
+  }
+
+  def withDoctypeDecl(stringRepr: String, doctypeDeclaration: DoctypeDeclaration, root: LabeledElement): Example = {
+    val prolog = Prolog(Some(defaultDecl), List.empty, Some((doctypeDeclaration, List.empty)))
+    Example(stringRepr, XmlDocument(prolog, root))
+  }
+
+  def apply(stringRepr: String, misc: Seq[Misc], root: LabeledElement): Example = {
+    val prolog = Prolog(Some(defaultDecl), misc, None)
+    Example(stringRepr, XmlDocument(prolog, root))
+  }
+
+}
 
 trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
   val noNamespaceExample = Example(
@@ -113,6 +133,68 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
           labeledElement("h", Text("item2"))
         ), Seq.empty))
       )
+    )
+  }
+
+  val xmlWithDtd = {
+    val str = """<?xml version="1.0" encoding="UTF-8"?>
+                |<!DOCTYPE html
+                |    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                |    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+                |[
+                |    <!ENTITY test-entity "This <em>is</em> an entity.">
+                |]>
+                |<note></note>""".stripMargin
+
+    // Note, that there are 2 top level elements: Dtd and LabeledElements, end of line after the Dtd is ignored
+    Example.withDoctypeDecl(
+      str,
+      DoctypeDeclaration("""<!DOCTYPE html
+            |    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+            |    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+            |[
+            |    <!ENTITY test-entity "This <em>is</em> an entity.">
+            |]>""".stripMargin),
+      labeledElement("note")
+    )
+  }
+
+  val xmlWithPI = {
+    val str =
+      """<?xml version="1.0" encoding="UTF-8"?>
+        |<?xml-stylesheet type="text/xsl" href="style.xsl"?>
+        |<?welcome  to pg = 10 of tutorials point?>
+        |<?welcome?>
+        |<note>something<?mso-application progid="Excel.Sheet"?>else</note>
+      """.stripMargin
+
+    Example(
+      str,
+      List(
+        ProcessingInstruction("xml-stylesheet", """type="text/xsl" href="style.xsl""""),
+        ProcessingInstruction("welcome", "to pg = 10 of tutorials point"),
+        ProcessingInstruction("welcome", "")
+      ),
+      labeledElement("note", Text("something"), ProcessingInstruction("mso-application", """progid="Excel.Sheet""""), Text("else"))
+    )
+  }
+
+  val xmlWithCData = {
+    val cdataContent = """
+                         |    I can use all sorts of reserved characters
+                         |    like > < " and &
+                         |    or write things like
+                         |    <foo></bar>
+                         |    but my document is still well formed!
+                         |""".stripMargin
+
+    val str =
+      s"""<?xml version="1.0" encoding="UTF-8"?>
+        |<note>something<![CDATA[$cdataContent]]>else</note>""".stripMargin
+
+    Example(
+      str,
+      labeledElement("note", Text("something"), CData(cdataContent), Text("else"))
     )
   }
 

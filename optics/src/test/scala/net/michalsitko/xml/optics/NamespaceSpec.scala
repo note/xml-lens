@@ -1,13 +1,13 @@
 package net.michalsitko.xml.optics
 
 import monocle.Traversal
-import net.michalsitko.xml.entities.{Element, LabeledElement}
+import net.michalsitko.xml.entities.Element
+import net.michalsitko.xml.optics.ElementOptics._
+import net.michalsitko.xml.optics.XmlDocumentOptics._
 import net.michalsitko.xml.parsing.XmlParser
 import org.scalatest.{Matchers, WordSpec}
 
 class NamespaceSpec extends WordSpec with Matchers {
-  import ElementOptics._
-
   "Optics" should {
     "should respect namespaces" in new Context {
       val xml = XmlParser.parse(input).right.get
@@ -26,10 +26,10 @@ class NamespaceSpec extends WordSpec with Matchers {
         withCriteria(deeper(ns.name("f")))
       }
 
-      ignoreNs.getAll(xml) should equal(List("a.com", "b.com", "c.com", "d.com"))
-      withNsA.getAll(xml) should equal(List("a.com"))
-      withNsB.getAll(xml) should equal(List("b.com"))
-      withNsC.getAll(xml) should equal(List("c.com"))
+      ignoreNs.getAll(xml) should ===(List("a.com", "b.com", "c.com", "d.com"))
+      withNsA.getAll(xml) should ===(List("a.com"))
+      withNsB.getAll(xml) should ===(List("b.com"))
+      withNsC.getAll(xml) should ===(List("c.com"))
     }
 
     "should allow to use global namespace" in new Context {
@@ -40,7 +40,7 @@ class NamespaceSpec extends WordSpec with Matchers {
         withCriteria(deeper(ns.name("f")))
       }
 
-      defaultNs.getAll(xml) should equal(List("no namespace"))
+      defaultNs.getAll(xml) should ===(List("no namespace"))
     }
 
   }
@@ -69,10 +69,10 @@ trait Context {
       |   </c1>
       |</a>""".stripMargin
 
-  def withCriteria(criteria: Traversal[Element, Element]): Traversal[LabeledElement, String] = {
-    import LabeledElementOptics._
+  def withCriteria(criteria: Traversal[Element, Element]) = {
     import ElementOptics._
+    import LabeledElementOptics._
 
-    deep("c1").composeTraversal(criteria).composeOptional(hasTextOnly)
+    rootLens.composeTraversal(deep("c1").composeTraversal(criteria).composeOptional(hasTextOnly))
   }
 }

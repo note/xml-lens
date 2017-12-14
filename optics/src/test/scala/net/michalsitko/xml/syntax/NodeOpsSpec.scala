@@ -1,13 +1,15 @@
 package net.michalsitko.xml.syntax
 
+import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.Text
-import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.XmlPrinter
+import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
+import net.michalsitko.xml.syntax.document._
 import net.michalsitko.xml.syntax.node._
 import net.michalsitko.xml.test.utils.ExampleInputs
-import org.scalatest.{Matchers, WordSpec}
 
-class NodeOpsSpec extends WordSpec with Matchers with ExampleInputs with Examples {
+class NodeOpsSpec extends BasicSpec with ExampleInputs with Examples {
+  implicit val printerConfig = PrinterConfig(None)
+
   "minimize" should {
     "work as expected" in {
       val input = labeledElement("a",
@@ -33,27 +35,23 @@ class NodeOpsSpec extends WordSpec with Matchers with ExampleInputs with Example
         )
       )
 
-      input.minimize should equal(expectedRes)
+      input.minimize should === (expectedRes)
     }
 
     "work as expected 2" in {
-      val input = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
-
-      val res = input.minimize
+      val doc = parseExample(noNamespaceXmlStringWithWsExample).minimize
 
       val expectedRes =
         """<?xml version="1.0" encoding="UTF-8"?>
           |<a><c1><f>item1</f><g>item2</g></c1><c1><f>item1</f><h>item2</h></c1></a>""".stripMargin
 
-      XmlPrinter.print(res) should equal(expectedRes)
+      XmlPrinter.print(doc) should === (expectedRes)
     }
 
     "respect comments" in {
-      val input = XmlParser.parse(inputWithComments).right.get
+      val doc = parse(inputWithComments).minimize
 
-      val res = input.minimize
-
-      XmlPrinter.print(res) should equal(outputWithComments)
+      XmlPrinter.print(doc) should === (outputWithComments)
     }
   }
 }
