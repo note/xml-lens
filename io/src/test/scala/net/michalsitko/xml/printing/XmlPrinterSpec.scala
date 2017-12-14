@@ -1,10 +1,10 @@
 package net.michalsitko.xml.printing
 
+import net.michalsitko.xml.BaseSpec
 import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
 import net.michalsitko.xml.utils.XmlDocumentFactory
-import org.scalatest.{Matchers, WordSpec}
 
-class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs with XmlGenerator {
+class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator {
   implicit val printerConfig = XmlPrinter.DefaultPrinterConfig.copy(identWith = None)
 
   "XmlPrinter" should {
@@ -41,7 +41,7 @@ class XmlPrinterSpec extends WordSpec with Matchers with ExampleInputs with XmlG
 
     // TODO: we don't guarantee preserving whitespace outside of root element
     // decide if it's a good decision
-    res.trim should equal(specificExample.stringRepr.trim)
+    res.trim should ===(specificExample.stringRepr.trim)
   }
 
 }

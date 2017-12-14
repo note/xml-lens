@@ -1,11 +1,11 @@
 package net.michalsitko.xml.roundtrips
 
+import net.michalsitko.xml.BaseSpec
 import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.test.utils.ExampleInputs
-import org.scalatest.{Matchers, WordSpec}
 
-class ParserPrinterSpec extends WordSpec with Matchers with ExampleInputs {
+class ParserPrinterSpec extends BaseSpec with ExampleInputs {
   implicit val parserConfig = XmlParser.DefaultParserConfig
   implicit val printerConfig = XmlPrinter.DefaultPrinterConfig.copy(identWith = None)
 
@@ -15,7 +15,7 @@ class ParserPrinterSpec extends WordSpec with Matchers with ExampleInputs {
       val parsedXml = parsed.right.get
       val printed = XmlPrinter.print(parsedXml)
 
-      printed should equal(example)
+      printed should ===(example)
     }
   }
 
@@ -44,7 +44,7 @@ class ParserPrinterSpec extends WordSpec with Matchers with ExampleInputs {
         val parsedXml = parsed.right.get
         val printed = XmlPrinter.print(parsedXml)
 
-        printed should equal(xmlWithEmptyElement)
+        printed should ===(xmlWithEmptyElement)
       }
     }
 
@@ -52,25 +52,25 @@ class ParserPrinterSpec extends WordSpec with Matchers with ExampleInputs {
       val parsed = XmlParser.parse(xmlWithEntity)
       println("bazinga: " + parsed)
       val printed = XmlPrinter.print(parsed.right.get)
-      printed should equal(xmlWithEntity)
+      printed should ===(xmlWithEntity)
     }
 
     "pretty print" in {
       val xml = XmlParser.parse(uglyXmlString).right.get
       val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig)
-      printed should equal(prettyXmlString)
+      printed should ===(prettyXmlString)
     }
 
     "pretty print with comments" in {
       val xml = XmlParser.parse(uglyXmlString2).right.get
       val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig)
-      printed should equal(prettyXmlString2)
+      printed should ===(prettyXmlString2)
     }
 
     "PrinterConfig is taken into account" in {
       val xml = XmlParser.parse(uglyXmlString).right.get
       val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig.copy(identWith = Some(" ")))
-      printed should equal(prettyXmlStringIntendedWithOneSpace)
+      printed should ===(prettyXmlStringIntendedWithOneSpace)
     }
   }
 

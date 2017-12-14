@@ -1,13 +1,12 @@
 package net.michalsitko.xml.parsing
 
+import net.michalsitko.xml.BaseSpec
 import net.michalsitko.xml.entities.{LabeledElement, Prolog, XmlDeclaration, XmlDocument}
 import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
 import net.michalsitko.xml.utils.XmlDocumentFactory
-import org.scalactic.TypeCheckedTripleEquals
-import org.scalatest.{Matchers, WordSpec}
 
-class XmlParserSpec extends WordSpec with Matchers with TypeCheckedTripleEquals with ExampleInputs with XmlGenerator {
+class XmlParserSpec extends BaseSpec with ExampleInputs with XmlGenerator {
   implicit val parserConfig = XmlParser.DefaultParserConfig
   implicit val printerConfig = XmlPrinter.DefaultPrinterConfig
 
