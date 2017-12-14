@@ -9,30 +9,30 @@ class ElementOpticsSpec extends WordSpec with Matchers with ExampleBuilderHelper
 
   "indexOptional" should {
     "return the n-th node" in {
-      indexOptional(0).getOption(input.element) should equal (Some(first))
-      indexOptional(1).getOption(input.element) should equal (Some(second))
-      indexOptional(2).getOption(input.element) should equal (Some(third))
+      indexOptional(0).getOption(input.element) should === (Some(first))
+      indexOptional(1).getOption(input.element) should === (Some(second))
+      indexOptional(2).getOption(input.element) should === (Some(third))
     }
 
     "return None if node with given index does not exist" in {
-      indexOptional(3).getOption(input.element) should equal (None)
-      indexOptional(105).getOption(input.element) should equal (None)
+      indexOptional(3).getOption(input.element) should === (None)
+      indexOptional(105).getOption(input.element) should === (None)
     }
 
     "be able to set text Node" in {
       val expectedOutput = testedElement(Text("NEW"), second, third).element
 
-      indexOptional(0).set(Text("NEW"))(input.element) should equal (expectedOutput)
+      indexOptional(0).set(Text("NEW"))(input.element) should === (expectedOutput)
     }
   }
 
   "indexElementOptional" should {
     "work" in {
-      indexElementOptional(1).getOption(input.element) should equal (Some(third))
+      indexElementOptional(1).getOption(input.element) should === (Some(third))
     }
 
     "return None if element with given index does not exist" in {
-      indexElementOptional(2).getOption(input.element) should equal (None)
+      indexElementOptional(2).getOption(input.element) should === (None)
     }
   }
 
