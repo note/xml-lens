@@ -1,12 +1,12 @@
 package net.michalsitko.xml.syntax
 
 import monocle.Traversal
-import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement, NamespaceDeclaration}
+import net.michalsitko.xml.entities._
 import net.michalsitko.xml.optics.ElementOptics.allLabeledElements
 import net.michalsitko.xml.optics._
 
 trait ElementOps {
-  def current: Traversal[LabeledElement, Element]
+  def current: Traversal[XmlDocument, Element]
 
   def attr(nameMatcher: String): TextBuilder =
     attr(NameMatcher.fromString(nameMatcher))
@@ -19,7 +19,7 @@ trait ElementOps {
     current.composeLens(ElementOptics.attributes)
   )
 
-  def replaceOrAddAttr(key: NameMatcher with ToResolvedName, newValue: String): LabeledElement => LabeledElement = { el =>
+  def replaceOrAddAttr(key: NameMatcher with ToResolvedName, newValue: String): XmlDocument => XmlDocument = { el =>
     val modifyExisting = ElementOptics.attribute(key).modifyOption(_ => newValue)
 
     val addNs: (Element) => Element = key match {
@@ -40,7 +40,7 @@ trait ElementOps {
     }(el)
   }
 
-  def renameLabel(oldLabel: NameMatcher with ToResolvedName, newLabel: NameMatcher with ToResolvedName): LabeledElement => LabeledElement = { labeledElement =>
+  def renameLabel(oldLabel: NameMatcher with ToResolvedName, newLabel: NameMatcher with ToResolvedName): XmlDocument => XmlDocument = { labeledElement =>
     current.modify { element =>
       allLabeledElements.modify { el =>
         if (oldLabel.matches(el.label)) {
@@ -52,10 +52,10 @@ trait ElementOps {
     }(labeledElement)
   }
 
-  def renameLabel(oldLabel: String, newLabel: String): LabeledElement => LabeledElement =
+  def renameLabel(oldLabel: String, newLabel: String): XmlDocument => XmlDocument =
     renameLabel(NameMatcher.fromString(oldLabel), NameMatcher.fromString(newLabel))
 
-  def replaceOrAddAttr(key: String, newValue: String): LabeledElement => LabeledElement =
+  def replaceOrAddAttr(key: String, newValue: String): XmlDocument => XmlDocument =
     replaceOrAddAttr(NameMatcher.fromString(key), newValue)
 
   def hasTextOnly: TextBuilder = TextBuilder (

@@ -15,7 +15,7 @@ import net.michalsitko.xml.entities._
 object XmlPrinter {
   val DefaultPrinterConfig = PrinterConfig(Some("  "))
 
-  def print(doc: XmlDocument)(implicit cfg: PrinterConfig): String = {
+  def print(doc: XmlDocument)(implicit cfg: PrinterConfig = DefaultPrinterConfig): String = {
     val stringOutput = new StringWriter()
     val writer = cfg.identWith match {
       case Some(ident)  => new PrettyXmlWriter(stringOutput, cfg)

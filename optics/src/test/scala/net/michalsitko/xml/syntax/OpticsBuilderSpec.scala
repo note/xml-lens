@@ -1,26 +1,28 @@
 package net.michalsitko.xml.syntax
 
+import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement}
-import net.michalsitko.xml.optics.{LabeledElementOptics, Namespace, NodeOptics, PrefixedNamespace}
-import net.michalsitko.xml.parsing.XmlParser
+import net.michalsitko.xml.optics._
 import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
 import net.michalsitko.xml.syntax.OpticsBuilder._
+import net.michalsitko.xml.syntax.document._
 import net.michalsitko.xml.test.utils.ExampleInputs
-import org.scalatest.{Matchers, WordSpec}
 
-class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
+class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
+  implicit val printerConfig = PrinterConfig(None)
+
   "OpticsBuilder" should {
     "set text for chosen path" in {
-      val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
+      val parsed = parseExample(noNamespaceXmlStringWithWsExample)
 
       val traversal = (root \ "c1" \ "f").hasTextOnly
-      val res = traversal.set("new").apply(parsed)
+      val res = traversal.set("new")(parsed)
 
       XmlPrinter.print(res) should equal(expectedRes)
     }
 
     "modify text for chosen path" in {
-      val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
+      val parsed = parseExample(noNamespaceXmlStringWithWsExample)
 
       val traversal = (root \ "c1" \ "f").hasTextOnly
       val res = traversal.modify(_.toUpperCase)(parsed)
@@ -29,7 +31,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "modify existing attribute value" in {
-      val parsed = XmlParser.parse(input3).right.get
+      val parsed = parse(input3)
 
       val traversal = (root \ "c1" \ "f").attr("someKey")
       val res = traversal.set("newValue")(parsed)
@@ -38,7 +40,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "add attribute" in {
-      val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
+      val parsed = parseExample(noNamespaceXmlStringWithWsExample)
 
       val traversal = (root \ "c1" \ "f").attrs
 
@@ -47,7 +49,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "replaceOrAddAttr" in {
-      val parsed = XmlParser.parse(input5).right.get
+      val parsed = parse(input5)
 
       val traversal = (root \ "c1" \ "f")
 
@@ -57,7 +59,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "replaceOrAddAttr for ResolvedNameMatcher" in {
-      val parsed = XmlParser.parse(input6).right.get
+      val parsed = parse(input6)
 
       val ns = PrefixedNamespace("a", "http://a.com")
       val traversal = (root \ "c1" \ "f")
@@ -68,7 +70,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "modify attribute for ResolvedNameMatcher" in {
-      val parsed = XmlParser.parse(input7).right.get
+      val parsed = parse(input7)
 
       val ns = Namespace("http://a.com")
       val traversal = (root \ "c1" \ "f").attr(ns.name("someKey"))
@@ -78,7 +80,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "modify attribute for IgnoreNamespaceMatcher" in {
-      val parsed = XmlParser.parse(input7).right.get
+      val parsed = parse(input7)
 
       val traversal = (root \ "c1" \ "f").attr("someKey")
 
@@ -87,7 +89,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "modify attribute for ResolvedNameMatcher2" in {
-      val parsed = XmlParser.parse(input7).right.get
+      val parsed = parse(input7)
 
       val ns = Namespace("")
       val traversal = (root \ "c1" \ "f").attr(ns.name("someKey"))
@@ -97,7 +99,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "modify attribute in root element" in {
-      val parsed = XmlParser.parse(input10).right.get
+      val parsed = parse(input10)
 
       val traversal = root.attr("someKey")
 
@@ -106,14 +108,14 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "modify text in root element" in {
-      val parsed = XmlParser.parse(input10).right.get
+      val parsed = parse(input10)
 
       val res = root.hasTextOnly.set("hello")(parsed)
       XmlPrinter.print(res) should equal(expectedRes11)
     }
 
     "add attribute in root element" in {
-      val parsed = XmlParser.parse(input10).right.get
+      val parsed = parse(input10)
 
       val res = root.attrs.modify(attrs => attrs :+ Attribute.unprefixed("anotherKey", "newValue"))(parsed)
       XmlPrinter.print(res) should equal(expectedRes12)
@@ -121,12 +123,12 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
 
     "replaceOrAddAttr in root element" in {
       {
-        val parsed = XmlParser.parse(input13).right.get
+        val parsed = parse(input13)
         val res = root.replaceOrAddAttr("anotherKey", "newValue")(parsed)
         XmlPrinter.print(res) should equal(expectedRes12)
       }
       {
-        val parsed = XmlParser.parse(input14).right.get
+        val parsed = parse(input14)
         val res = root.replaceOrAddAttr("anotherKey", "newValue")(parsed)
         XmlPrinter.print(res) should equal(expectedRes12)
       }
@@ -134,7 +136,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
 
     // TODO: add to cookbook
     "renameLabel" in {
-      val parsed = XmlParser.parse(example15("f")).right.get
+      val parsed = parse(example15("f"))
 
       val res = (root \ "c1").renameLabel("f", "xyz")(parsed)
       XmlPrinter.print(res) should equal(example15("xyz"))
@@ -145,7 +147,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       import LabeledElementOptics._
       import NodeOptics._
 
-      val parsed = XmlParser.parse(example15("f")).right.get
+      val parsed = parse(example15("f"))
 
       // TODO: does not look nice
       val res = (((root \ "c1").having { node =>
@@ -160,7 +162,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
       import NodeOptics._
       import net.michalsitko.xml.optics.ElementOptics._
 
-      val parsed = XmlParser.parse(example17("item")).right.get
+      val parsed = parse(example17("item"))
 
       val res = (((root \ "c1").having { node =>
         isLabeledElement.composeOptional(isLabeled("g")).composeOptional(attribute("someKey")).getOption(node).isDefined
@@ -171,7 +173,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
 
     // TODO: add info to cookbook, comment difference with another index methods (in optics)
     "index" in {
-      val parsed = XmlParser.parse(example17("item")).right.get
+      val parsed = parse(example17("item"))
 
       val res = (root \ "c1" \ "f").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
@@ -179,7 +181,7 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "index and then index" in {
-      val parsed = XmlParser.parse(example19("item")).right.get
+      val parsed = parse(example19("item"))
 
       val res = ((root \ "c1" \ "f").index(1) \ "h" \ "i").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
@@ -187,19 +189,18 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
     }
 
     "childAt" in {
-      import net.michalsitko.xml.syntax.node._
       // we need to minimize as unneccessary Text nodes (caused just by the fact that input string is formatted)
       // would interfere with `childAt`
-      val parsed = XmlParser.parse(example18("item")).right.get.minimize
+      val parsed = parse(example18("item")).minimize
 
       val res = (root \ "c1" \ "f").childAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(example18("ITEM"))
+      XmlPrinter.print(res)(PrinterConfig(Some("  "))) should equal(example18("ITEM"))
     }
 
     "elementAt" in {
       // contrary to `childAt` we don't need to minimize as Text elements will be ignored
-      val parsed = XmlParser.parse(example18("item")).right.get
+      val parsed = parse(example18("item"))
 
       val res = (root \ "c1" \ "f").elementAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
@@ -208,23 +209,23 @@ class OpticsBuilderSpec extends WordSpec with Matchers with ExampleInputs {
 
     // TODO: may be a nice addition to cookbook
     "insert new node as the first node" in {
-      val parsed = XmlParser.parse(minimalInput).right.get
+      val parsed = parse(minimalInput)
 
       // TODO: better factory methods needed instead of this
       val newElement = LabeledElement.unprefixed("new", Element())
       val res = (root \ "f").children.modify( ch => newElement +: ch)(parsed)
 
-      XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(example20)
+      XmlPrinter.print(res)(PrinterConfig(Some("  "))) should equal(example20)
     }
 
     "insert new node as the last node" in {
-      val parsed = XmlParser.parse(minimalInput).right.get
+      val parsed = parse(minimalInput)
 
       // TODO: better factory methods needed instead of this
       val newElement = LabeledElement.unprefixed("new", Element())
       val res = (root \ "f").children.modify( ch => ch :+ newElement)(parsed)
 
-      XmlPrinter.prettyPrint(res, PrinterConfig(Some("  "))) should equal(example21)
+      XmlPrinter.print(res)(PrinterConfig(Some("  "))) should equal(example21)
     }
 
   }

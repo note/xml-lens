@@ -53,10 +53,10 @@ object XmlParser {
   // TODO: think about making return type Either[ParsingException, Node]. Current version use an (unneccessary?) assumption
   def parse(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: ParserConfig = DefaultParserConfig): Either[ParsingException, XmlDocument] = {
     val stream = new ByteArrayInputStream(input.getBytes(charset))
-    parse(stream)
+    parseStream(stream)
   }
 
-  def parse(inputStream: InputStream)(implicit config: ParserConfig): Either[ParsingException, XmlDocument] =
+  def parseStream(inputStream: InputStream)(implicit config: ParserConfig = DefaultParserConfig): Either[ParsingException, XmlDocument] =
     Try(read(inputStream, config)).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
 
   private def read(inputStream: InputStream, config: ParserConfig): XmlDocument = {
