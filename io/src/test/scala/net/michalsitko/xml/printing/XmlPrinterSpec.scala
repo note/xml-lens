@@ -6,6 +6,8 @@ import net.michalsitko.xml.utils.XmlDocumentFactory
 class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator {
   implicit val printerConfig = XmlPrinter.DefaultPrinterConfig
 
+  def prettyCfg(singleIndent: String) = PrinterConfig(Indent.IndentWith(singleIndent))
+
   "XmlPrinter" should {
     "work for basic example" in {
       check(noNamespaceExample)
@@ -32,16 +34,6 @@ class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator {
 
       val doc = XmlDocumentFactory.noProlog(deepXml)
       XmlPrinter.print(doc)
-    }
-
-    "take into account PrinterConfig" in {
-//      PrinterConfig(Some(" "))
-//
-//      PrinterConfig(Some("  "))
-//
-//      PrinterConfig(None) // do nothing
-//
-//      PrinterConfig()
     }
   }
 

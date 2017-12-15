@@ -50,8 +50,10 @@ class ParserPrinterSpec extends BasicSpec with ExampleInputs {
 
     "pretty print" in {
       val xml = parse(uglyXmlString)
-      val printed = XmlPrinter.print(xml)(PrinterConfig(Indent.IndentWith("  ")))
-      printed should === (prettyXmlString)
+      val prettyCfg = PrinterConfig(Indent.IndentWith("  "))
+
+      XmlPrinter.print(xml)(prettyCfg)  should === (prettyXmlString)
+      XmlPrinter.print(xml)             should === (uglyXmlString)
     }
 
     "pretty print with comments" in {
