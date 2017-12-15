@@ -1,6 +1,5 @@
 package net.michalsitko.xml.printing
 
-// TODO: document and test the difference between identWith = None and identWith = Some("")
 case class PrinterConfig(indent: Indent)
 
 sealed trait Indent
