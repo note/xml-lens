@@ -13,13 +13,13 @@ import net.michalsitko.xml.entities._
 // which is not true in general. User can manipulate AST in any way, so we should take care of undefined namespaces' prefixes,
 // isRepairingNamespaces, escaping special characters
 object XmlPrinter {
-  val DefaultPrinterConfig = PrinterConfig(Some("  "))
+  val DefaultPrinterConfig = PrinterConfig(Indent.Remain)
 
   def print(doc: XmlDocument)(implicit cfg: PrinterConfig = DefaultPrinterConfig): String = {
     val stringOutput = new StringWriter()
-    val writer = cfg.identWith match {
-      case Some(ident)  => new PrettyXmlWriter(stringOutput, cfg)
-      case None         => new JavaXmlWriter(stringOutput, cfg)
+    val writer = cfg.indent match {
+      case _: Indent.IndentWith  => new PrettyXmlWriter(stringOutput, cfg)
+      case Indent.Remain         => new JavaXmlWriter(stringOutput, cfg)
     }
 
     writer.writeProlog(doc.prolog)

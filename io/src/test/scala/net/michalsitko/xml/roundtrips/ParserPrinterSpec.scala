@@ -1,14 +1,10 @@
 package net.michalsitko.xml.roundtrips
 
 import net.michalsitko.xml.BasicSpec
-import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.XmlPrinter
+import net.michalsitko.xml.printing.{Indent, PrinterConfig, XmlPrinter}
 import net.michalsitko.xml.test.utils.ExampleInputs
 
 class ParserPrinterSpec extends BasicSpec with ExampleInputs {
-  implicit val parserConfig = XmlParser.DefaultParserConfig
-  implicit val printerConfig = XmlPrinter.DefaultPrinterConfig.copy(identWith = None)
-
   def testForInputs(inputs: String*): Unit = {
     inputs.foreach { example =>
       val parsed = parse(example)
@@ -54,19 +50,19 @@ class ParserPrinterSpec extends BasicSpec with ExampleInputs {
 
     "pretty print" in {
       val xml = parse(uglyXmlString)
-      val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig)
+      val printed = XmlPrinter.print(xml)(PrinterConfig(Indent.IndentWith("  ")))
       printed should === (prettyXmlString)
     }
 
     "pretty print with comments" in {
       val xml = parse(uglyXmlString2)
-      val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig)
+      val printed = XmlPrinter.print(xml)(PrinterConfig(Indent.IndentWith("  ")))
       printed should === (prettyXmlString2)
     }
 
     "PrinterConfig is taken into account" in {
       val xml = parse(uglyXmlString)
-      val printed = XmlPrinter.print(xml)(XmlPrinter.DefaultPrinterConfig.copy(identWith = Some(" ")))
+      val printed = XmlPrinter.print(xml)(PrinterConfig(Indent.IndentWith(" ")))
       printed should === (prettyXmlStringIntendedWithOneSpace)
     }
   }

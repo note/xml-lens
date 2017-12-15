@@ -4,7 +4,7 @@ import net.michalsitko.xml.test.utils.{BaseSpec, Example, ExampleInputs, XmlGene
 import net.michalsitko.xml.utils.XmlDocumentFactory
 
 class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator {
-  implicit val printerConfig = XmlPrinter.DefaultPrinterConfig.copy(identWith = None)
+  implicit val printerConfig = XmlPrinter.DefaultPrinterConfig
 
   "XmlPrinter" should {
     "work for basic example" in {
@@ -32,6 +32,16 @@ class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator {
 
       val doc = XmlDocumentFactory.noProlog(deepXml)
       XmlPrinter.print(doc)
+    }
+
+    "take into account PrinterConfig" in {
+//      PrinterConfig(Some(" "))
+//
+//      PrinterConfig(Some("  "))
+//
+//      PrinterConfig(None) // do nothing
+//
+//      PrinterConfig()
     }
   }
 

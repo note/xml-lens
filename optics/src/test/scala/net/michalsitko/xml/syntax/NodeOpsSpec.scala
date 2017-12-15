@@ -2,14 +2,12 @@ package net.michalsitko.xml.syntax
 
 import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.Text
-import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
+import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.syntax.document._
 import net.michalsitko.xml.syntax.node._
 import net.michalsitko.xml.test.utils.ExampleInputs
 
 class NodeOpsSpec extends BasicSpec with ExampleInputs with Examples {
-  implicit val printerConfig = PrinterConfig(None)
-
   "minimize" should {
     "work as expected" in {
       val input = labeledElement("a",

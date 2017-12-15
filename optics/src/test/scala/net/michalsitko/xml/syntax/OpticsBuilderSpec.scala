@@ -3,14 +3,12 @@ package net.michalsitko.xml.syntax
 import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement}
 import net.michalsitko.xml.optics._
-import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
+import net.michalsitko.xml.printing.{Indent, PrinterConfig, XmlPrinter}
 import net.michalsitko.xml.syntax.OpticsBuilder._
 import net.michalsitko.xml.syntax.document._
 import net.michalsitko.xml.test.utils.ExampleInputs
 
 class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
-  implicit val printerConfig = PrinterConfig(None)
-
   "OpticsBuilder" should {
     "set text for chosen path" in {
       val parsed = parseExample(noNamespaceXmlStringWithWsExample)
@@ -195,7 +193,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
 
       val res = (root \ "c1" \ "f").childAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res)(PrinterConfig(Some("  "))) should === (example18("ITEM"))
+      XmlPrinter.print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example18("ITEM"))
     }
 
     "elementAt" in {
@@ -215,7 +213,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val newElement = LabeledElement.unprefixed("new", Element())
       val res = (root \ "f").children.modify( ch => newElement +: ch)(parsed)
 
-      XmlPrinter.print(res)(PrinterConfig(Some("  "))) should === (example20)
+      XmlPrinter.print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example20)
     }
 
     "insert new node as the last node" in {
@@ -225,7 +223,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val newElement = LabeledElement.unprefixed("new", Element())
       val res = (root \ "f").children.modify( ch => ch :+ newElement)(parsed)
 
-      XmlPrinter.print(res)(PrinterConfig(Some("  "))) should === (example21)
+      XmlPrinter.print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example21)
     }
 
   }

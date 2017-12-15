@@ -7,12 +7,10 @@ import net.michalsitko.xml.optics.ElementOptics._
 import net.michalsitko.xml.optics.LabeledElementOptics._
 import net.michalsitko.xml.optics.XmlDocumentOptics._
 import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.{PrinterConfig, XmlPrinter}
+import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.test.utils.ExampleInputs
 
 class OpticsSpec extends BasicSpec with ExampleInputs {
-  implicit val printerConfig = PrinterConfig(None)
-
   "deeper" should {
     "enable to set new Text" in {
       val parsed = parseExample(noNamespaceXmlStringWithWsExample)

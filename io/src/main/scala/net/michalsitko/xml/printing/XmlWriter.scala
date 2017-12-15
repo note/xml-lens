@@ -2,10 +2,12 @@ package net.michalsitko.xml.printing
 
 import java.io.Writer
 import javax.xml.stream.{XMLOutputFactory, XMLStreamWriter}
+
 import net.michalsitko.xml.entities._
+import net.michalsitko.xml.printing.Indent.IndentWith
 
 // all methods returns Unit as it's designed to work over some mutable Writer-like type (like java.io.Writer or OutputStream)
-trait XmlWriter {
+private [printing] trait XmlWriter {
   def writeProlog(prolog: Prolog): Unit
 
   def writeLabeled(elem: LabeledElement): Unit
@@ -25,7 +27,7 @@ trait XmlWriter {
   def writeEntityReference(entityReference: EntityReference): Unit
 }
 
-abstract class CommonWriter extends XmlWriter {
+private [printing] abstract class CommonWriter extends XmlWriter {
   protected val sw: XMLStreamWriter
   protected val EOL = System.getProperty("line.separator")
 
@@ -69,16 +71,15 @@ abstract class CommonWriter extends XmlWriter {
 
 }
 
-class PrettyXmlWriter (output: Writer, cfg: PrinterConfig) extends CommonWriter {
+private [printing] class PrettyXmlWriter (output: Writer, cfg: PrinterConfig) extends CommonWriter {
   private var nestedLevel: Int = 0
   protected val sw = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
 
-  val ident: Int => Unit = cfg.identWith match {
-    case Some(identWith) => identLevel =>
-      for (i <- 0 until identLevel) {
-        sw.writeCharacters(identWith)
-      }
-    case None =>
+  val ident: Int => Unit = cfg.indent match {
+    case Indent.IndentWith(singleIndent) => identLevel =>
+      for (_ <- 0 until identLevel)
+        sw.writeCharacters(singleIndent)
+    case Indent.Remain =>
       _ => ()
   }
 
@@ -99,13 +100,11 @@ class PrettyXmlWriter (output: Writer, cfg: PrinterConfig) extends CommonWriter 
     nestedLevel += 1
   }
 
-  def writeText(text: Text): Unit = {
-    if(cfg.identWith.isDefined && text.text.forall(_.isWhitespace)) {
-
-    } else {
-      sw.writeCharacters(text.text)
+  def writeText(text: Text): Unit =
+    cfg.indent match {
+      case _: IndentWith if text.text.forall(_.isWhitespace) => // do nothing
+      case _ => sw.writeCharacters(text.text)
     }
-  }
 
   def writeEndElement(elem: LabeledElement): Unit = {
     nestedLevel -= 1
@@ -125,7 +124,7 @@ class PrettyXmlWriter (output: Writer, cfg: PrinterConfig) extends CommonWriter 
 
 }
 
-class JavaXmlWriter(output: Writer, cfg: PrinterConfig) extends CommonWriter {
+private [printing] class JavaXmlWriter(output: Writer, cfg: PrinterConfig) extends CommonWriter {
   protected val sw = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
 
   def writeLabeled(elem: LabeledElement): Unit = {
@@ -145,6 +144,3 @@ class JavaXmlWriter(output: Writer, cfg: PrinterConfig) extends CommonWriter {
     sw.writeEndElement()
 
 }
-
-// TODO: document and test the difference between identWith = None and identWith = Some("")
-case class PrinterConfig(identWith: Option[String])
