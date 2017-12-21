@@ -31,6 +31,12 @@ private [printing] abstract class CommonWriter extends XmlWriter {
   protected val sw: XMLStreamWriter
   protected val EOL = System.getProperty("line.separator")
 
+  protected def createXmlStreamWriter(output: Writer) = {
+    val factory = XMLOutputFactory.newFactory()
+    factory.setProperty("javax.xml.stream.isRepairingNamespaces", false)
+    factory.createXMLStreamWriter(output)
+  }
+
   protected def writeInvocation(declaration: XmlDeclaration) = {
     declaration.encoding match {
       case Some(encoding) => sw.writeStartDocument(encoding, declaration.version)
@@ -73,7 +79,7 @@ private [printing] abstract class CommonWriter extends XmlWriter {
 
 private [printing] class PrettyXmlWriter (output: Writer, cfg: PrinterConfig) extends CommonWriter {
   private var nestedLevel: Int = 0
-  protected val sw = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
+  protected val sw = createXmlStreamWriter(output)
 
   val ident: Int => Unit = cfg.indent match {
     case Indent.IndentWith(singleIndent) => identLevel =>
@@ -125,7 +131,7 @@ private [printing] class PrettyXmlWriter (output: Writer, cfg: PrinterConfig) ex
 }
 
 private [printing] class JavaXmlWriter(output: Writer, cfg: PrinterConfig) extends CommonWriter {
-  protected val sw = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
+  protected val sw = createXmlStreamWriter(output)
 
   def writeLabeled(elem: LabeledElement): Unit = {
     sw.writeStartElement(elem.label.prefix, elem.label.localName, elem.label.uri)
