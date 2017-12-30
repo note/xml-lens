@@ -12,23 +12,8 @@ import scala.util.Try
 // TODO: create proper hierarchy of errors
 case class ParsingException(message: String, cause: Throwable) extends Exception(message, cause)
 
-private [parsing] trait NodeBuilder {
-  def addChild(node: Node): Unit
-}
-
-private [parsing] class TopNodesBuilder extends NodeBuilder {
-  private val children = ArrayBuffer.empty[Node]
-
-  def addChild(node: Node): Unit = {
-    children += node
-  }
-
-  def build: Seq[Node] =
-    children.toList
-}
-
-private [parsing] class LabeledElementBuilder(label: ResolvedName, attributes: Seq[Attribute], children: ArrayBuffer[Node], namespaceDeclarations: Seq[NamespaceDeclaration]) extends NodeBuilder {
-  def addChild(node: Node): Unit = {
+private [parsing] class LabeledElementBuilder(label: ResolvedName, attributes: Seq[Attribute], children: ArrayBuffer[Node], namespaceDeclarations: Seq[NamespaceDeclaration]) {
+   def addChild(node: Node): Unit = {
     children += (node)
   }
 
@@ -72,99 +57,114 @@ object XmlParser {
       xmlInFact.createXMLStreamReader(inputStream)
     }
 
-    val xmlDeclaration = getDeclaration(reader)
-    val topNodesBuilder = new TopNodesBuilder()
-    val (l1, decl) = readNext(topNodesBuilder, reader)
-    val prolog = Prolog(xmlDeclaration, l1, decl)
-
-    XmlDocument(prolog, topNodesBuilder.build.head.asInstanceOf[LabeledElement]) // TODO: it's quite terrible
+    readNext(reader)
   }
 
-  private def readNext(root: NodeBuilder, reader: XMLStreamReader): (Vector[Misc], Option[(DoctypeDeclaration, Vector[Misc])]) = {
-    var elementStack = List.empty[LabeledElementBuilder]
+  private def readNext(reader: XMLStreamReader): XmlDocument = {
+    def readUntilRootElement: (Prolog, Option[LabeledElementBuilder]) = {
+      var curr = if (reader.hasNext) reader.next else null
 
-    var f1 = Vector.empty[Misc]
-    var f2 = Vector.empty[Misc]
-    var doctypeDecl = Option.empty[DoctypeDeclaration]
+      val xmlDeclaration = getDeclaration(reader)
 
-    var curr = if (reader.hasNext) reader.next else null
-    // TODO: test it thoroughly
-    while(curr != null && curr != START_ELEMENT) {
-      curr match {
-        case COMMENT =>
-          val comment = Comment(reader.getText())
-          doctypeDecl match {
-            case None =>
-              f1 = f1 :+ comment
-            case Some(_) =>
-              f2 = f2 :+ comment
-          }
+      var f1 = Vector.empty[Misc]
+      var f2 = Vector.empty[Misc]
+      var doctypeDecl = Option.empty[DoctypeDeclaration]
 
-        case PROCESSING_INSTRUCTION =>
-          val pi = ProcessingInstruction(reader.getPITarget(), reader.getPIData())
-          doctypeDecl match {
-            case None =>
-              f1 = f1 :+ pi
-            case Some(_) =>
-              f2 = f2 :+ pi
-          }
+      // TODO: test it thoroughly
+      while(curr != null && curr != START_ELEMENT) {
+        curr match {
+          case COMMENT =>
+            val comment = Comment(reader.getText())
+            doctypeDecl match {
+              case None =>
+                f1 = f1 :+ comment
+              case Some(_) =>
+                f2 = f2 :+ comment
+            }
 
-        case DTD =>
-          val decl = DoctypeDeclaration(reader.getText())
-          doctypeDecl = Some(decl)
+          case PROCESSING_INSTRUCTION =>
+            val pi = ProcessingInstruction(reader.getPITarget(), reader.getPIData())
+            doctypeDecl match {
+              case None =>
+                f1 = f1 :+ pi
+              case Some(_) =>
+                f2 = f2 :+ pi
+            }
+
+          case DTD =>
+            val decl = DoctypeDeclaration(reader.getText())
+            doctypeDecl = Some(decl)
+        }
+        curr = if (reader.hasNext) reader.next else null
       }
 
-      curr = if (reader.hasNext) reader.next else null
-    }
+      val prolog = Prolog(xmlDeclaration, f1, doctypeDecl.map(decl => (decl, f2)))
 
-    while(curr != null) {
-      curr match {
-        case START_ELEMENT =>
-          val nsDeclarations = getNamespaceDeclarations(reader)
-          val attrs = getAttributes(reader)
-          val label = getName(reader)
-          val initialChild = new LabeledElementBuilder(label, attrs, ArrayBuffer.empty[Node], nsDeclarations)
-          elementStack = initialChild :: elementStack
-
-        case CHARACTERS =>
-          val parent = elementStack.head
-          val text = reader.getText
-          parent.addChild(Text(text))
-
-        case END_ELEMENT =>
-          val current = elementStack.head
-          elementStack.tail.headOption.getOrElse(root).addChild(current.build)
-          elementStack = elementStack.tail
-
-        case COMMENT =>
-          // `headOption` because COMMENT can be top level Node
-          val parent = elementStack.headOption.getOrElse(root)
-          val commentText = reader.getText()
-          parent.addChild(Comment(commentText))
-
-        case PROCESSING_INSTRUCTION =>
-          val parent = elementStack.headOption.getOrElse(root)
-          val pi = ProcessingInstruction(reader.getPITarget(), reader.getPIData())
-          parent.addChild(pi)
-
-        case CDATA =>
-          val parent = elementStack.head
-          val commentText = reader.getText()
-          parent.addChild(CData(commentText))
-
-        case ENTITY_REFERENCE =>
-          val parent = elementStack.head
-          val ref = EntityReference(reader.getLocalName(), reader.getText())
-          parent.addChild(ref)
-
-        case _ =>
-          // ignore for now
+      if (curr == null) {
+        (prolog, None)
+      } else {
+        // TODO: remove duplication (1)
+        val nsDeclarations = getNamespaceDeclarations(reader)
+        val attrs = getAttributes(reader)
+        val label = getName(reader)
+        (prolog, Some(new LabeledElementBuilder(label, attrs, ArrayBuffer.empty[Node], nsDeclarations)))
       }
-
-      curr = if (reader.hasNext) reader.next else null
     }
 
-    (f1, doctypeDecl.map(decl => (decl, f2)))
+    readUntilRootElement match {
+      case (prolog, Some(root)) =>
+        var elementStack = List(root)
+
+        while (reader.hasNext) {
+          reader.next() match {
+            case START_ELEMENT =>
+              // TODO: remove duplication (2)
+              val nsDeclarations = getNamespaceDeclarations(reader)
+              val attrs = getAttributes(reader)
+              val label = getName(reader)
+              val newChild = new LabeledElementBuilder(label, attrs, ArrayBuffer.empty[Node], nsDeclarations)
+              elementStack = newChild :: elementStack
+
+            case CHARACTERS =>
+              val parent = elementStack.head
+              val text = reader.getText
+              parent.addChild(Text(text))
+
+            case END_ELEMENT =>
+              val current = elementStack.head
+              elementStack.tail.headOption.foreach(_.addChild(current.build))
+              elementStack = elementStack.tail
+
+            case COMMENT =>
+              val parent = elementStack.head
+              val commentText = reader.getText()
+              parent.addChild(Comment(commentText))
+
+            case PROCESSING_INSTRUCTION =>
+              val parent = elementStack.head
+              val pi = ProcessingInstruction(reader.getPITarget(), reader.getPIData())
+              parent.addChild(pi)
+
+            case CDATA =>
+              val parent = elementStack.head
+              val commentText = reader.getText()
+              parent.addChild(CData(commentText))
+
+            case ENTITY_REFERENCE =>
+              val parent = elementStack.head
+              val ref = EntityReference(reader.getLocalName(), reader.getText())
+              parent.addChild(ref)
+
+            case _ =>
+            // TODO: ignore for now
+          }
+        }
+
+        XmlDocument(prolog, root.build)
+
+      case (prolog, None) =>
+        throw new RuntimeException("no root element found") // TODO: change it, generally think about error handling
+    }
   }
 
   private def getDeclaration(reader: XMLStreamReader) = {
