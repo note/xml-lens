@@ -4,12 +4,13 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.{Charset, StandardCharsets}
 import javax.xml.stream.XMLStreamConstants._
 import javax.xml.stream.{XMLInputFactory, XMLResolver, XMLStreamReader}
+
 import net.michalsitko.xml.entities._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
+import scala.util.control.NonFatal
 
-// TODO: create proper hierarchy of errors
 case class ParsingException(message: String, cause: Throwable) extends Exception(message, cause)
 
 private [parsing] class LabeledElementBuilder(label: ResolvedName, attributes: Seq[Attribute], namespaceDeclarations: Seq[NamespaceDeclaration]) {
@@ -37,28 +38,30 @@ object XmlParser {
 
   val DefaultParserConfig = ParserConfig(replaceEntityReferences = false)
 
-  // TODO: think about making return type Either[ParsingException, Node]. Current version use an (unneccessary?) assumption
   def parse(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: ParserConfig = DefaultParserConfig): Either[ParsingException, XmlDocument] = {
     val stream = new ByteArrayInputStream(input.getBytes(charset))
     parseStream(stream)
   }
 
   def parseStream(inputStream: InputStream)(implicit config: ParserConfig = DefaultParserConfig): Either[ParsingException, XmlDocument] =
-    Try(read(inputStream, config)).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
+    Try(read(inputStream, config)).asEither.left.map {
+      case e: ParsingException  => e
+      case NonFatal(e)          => ParsingException(s"Cannot parse XML: ${e.getMessage}", e)
+    }
 
   private def read(inputStream: InputStream, config: ParserConfig): XmlDocument = {
     val reader = {
-      val xmlInFact = XMLInputFactory.newInstance()
+      val xmlFactory = XMLInputFactory.newInstance()
 
       // see more at https://docs.oracle.com/javase/7/docs/api/javax/xml/stream/XMLInputFactory.html
       // TODO: do we really need to set those properties? Understand them better and either remove or document it better here
-      xmlInFact.setProperty("javax.xml.stream.isReplacingEntityReferences", false)
-      xmlInFact.setProperty("javax.xml.stream.isValidating", false)
-      xmlInFact.setXMLResolver(BlankingResolver)
+      xmlFactory.setProperty("javax.xml.stream.isReplacingEntityReferences", false)
+      xmlFactory.setProperty("javax.xml.stream.isValidating", false)
+      xmlFactory.setXMLResolver(BlankingResolver)
 
       // https://stackoverflow.com/questions/8591644/need-a-cdata-event-notifying-stax-parser-for-java
-      xmlInFact.setProperty("http://java.sun.com/xml/stream/properties/report-cdata-event", true)
-      xmlInFact.createXMLStreamReader(inputStream)
+      xmlFactory.setProperty("http://java.sun.com/xml/stream/properties/report-cdata-event", true)
+      xmlFactory.createXMLStreamReader(inputStream)
     }
 
     readNext(reader)
@@ -172,7 +175,7 @@ object XmlParser {
         XmlDocument(prolog, root.build)
 
       case (prolog, None) =>
-        throw new RuntimeException("no root element found") // TODO: change it, generally think about error handling
+        throw new ParsingException("no root element found", null)
     }
   }
 

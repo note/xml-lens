@@ -3,14 +3,6 @@ package net.michalsitko.xml.printing
 import java.io.StringWriter
 import net.michalsitko.xml.entities._
 
-// Printers assumes that javax.xml.stream.isRepairingNamespaces is set to false.
-// Instead, they do their own repairing. That's because: Doing it on xml-lens level give better opportunity to be platform
-// (and XML writer implementation) independent
-
-// TODO: whole XmlPrinter needs rethinking
-// current version is very naive. It assumes that input for `print` is basically a result of XmlParser.parse
-// which is not true in general. User can manipulate AST in any way, so we should take care of undefined namespaces' prefixes,
-// isRepairingNamespaces, escaping special characters
 object XmlPrinter {
   val DefaultPrinterConfig = PrinterConfig(Indent.Remain)
 
