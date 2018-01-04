@@ -64,7 +64,7 @@ object Attribute {
     Attribute(ResolvedName.unprefixed(key), value)
 }
 
-// should prefix and/or uri be optional?
+// TODO: should prefix and/or uri be optional? The same question applies to Attribute
 case class ResolvedName(prefix: String, uri: String, localName: String) {
   def hasPrefix: Boolean = prefix.nonEmpty
 }

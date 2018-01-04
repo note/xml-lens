@@ -41,6 +41,10 @@ class XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
       checkCorrectInput(xmlWithDtd)
     }
 
+    "fail on parsing DTD withing root element" in {
+      XmlParser.parse(xmlWithDtdIncorrectly).isLeft should === (true)
+    }
+
     "parse Processing Instructions" in {
       checkCorrectInput(xmlWithPI)
     }

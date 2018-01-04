@@ -4,15 +4,18 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.{Charset, StandardCharsets}
 import javax.xml.stream.XMLStreamConstants._
 import javax.xml.stream.{XMLInputFactory, XMLResolver, XMLStreamReader}
+
 import net.michalsitko.xml.entities._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
+import scala.util.control.NonFatal
 
-// TODO: create proper hierarchy of errors
 case class ParsingException(message: String, cause: Throwable) extends Exception(message, cause)
 
-private [parsing] class LabeledElementBuilder(label: ResolvedName, attributes: Seq[Attribute], children: ArrayBuffer[Node], namespaceDeclarations: Seq[NamespaceDeclaration]) {
+private [parsing] class LabeledElementBuilder(label: ResolvedName, attributes: Seq[Attribute], namespaceDeclarations: Seq[NamespaceDeclaration]) {
+  val children: ArrayBuffer[Node] = ArrayBuffer.empty[Node]
+
    def addChild(node: Node): Unit = {
     children += (node)
   }
@@ -35,32 +38,43 @@ object XmlParser {
 
   val DefaultParserConfig = ParserConfig(replaceEntityReferences = false)
 
-  // TODO: think about making return type Either[ParsingException, Node]. Current version use an (unneccessary?) assumption
   def parse(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: ParserConfig = DefaultParserConfig): Either[ParsingException, XmlDocument] = {
     val stream = new ByteArrayInputStream(input.getBytes(charset))
     parseStream(stream)
   }
 
   def parseStream(inputStream: InputStream)(implicit config: ParserConfig = DefaultParserConfig): Either[ParsingException, XmlDocument] =
-    Try(read(inputStream, config)).asEither.left.map(e => ParsingException(s"Cannot parse XML: ${e.getMessage}", e))
+    Try(read(inputStream, config)).asEither.left.map {
+      case e: ParsingException  => e
+      case NonFatal(e)          => ParsingException(s"Cannot parse XML: ${e.getMessage}", e)
+    }
 
   private def read(inputStream: InputStream, config: ParserConfig): XmlDocument = {
     val reader = {
-      val xmlInFact = XMLInputFactory.newInstance()
+      val xmlFactory = XMLInputFactory.newInstance()
 
+      // see more at https://docs.oracle.com/javase/7/docs/api/javax/xml/stream/XMLInputFactory.html
       // TODO: do we really need to set those properties? Understand them better and either remove or document it better here
-      xmlInFact.setProperty("javax.xml.stream.isReplacingEntityReferences", false)
-      xmlInFact.setXMLResolver(BlankingResolver)
+      xmlFactory.setProperty("javax.xml.stream.isReplacingEntityReferences", false)
+      xmlFactory.setProperty("javax.xml.stream.isValidating", false)
+      xmlFactory.setXMLResolver(BlankingResolver)
 
       // https://stackoverflow.com/questions/8591644/need-a-cdata-event-notifying-stax-parser-for-java
-      xmlInFact.setProperty("http://java.sun.com/xml/stream/properties/report-cdata-event", true)
-      xmlInFact.createXMLStreamReader(inputStream)
+      xmlFactory.setProperty("http://java.sun.com/xml/stream/properties/report-cdata-event", true)
+      xmlFactory.createXMLStreamReader(inputStream)
     }
 
     readNext(reader)
   }
 
   private def readNext(reader: XMLStreamReader): XmlDocument = {
+    def newElementBuilder(): LabeledElementBuilder = {
+      val nsDeclarations = getNamespaceDeclarations(reader)
+      val attrs = getAttributes(reader)
+      val label = getName(reader)
+      new LabeledElementBuilder(label, attrs, nsDeclarations)
+    }
+
     def readUntilRootElement: (Prolog, Option[LabeledElementBuilder]) = {
       var curr = if (reader.hasNext) reader.next else null
 
@@ -103,11 +117,7 @@ object XmlParser {
       if (curr == null) {
         (prolog, None)
       } else {
-        // TODO: remove duplication (1)
-        val nsDeclarations = getNamespaceDeclarations(reader)
-        val attrs = getAttributes(reader)
-        val label = getName(reader)
-        (prolog, Some(new LabeledElementBuilder(label, attrs, ArrayBuffer.empty[Node], nsDeclarations)))
+        (prolog, Some(newElementBuilder()))
       }
     }
 
@@ -115,55 +125,57 @@ object XmlParser {
       case (prolog, Some(root)) =>
         var elementStack = List(root)
 
+        def addToStack(node: => Node): Unit = {
+          elementStack.head.addChild(node)
+        }
+
         while (reader.hasNext) {
           reader.next() match {
             case START_ELEMENT =>
-              // TODO: remove duplication (2)
-              val nsDeclarations = getNamespaceDeclarations(reader)
-              val attrs = getAttributes(reader)
-              val label = getName(reader)
-              val newChild = new LabeledElementBuilder(label, attrs, ArrayBuffer.empty[Node], nsDeclarations)
-              elementStack = newChild :: elementStack
-
-            case CHARACTERS =>
-              val parent = elementStack.head
-              val text = reader.getText
-              parent.addChild(Text(text))
+              elementStack = newElementBuilder() :: elementStack
 
             case END_ELEMENT =>
               val current = elementStack.head
               elementStack.tail.headOption.foreach(_.addChild(current.build))
               elementStack = elementStack.tail
 
-            case COMMENT =>
-              val parent = elementStack.head
-              val commentText = reader.getText()
-              parent.addChild(Comment(commentText))
-
             case PROCESSING_INSTRUCTION =>
-              val parent = elementStack.head
-              val pi = ProcessingInstruction(reader.getPITarget(), reader.getPIData())
-              parent.addChild(pi)
+              addToStack {
+                ProcessingInstruction(reader.getPITarget(), reader.getPIData())
+              }
+
+            case CHARACTERS =>
+              addToStack {
+                Text(reader.getText())
+              }
+
+            case COMMENT =>
+              addToStack {
+                Comment(reader.getText())
+              }
 
             case CDATA =>
-              val parent = elementStack.head
-              val commentText = reader.getText()
-              parent.addChild(CData(commentText))
+              addToStack {
+                CData(reader.getText())
+              }
 
             case ENTITY_REFERENCE =>
-              val parent = elementStack.head
-              val ref = EntityReference(reader.getLocalName(), reader.getText())
-              parent.addChild(ref)
+              addToStack {
+                EntityReference(reader.getLocalName(), reader.getText())
+              }
 
-            case _ =>
-            // TODO: ignore for now
+            case SPACE | // should not happen as our XmlProcessor is in non-validating mode see more at https://docs.oracle.com/cd/E17802_01/webservices/webservices/docs/1.5/api/javax/xml/stream/events/Characters.html
+                 START_DOCUMENT | END_DOCUMENT | ATTRIBUTE | NAMESPACE | ENTITY_DECLARATION | // handled on different level (via calling methods on element)
+                 DTD | // should not appear within root element
+                 NOTATION_DECLARATION => // this element of XML is ignored for now
+            // ignore
           }
         }
 
         XmlDocument(prolog, root.build)
 
       case (prolog, None) =>
-        throw new RuntimeException("no root element found") // TODO: change it, generally think about error handling
+        throw new ParsingException("no root element found", null)
     }
   }
 
