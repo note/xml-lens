@@ -89,4 +89,7 @@ lazy val docs = (project in file("docs"))
 
 lazy val root = (project in file("."))
   .commonSettings
+  .settings(
+    name := "xml-lens"
+  )
   .aggregate(io, optics)
