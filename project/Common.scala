@@ -50,7 +50,7 @@ object Common {
     crossScalaVersions := commonCrossScalaVersions,
     coverageHighlighting := true,
     coverageScalacPluginVersion := "1.3.0",
-    version := "0.1.0"
+    version := "0.1.0-SNAPSHOT"
   )
 
 }
