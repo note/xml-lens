@@ -1,14 +1,19 @@
 import sbt.Keys.{libraryDependencies, scalacOptions, _}
 import Common._
 import Dependencies._
+// shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
+import sbtcrossproject.{crossProject, CrossType}
 
-lazy val ast = (project in file("ast"))
+lazy val ast = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) in file("ast"))
   .commonSettings
   .settings(
     name := "xml-lens-ast"
   )
 
-lazy val testsCommon = (project in file("tests-common"))
+lazy val astJVM = ast.jvm
+lazy val astJS  = ast.js
+
+lazy val testsCommon = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) in file("tests-common"))
   .commonSettings
   .settings(
     name := "xml-lens-tests-common",
@@ -16,20 +21,29 @@ lazy val testsCommon = (project in file("tests-common"))
   )
   .dependsOn(ast)
 
-lazy val io = (project in file("io"))
+lazy val testsCommonJVM = testsCommon.jvm
+lazy val testsCommonJS  = testsCommon.js
+
+lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Dummy) in file("io"))
   .commonSettings
   .settings(
     name := "xml-lens-io"
   )
   .dependsOn(ast, testsCommon % "test->test")
 
-lazy val optics = (project in file("optics"))
+lazy val ioJVM = io.jvm
+lazy val ioJS  = io.js
+
+lazy val optics = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) in file("optics"))
   .commonSettings
   .settings(
     name := "xml-lens-optics",
     libraryDependencies ++= Seq(monocleCore, monocleLaw)
   )
   .dependsOn(ast, testsCommon % "test->test", io % "test->test")
+
+lazy val opticsJVM = optics.jvm
+lazy val opticsJS  = optics.js
 
 lazy val bench = (project in file("bench"))
   .commonSettings
@@ -39,7 +53,7 @@ lazy val bench = (project in file("bench"))
     scalacOptions += "-Xlint:_,-missing-interpolator"
   )
   .enablePlugins(JmhPlugin)
-  .dependsOn(optics, io)
+  .dependsOn(opticsJVM, ioJVM)
 
 lazy val examples = (project in file("examples"))
   .commonSettings
@@ -49,7 +63,7 @@ lazy val examples = (project in file("examples"))
     scalacOptions += "-Xlint:_,-missing-interpolator"
   )
   .enablePlugins(JmhPlugin)
-  .dependsOn(optics, io)
+  .dependsOn(opticsJVM, ioJVM)
 
 lazy val docSettings = Seq(
   micrositeName := "xml-lens",
@@ -61,7 +75,7 @@ lazy val docSettings = Seq(
   micrositeGithubRepo := "xml-lens",
   micrositeGitterChannel := false,
   autoAPIMappings := true,
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(ast, optics),
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(astJVM, opticsJVM),
   siteSubdirName in ScalaUnidoc := "api",
   addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
   ghpagesNoJekyll := false,
@@ -85,11 +99,11 @@ lazy val docs = (project in file("docs"))
   .enablePlugins(GhpagesPlugin)
   .enablePlugins(MicrositesPlugin)
   .enablePlugins(ScalaUnidocPlugin)
-  .dependsOn(ast, io, optics)
+  .dependsOn(astJVM, ioJVM, opticsJVM)
 
 lazy val root = (project in file("."))
   .commonSettings
   .settings(
     name := "xml-lens"
   )
-  .aggregate(io, optics)
+  .aggregate(ioJVM, ioJS, opticsJVM, opticsJS)
