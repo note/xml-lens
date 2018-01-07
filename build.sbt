@@ -36,7 +36,7 @@ lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) i
 lazy val ioJVM = io.jvm
 lazy val ioJS  = io.js
 
-lazy val optics = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) in file("optics"))
+lazy val optics = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) in file("optics"))
   .commonSettings
   .settings(
     name := "xml-lens-optics",

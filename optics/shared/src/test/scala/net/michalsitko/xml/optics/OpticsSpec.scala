@@ -6,9 +6,12 @@ import net.michalsitko.xml.entities._
 import net.michalsitko.xml.optics.ElementOptics._
 import net.michalsitko.xml.optics.LabeledElementOptics._
 import net.michalsitko.xml.optics.XmlDocumentOptics._
+import net.michalsitko.xml.printing.PrinterConfig
 import net.michalsitko.xml.test.utils.ExampleInputs
 
-class OpticsSpec extends BasicSpec with ExampleInputs {
+trait OpticsSpec extends BasicSpec with ExampleInputs {
+  implicit val printerConfig = PrinterConfig.Default
+
   "deeper" should {
     "enable to set new Text" in {
       val parsed = parseExample(noNamespaceXmlStringWithWsExample)
@@ -16,7 +19,7 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeOptional(hasTextOnly))
 
       val res = traversal.set("new").apply(parsed)
-      XmlPrinter.print(res) should ===(expectedRes)
+      print(res) should ===(expectedRes)
     }
 
     "modify text" in {
@@ -25,7 +28,7 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeOptional(hasTextOnly))
 
       val res = traversal.modify(_.toUpperCase)(parsed)
-      XmlPrinter.print(res) should ===(expectedRes2)
+      print(res) should ===(expectedRes2)
     }
 
     "modify existing attribute value" in {
@@ -34,16 +37,16 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeOptional(attribute("someKey")))
 
       val res = traversal.set("newValue")(parsed)
-      XmlPrinter.print(res) should ===(expectedRes3)
+      print(res) should ===(expectedRes3)
     }
 
     "add attribute" in {
-      val parsed = XmlParser.parse(noNamespaceXmlStringWithWsExample.stringRepr).right.get
+      val parsed = parseExample(noNamespaceXmlStringWithWsExample)
 
       val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeLens(attributes))
 
       val res = traversal.modify(attrs => attrs :+ Attribute.unprefixed("someKey", "newValue"))(parsed)
-      XmlPrinter.print(res) should ===(expectedRes4)
+      print(res) should ===(expectedRes4)
     }
 
     "modifyExistingOrAdd" in {
@@ -67,7 +70,7 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")))
 
       val res = replaceExistingAttrOrAdd(traversal)("someKey", "newValue")(parsed)
-      XmlPrinter.print(res) should ===(expectedRes5)
+      print(res) should ===(expectedRes5)
     }
 
     "delete all attributes" in {
@@ -76,7 +79,7 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeLens(attributes))
 
       val res = traversal.modify(_ => List.empty)(parsed)
-      XmlPrinter.print(res) should ===(expectedRes6)
+      print(res) should ===(expectedRes6)
     }
 
     "delete single attribute" in {
@@ -85,7 +88,7 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")).composeLens(attributes))
 
       val res = traversal.modify(attrs => attrs.filter(_.key != ResolvedName.unprefixed("someKey")))(parsed)
-      XmlPrinter.print(res) should ===(expectedRes7)
+      print(res) should ===(expectedRes7)
     }
 
     "delete children" in {
@@ -94,7 +97,7 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       val traversal = rootLens.composeTraversal(deep("c1"))
 
       val res = traversal.modify(el => el.copy(children = List.empty))(parsed)
-      XmlPrinter.print(res) should ===(expectedRes8)
+      print(res) should ===(expectedRes8)
     }
 
     "delete specific child" in {
@@ -115,7 +118,7 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       }
 
       val res = traversal.modify(removeF)(parsed)
-      XmlPrinter.print(res) should ===(expectedRes9)
+      print(res) should ===(expectedRes9)
     }
 
     "rename element label" in {
@@ -135,7 +138,7 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       val traversal = rootLens.composeTraversal(deep("c1"))
 
       val res = traversal.modify(renameLabel)(parsed)
-      XmlPrinter.print(res) should ===(expectedRes10)
+      print(res) should ===(expectedRes10)
     }
 
     "modify element's child node based on existence of another child" in {
@@ -148,7 +151,7 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       }
 
       val res = rootLens.composeTraversal(deep("c1")).modify(modFun)(parsed)
-      XmlPrinter.print(res) should ===(output11)
+      print(res) should ===(output11)
     }
 
     "do a few modifications" in {
@@ -160,7 +163,7 @@ class OpticsSpec extends BasicSpec with ExampleInputs {
       val traversal = rootLens.composeTraversal(deep("c1").composeTraversal(deeper("f")))
       val res = traversal.modify(addAttr andThen modifyText)(parsed)
 
-      XmlPrinter.print(res) should ===(output12)
+      print(res) should ===(output12)
     }
 
   }

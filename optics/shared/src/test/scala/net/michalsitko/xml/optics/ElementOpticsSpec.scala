@@ -1,10 +1,9 @@
 package net.michalsitko.xml.optics
 
-import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.{LabeledElement, Node, Text}
-import net.michalsitko.xml.test.utils.ExampleBuilderHelper
+import net.michalsitko.xml.test.utils.{BaseSpec, ExampleBuilderHelper}
 
-class ElementOpticsSpec extends BasicSpec with ExampleBuilderHelper {
+class ElementOpticsSpec extends BaseSpec with ExampleBuilderHelper {
   import ElementOptics._
 
   "indexOptional" should {

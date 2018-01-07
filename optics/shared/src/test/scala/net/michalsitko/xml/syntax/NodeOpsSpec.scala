@@ -2,11 +2,14 @@ package net.michalsitko.xml.syntax
 
 import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.Text
+import net.michalsitko.xml.printing.PrinterConfig
 import net.michalsitko.xml.syntax.document._
 import net.michalsitko.xml.syntax.node._
 import net.michalsitko.xml.test.utils.ExampleInputs
 
-class NodeOpsSpec extends BasicSpec with ExampleInputs with Examples {
+trait NodeOpsSpec extends BasicSpec with ExampleInputs with Examples {
+  implicit val printerConfig = PrinterConfig.Default
+
   "minimize" should {
     "work as expected" in {
       val input = labeledElement("a",
@@ -42,13 +45,13 @@ class NodeOpsSpec extends BasicSpec with ExampleInputs with Examples {
         """<?xml version="1.0" encoding="UTF-8"?>
           |<a><c1><f>item1</f><g>item2</g></c1><c1><f>item1</f><h>item2</h></c1></a>""".stripMargin
 
-      XmlPrinter.print(doc) should === (expectedRes)
+      print(doc) should === (expectedRes)
     }
 
     "respect comments" in {
       val doc = parse(inputWithComments).minimize
 
-      XmlPrinter.print(doc) should === (outputWithComments)
+      print(doc) should === (outputWithComments)
     }
   }
 }

@@ -6,7 +6,7 @@ import net.michalsitko.xml.entities.Element
 import net.michalsitko.xml.optics.ElementOptics._
 import net.michalsitko.xml.optics.XmlDocumentOptics._
 
-class NamespaceSpec extends BasicSpec {
+trait NamespaceSpec extends BasicSpec {
   "Optics" should {
     "should respect namespaces" in new Context {
       val xml = parse(input)

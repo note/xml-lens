@@ -4,15 +4,18 @@ import monocle.function.Plated
 import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.{LabeledElement, Node, ResolvedName, Text}
 import net.michalsitko.xml.optics.XmlDocumentOptics._
+import net.michalsitko.xml.printing.PrinterConfig
 import net.michalsitko.xml.test.utils.ExampleBuilderHelper
 
-class PlatedSpec extends BasicSpec with ExampleBuilderHelper {
+trait PlatedSpec extends BasicSpec with ExampleBuilderHelper {
   import OpticsInstances._
+
+  implicit val printerConfig = PrinterConfig.Default
 
   def testPlated(plated: Node => Node, input: String, expectedOutput: String) = {
     // TODO: get rid of instanceOf
     val res = rootLens.modify(plated andThen(_.asInstanceOf[LabeledElement]))(parse(input))
-    XmlPrinter.print(res) should === (expectedOutput)
+    print(res) should === (expectedOutput)
   }
 
   "nodePlated" should {

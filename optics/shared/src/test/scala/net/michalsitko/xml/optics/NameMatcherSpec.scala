@@ -1,9 +1,9 @@
 package net.michalsitko.xml.optics
 
-import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.ResolvedName
+import net.michalsitko.xml.test.utils.BaseSpec
 
-class NameMatcherSpec extends BasicSpec {
+class NameMatcherSpec extends BaseSpec {
   "IgnoreNamespaceMatcher" should {
     "work" in {
       val matcher = IgnoreNamespaceMatcher("elem")

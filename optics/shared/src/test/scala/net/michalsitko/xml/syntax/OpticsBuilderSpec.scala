@@ -3,11 +3,14 @@ package net.michalsitko.xml.syntax
 import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement}
 import net.michalsitko.xml.optics._
+import net.michalsitko.xml.printing.{Indent, PrinterConfig}
 import net.michalsitko.xml.syntax.OpticsBuilder._
 import net.michalsitko.xml.syntax.document._
 import net.michalsitko.xml.test.utils.ExampleInputs
 
-class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
+trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
+  implicit val printerConfig = PrinterConfig.Default
+
   "OpticsBuilder" should {
     "set text for chosen path" in {
       val parsed = parseExample(noNamespaceXmlStringWithWsExample)
@@ -15,7 +18,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val traversal = (root \ "c1" \ "f").hasTextOnly
       val res = traversal.set("new")(parsed)
 
-      XmlPrinter.print(res) should === (expectedRes)
+      print(res) should === (expectedRes)
     }
 
     "modify text for chosen path" in {
@@ -24,7 +27,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val traversal = (root \ "c1" \ "f").hasTextOnly
       val res = traversal.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res) should === (expectedRes2)
+      print(res) should === (expectedRes2)
     }
 
     "modify existing attribute value" in {
@@ -33,7 +36,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val traversal = (root \ "c1" \ "f").attr("someKey")
       val res = traversal.set("newValue")(parsed)
 
-      XmlPrinter.print(res) should === (expectedRes3)
+      print(res) should === (expectedRes3)
     }
 
     "add attribute" in {
@@ -42,7 +45,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val traversal = (root \ "c1" \ "f").attrs
 
       val res = traversal.modify(attrs => attrs :+ Attribute.unprefixed("someKey", "newValue"))(parsed)
-      XmlPrinter.print(res) should === (expectedRes4)
+      print(res) should === (expectedRes4)
     }
 
     "replaceOrAddAttr" in {
@@ -52,7 +55,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
 
       val res = traversal.replaceOrAddAttr("someKey", "newValue")(parsed)
 
-      XmlPrinter.print(res) should === (expectedRes4)
+      print(res) should === (expectedRes4)
     }
 
     "replaceOrAddAttr for ResolvedNameMatcher" in {
@@ -63,7 +66,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
 
       val res = traversal.replaceOrAddAttr(ns.name("someKey"), "newValue")(parsed)
 
-      XmlPrinter.print(res) should === (expectedRes6)
+      print(res) should === (expectedRes6)
     }
 
     "modify attribute for ResolvedNameMatcher" in {
@@ -73,7 +76,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val traversal = (root \ "c1" \ "f").attr(ns.name("someKey"))
 
       val res = traversal.modify(_.toUpperCase)(parsed)
-      XmlPrinter.print(res) should === (expectedRes7)
+      print(res) should === (expectedRes7)
     }
 
     "modify attribute for IgnoreNamespaceMatcher" in {
@@ -82,7 +85,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val traversal = (root \ "c1" \ "f").attr("someKey")
 
       val res = traversal.modify(_.toUpperCase)(parsed)
-      XmlPrinter.print(res) should === (expectedRes8)
+      print(res) should === (expectedRes8)
     }
 
     "modify attribute for ResolvedNameMatcher2" in {
@@ -92,7 +95,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val traversal = (root \ "c1" \ "f").attr(ns.name("someKey"))
 
       val res = traversal.modify(_.toUpperCase)(parsed)
-      XmlPrinter.print(res) should === (expectedRes9)
+      print(res) should === (expectedRes9)
     }
 
     "modify attribute in root element" in {
@@ -101,33 +104,33 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val traversal = root.attr("someKey")
 
       val res = traversal.set("newValue")(parsed)
-      XmlPrinter.print(res) should === (expectedRes10)
+      print(res) should === (expectedRes10)
     }
 
     "modify text in root element" in {
       val parsed = parse(input10)
 
       val res = root.hasTextOnly.set("hello")(parsed)
-      XmlPrinter.print(res) should === (expectedRes11)
+      print(res) should === (expectedRes11)
     }
 
     "add attribute in root element" in {
       val parsed = parse(input10)
 
       val res = root.attrs.modify(attrs => attrs :+ Attribute.unprefixed("anotherKey", "newValue"))(parsed)
-      XmlPrinter.print(res) should === (expectedRes12)
+      print(res) should === (expectedRes12)
     }
 
     "replaceOrAddAttr in root element" in {
       {
         val parsed = parse(input13)
         val res = root.replaceOrAddAttr("anotherKey", "newValue")(parsed)
-        XmlPrinter.print(res) should === (expectedRes12)
+        print(res) should === (expectedRes12)
       }
       {
         val parsed = parse(input14)
         val res = root.replaceOrAddAttr("anotherKey", "newValue")(parsed)
-        XmlPrinter.print(res) should === (expectedRes12)
+        print(res) should === (expectedRes12)
       }
     }
 
@@ -136,7 +139,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val parsed = parse(example15("f"))
 
       val res = (root \ "c1").renameLabel("f", "xyz")(parsed)
-      XmlPrinter.print(res) should === (example15("xyz"))
+      print(res) should === (example15("xyz"))
     }
 
     // TODO: add sht like this to cookbook
@@ -151,7 +154,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
         isLabeledElement.composeOptional(isLabeled("g")).getOption(node).isDefined
       }) \ "f").hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res) should === (output16)
+      print(res) should === (output16)
     }
 
     "having 2" in {
@@ -165,7 +168,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
         isLabeledElement.composeOptional(isLabeled("g")).composeOptional(attribute("someKey")).getOption(node).isDefined
       }) \ "f").hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res) should === (example17("ITEM"))
+      print(res) should === (example17("ITEM"))
     }
 
     // TODO: add info to cookbook, comment difference with another index methods (in optics)
@@ -174,7 +177,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
 
       val res = (root \ "c1" \ "f").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res) should === (example17("ITEM"))
+      print(res) should === (example17("ITEM"))
     }
 
     "index and then index" in {
@@ -182,7 +185,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
 
       val res = ((root \ "c1" \ "f").index(1) \ "h" \ "i").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res) should === (example19("ITEM"))
+      print(res) should === (example19("ITEM"))
     }
 
     "childAt" in {
@@ -192,7 +195,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
 
       val res = (root \ "c1" \ "f").childAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example18("ITEM"))
+      print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example18("ITEM"))
     }
 
     "elementAt" in {
@@ -201,7 +204,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
 
       val res = (root \ "c1" \ "f").elementAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      XmlPrinter.print(res) should === (example18("ITEM"))
+      print(res) should === (example18("ITEM"))
     }
 
     // TODO: may be a nice addition to cookbook
@@ -212,7 +215,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val newElement = LabeledElement.unprefixed("new", Element())
       val res = (root \ "f").children.modify( ch => newElement +: ch)(parsed)
 
-      XmlPrinter.print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example20)
+      print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example20)
     }
 
     "insert new node as the last node" in {
@@ -222,7 +225,7 @@ class OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val newElement = LabeledElement.unprefixed("new", Element())
       val res = (root \ "f").children.modify( ch => ch :+ newElement)(parsed)
 
-      XmlPrinter.print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example21)
+      print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example21)
     }
 
   }
