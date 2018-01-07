@@ -1,14 +1,16 @@
 package net.michalsitko.xml.roundtrips
 
 import net.michalsitko.xml.BasicSpec
-import net.michalsitko.xml.printing.{Indent, PrinterConfig, XmlPrinter}
+import net.michalsitko.xml.printing.{Indent, PrinterConfig}
 import net.michalsitko.xml.test.utils.ExampleInputs
 
-class ParserPrinterSpec extends BasicSpec with ExampleInputs {
+trait ParserPrinterSpec extends BasicSpec with ExampleInputs {
+  implicit val defaultPrinterConfig = PrinterConfig.Default
+
   def testForInputs(inputs: String*): Unit = {
     inputs.foreach { example =>
       val parsed = parse(example)
-      val printed = XmlPrinter.print(parsed)
+      val printed = print(parsed)
 
       printed should === (example)
     }
@@ -36,7 +38,7 @@ class ParserPrinterSpec extends BasicSpec with ExampleInputs {
 
       examples.foreach { example =>
         val parsed = parse(example)
-        val printed = XmlPrinter.print(parsed)
+        val printed = print(parsed)
 
         printed should === (xmlWithEmptyElement)
       }
@@ -44,7 +46,7 @@ class ParserPrinterSpec extends BasicSpec with ExampleInputs {
 
     "preserve entities" in {
       val parsed = parse(xmlWithEntity)
-      val printed = XmlPrinter.print(parsed)
+      val printed = print(parsed)
       printed should === (xmlWithEntity)
     }
 
@@ -52,19 +54,19 @@ class ParserPrinterSpec extends BasicSpec with ExampleInputs {
       val xml = parse(uglyXmlString)
       val prettyCfg = PrinterConfig(Indent.IndentWith("  "))
 
-      XmlPrinter.print(xml)(prettyCfg)  should === (prettyXmlString)
-      XmlPrinter.print(xml)             should === (uglyXmlString)
+      print(xml)(prettyCfg)  should === (prettyXmlString)
+      print(xml)             should === (uglyXmlString)
     }
 
     "pretty print with comments" in {
       val xml = parse(uglyXmlString2)
-      val printed = XmlPrinter.print(xml)(PrinterConfig(Indent.IndentWith("  ")))
+      val printed = print(xml)(PrinterConfig(Indent.IndentWith("  ")))
       printed should === (prettyXmlString2)
     }
 
     "PrinterConfig is taken into account" in {
       val xml = parse(uglyXmlString)
-      val printed = XmlPrinter.print(xml)(PrinterConfig(Indent.IndentWith(" ")))
+      val printed = print(xml)(PrinterConfig(Indent.IndentWith(" ")))
       printed should === (prettyXmlStringIntendedWithOneSpace)
     }
   }

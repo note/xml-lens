@@ -1,11 +1,12 @@
 package net.michalsitko.xml.printing
 
+import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities._
 import net.michalsitko.xml.test.utils._
 import net.michalsitko.xml.utils.XmlDocumentFactory
 
-class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator with ExampleBuilderHelper {
-  implicit val printerConfig = XmlPrinter.DefaultPrinterConfig
+trait XmlPrinterSpec extends BasicSpec with ExampleInputs with XmlGenerator with ExampleBuilderHelper {
+  implicit val printerConfig = PrinterConfig.Default
 
   def prettyCfg(singleIndent: String) = PrinterConfig(Indent.IndentWith(singleIndent))
 
@@ -34,7 +35,7 @@ class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator with 
       val deepXml = elementOfDepth(4000)
       val doc = XmlDocumentFactory.noProlog(deepXml)
 
-      XmlPrinter.print(doc)
+      print(doc)
     }
 
     "not repair undeclared namespace usage" in {
@@ -44,7 +45,7 @@ class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator with 
       val doc = XmlDocumentFactory.noProlog(xml)
 
       // the result is not a valid XML (it's not XmlPrinter responsibility to verify output correctness)
-      XmlPrinter.print(doc) should ===("<b><undeclaredPrefix:a></undeclaredPrefix:a></b>")
+      print(doc) should ===("<b><undeclaredPrefix:a></undeclaredPrefix:a></b>")
     }
 
     "escape special characters in XML" in {
@@ -52,7 +53,7 @@ class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator with 
       val doc = XmlDocumentFactory.noProlog(xml)
 
       // as you see `"` and `'` are not escaped as they do not have to be escaped in text node
-      XmlPrinter.print(doc) should ===("""<b attr="a&quot;b'c&lt;d&gt;e&amp;f">a"b'c&lt;d&gt;e&amp;f</b>""")
+      print(doc) should ===("""<b attr="a&quot;b'c&lt;d&gt;e&amp;f">a"b'c&lt;d&gt;e&amp;f</b>""")
     }
 
     "not verify output correctness" in {
@@ -61,12 +62,12 @@ class XmlPrinterSpec extends BaseSpec with ExampleInputs with XmlGenerator with 
       val doc = XmlDocumentFactory.noProlog(xml)
 
       // the result is not a valid XML (it's not XmlPrinter responsibility to verify output correctness)
-      XmlPrinter.print(doc) should ===("""<b attr="value" attr="value" attr="value3">something</b>""")
+      print(doc) should ===("""<b attr="value" attr="value" attr="value3">something</b>""")
     }
   }
 
   def check(specificExample: Example): Unit = {
-    val res = XmlPrinter.print(specificExample.document)
+    val res = print(specificExample.document)
 
     // TODO: we don't guarantee preserving whitespace outside of root element
     // decide if it's a good decision

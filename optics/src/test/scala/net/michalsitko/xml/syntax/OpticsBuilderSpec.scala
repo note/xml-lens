@@ -3,7 +3,6 @@ package net.michalsitko.xml.syntax
 import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.{Attribute, Element, LabeledElement}
 import net.michalsitko.xml.optics._
-import net.michalsitko.xml.printing.{Indent, PrinterConfig, XmlPrinter}
 import net.michalsitko.xml.syntax.OpticsBuilder._
 import net.michalsitko.xml.syntax.document._
 import net.michalsitko.xml.test.utils.ExampleInputs

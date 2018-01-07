@@ -4,7 +4,6 @@ import monocle.function.Plated
 import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.{LabeledElement, Node, ResolvedName, Text}
 import net.michalsitko.xml.optics.XmlDocumentOptics._
-import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.test.utils.ExampleBuilderHelper
 
 class PlatedSpec extends BasicSpec with ExampleBuilderHelper {

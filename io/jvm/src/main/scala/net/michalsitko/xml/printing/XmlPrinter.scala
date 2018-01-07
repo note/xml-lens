@@ -4,9 +4,7 @@ import java.io.StringWriter
 import net.michalsitko.xml.entities._
 
 object XmlPrinter {
-  val DefaultPrinterConfig = PrinterConfig(Indent.Remain)
-
-  def print(doc: XmlDocument)(implicit cfg: PrinterConfig = DefaultPrinterConfig): String = {
+  def print(doc: XmlDocument)(implicit cfg: PrinterConfig = PrinterConfig.Default): String = {
     val stringOutput = new StringWriter()
     val writer = cfg.indent match {
       case _: Indent.IndentWith  => new PrettyXmlWriter(stringOutput, cfg)

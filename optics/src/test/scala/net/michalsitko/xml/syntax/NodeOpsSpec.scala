@@ -2,7 +2,6 @@ package net.michalsitko.xml.syntax
 
 import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.Text
-import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.syntax.document._
 import net.michalsitko.xml.syntax.node._
 import net.michalsitko.xml.test.utils.ExampleInputs

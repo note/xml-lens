@@ -11,8 +11,6 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 import scala.util.control.NonFatal
 
-case class ParsingException(message: String, cause: Throwable) extends Exception(message, cause)
-
 private [parsing] class LabeledElementBuilder(label: ResolvedName, attributes: Seq[Attribute], namespaceDeclarations: Seq[NamespaceDeclaration]) {
   val children: ArrayBuffer[Node] = ArrayBuffer.empty[Node]
 
@@ -31,19 +29,15 @@ private [parsing] object BlankingResolver extends XMLResolver {
   }
 }
 
-case class ParserConfig(replaceEntityReferences: Boolean)
-
 object XmlParser {
   import net.michalsitko.xml.parsing.utils.TryOps._
 
-  val DefaultParserConfig = ParserConfig(replaceEntityReferences = false)
-
-  def parse(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: ParserConfig = DefaultParserConfig): Either[ParsingException, XmlDocument] = {
+  def parse(input: String, charset: Charset = StandardCharsets.UTF_8)(implicit config: ParserConfig = ParserConfig.Default): Either[ParsingException, XmlDocument] = {
     val stream = new ByteArrayInputStream(input.getBytes(charset))
     parseStream(stream)
   }
 
-  def parseStream(inputStream: InputStream)(implicit config: ParserConfig = DefaultParserConfig): Either[ParsingException, XmlDocument] =
+  def parseStream(inputStream: InputStream)(implicit config: ParserConfig = ParserConfig.Default): Either[ParsingException, XmlDocument] =
     Try(read(inputStream, config)).asEither.left.map {
       case e: ParsingException  => e
       case NonFatal(e)          => ParsingException(s"Cannot parse XML: ${e.getMessage}", e)

@@ -26,7 +26,7 @@ lazy val testsCommon = (crossProject(JSPlatform, JVMPlatform).crossType(CrossTyp
 lazy val testsCommonJVM = testsCommon.jvm
 lazy val testsCommonJS  = testsCommon.js
 
-lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Dummy) in file("io"))
+lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) in file("io"))
   .commonSettings
   .settings(
     name := "xml-lens-io"

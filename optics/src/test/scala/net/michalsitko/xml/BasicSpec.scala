@@ -1,7 +1,6 @@
 package net.michalsitko.xml
 
 import net.michalsitko.xml.entities.XmlDocument
-import net.michalsitko.xml.parsing.XmlParser
 import net.michalsitko.xml.test.utils.{BaseSpec, Example}
 
 trait BasicSpec extends BaseSpec {

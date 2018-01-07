@@ -1,13 +1,13 @@
 package net.michalsitko.xml.parsing
 
 import net.michalsitko.xml.BasicSpec
-import net.michalsitko.xml.printing.XmlPrinter
+import net.michalsitko.xml.printing.PrinterConfig
 import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
 import net.michalsitko.xml.utils.XmlDocumentFactory
 
-class XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
-  implicit val parserConfig = XmlParser.DefaultParserConfig
-  implicit val printerConfig = XmlPrinter.DefaultPrinterConfig
+trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
+  implicit val parserConfig = ParserConfig.Default
+  implicit val printerConfig = PrinterConfig.Default
 
   "parse" should {
     def checkCorrectInput(specificExample: Example): Unit =
@@ -42,7 +42,7 @@ class XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
     }
 
     "fail on parsing DTD withing root element" in {
-      XmlParser.parse(xmlWithDtdIncorrectly).isLeft should === (true)
+      parseEither(xmlWithDtdIncorrectly).isLeft should === (true)
     }
 
     "parse Processing Instructions" in {
@@ -55,14 +55,14 @@ class XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
 
     "fail for malformed inputs" in {
       malformedXmlStrings.foreach { example =>
-        XmlParser.parse(example).isLeft should === (true)
+        parseEither(example).isLeft should === (true)
       }
     }
 
     "deal with very deep XML" in {
-      val input = XmlPrinter.print(XmlDocumentFactory.noProlog(elementOfDepth(4000)))
+      val input = print(XmlDocumentFactory.noProlog(elementOfDepth(4000)))
 
-      XmlParser.parse(input).isRight should === (true)
+      parseEither(input).isRight should === (true)
     }
 
     "deal with empty XMLNS value" in {
@@ -112,7 +112,7 @@ class XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
           |<a></a>
         """.stripMargin
 
-      XmlParser.parse(xml).isLeft should === (true)
+      parseEither(xml).isLeft should === (true)
     }
 
     "parse XML without Declaration" in {
@@ -129,7 +129,7 @@ class XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
           """<?xml ?><a></a>
           """.stripMargin
 
-        XmlParser.parse(xml).isLeft should === (true)
+        parseEither(xml).isLeft should === (true)
       }
 
       {
@@ -137,7 +137,7 @@ class XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
           """<?xml encoding="UTF-8" ?><a></a>
           """.stripMargin
 
-        XmlParser.parse(xml).isLeft should === (true)
+        parseEither(xml).isLeft should === (true)
       }
     }
   }
