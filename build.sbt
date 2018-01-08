@@ -19,7 +19,7 @@ lazy val testsCommon = (crossProject(JSPlatform, JVMPlatform).crossType(CrossTyp
   .commonSettings
   .settings(
     name := "xml-lens-tests-common",
-    libraryDependencies ++= Seq(scalacheck, scalaTest)
+    libraryDependencies ++= Seq(scalacheck, scalaTest.value)
   )
   .dependsOn(ast)
 
@@ -51,7 +51,7 @@ lazy val bench = (project in file("bench"))
   .commonSettings
   .settings(
     name := "xml-lens-bench",
-    libraryDependencies ++= Seq(scalaXml, scalaTest),
+    libraryDependencies ++= Seq(scalaXml, scalaTest.value),
     scalacOptions += "-Xlint:_,-missing-interpolator"
   )
   .enablePlugins(JmhPlugin)
@@ -61,7 +61,7 @@ lazy val examples = (project in file("examples"))
   .commonSettings
   .settings(
     name := "xml-lens-examples",
-    libraryDependencies ++= Seq(scalaXml, scalaTest),
+    libraryDependencies ++= Seq(scalaXml, scalaTest.value),
     scalacOptions += "-Xlint:_,-missing-interpolator"
   )
   .enablePlugins(JmhPlugin)
