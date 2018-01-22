@@ -24,8 +24,8 @@ private [parsing] trait parser extends js.Object {
   var ondoctype: js.Function0[Unit] = js.native
   var oncomment: js.Function0[Unit] = js.native
   var onopentagstart: js.Function0[Unit] = js.native
-  var onattribute: js.Function1[Attribute, Unit] = js.native
-  var onopentag: js.Function1[Node, Unit] = js.native
+  var onattribute: js.Function1[JsAttribute, Unit] = js.native
+  var onopentag: js.Function1[JsNode, Unit] = js.native
   var onclosetag: js.Function0[Unit] = js.native
   var onopencdata: js.Function0[Unit] = js.native
   var oncdata: js.Function0[Unit] = js.native
@@ -41,9 +41,10 @@ private [parsing] trait parser extends js.Object {
 }
 
 @js.native
-private [parsing] trait Node extends js.Object {
+private [parsing] trait JsNode extends js.Object {
   val name: String = js.native
-  val attributes: js.Dictionary[String] = js.native
+  val attributes: js.Dictionary[JsAttribute] = js.native
+  val ns: js.Dictionary[String] = js.native
 
   // If the xmlns option is set, then it will contain namespace binding information on the ns member, and will have a local, prefix, and uri member.
   val local: String = js.native
@@ -52,9 +53,12 @@ private [parsing] trait Node extends js.Object {
 }
 
 @js.native
-private [parsing] trait Attribute extends js.Object {
-  val name: String = js.native
+private [parsing] trait JsAttribute extends js.Object {
+  val name: String = js.native // e.g. `prefix:attrName`
   val value: String = js.native
+  val prefix: String = js.native
+  val local: String = js.native
+  val uri: String = js.native
 }
 
 object JsParser {
