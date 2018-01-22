@@ -33,7 +33,7 @@ trait ParserPrinterSpec extends BasicSpec with ExampleInputs {
       testForInputs(xmlWithCData.stringRepr)
     }
 
-    "preserve empty element" in {
+    "preserve self-closing and empty elements as empty element" in {
       val examples = List(xmlWithSelfClosingTag, xmlWithEmptyElement)
 
       examples.foreach { example =>
