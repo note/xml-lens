@@ -33,13 +33,9 @@ lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) i
   )
   .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin))
   .jsSettings(
-    // there's no webjar for https://github.com/isaacs/sax-js/blob/master/lib/sax.js
-    // TODO: contribute a webjar for sax-js
-    // jsDependencies += ProvidedJS / "sax.js",
     npmDependencies in Compile += "sax" -> "1.2.4",
     // with `-Ywarn-dead-code` enabled `var onerror: js.Function1[js.Any, Unit] = js.native` fails
-    scalacOptions  -= "-Ywarn-dead-code",
-    scalaJSUseMainModuleInitializer := true
+    scalacOptions  -= "-Ywarn-dead-code"
   )
   .dependsOn(ast, testsCommon % "test->test")
 
