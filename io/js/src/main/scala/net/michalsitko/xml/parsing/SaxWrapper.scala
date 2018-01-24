@@ -19,7 +19,7 @@ private [parsing] trait Writer extends js.Object {
 //@JSImport("sax.js", "parser") // TODO: probably to remove
 private [parsing] trait parser extends js.Object {
   var ontext: js.Function1[String, Unit] = js.native
-  var onprocessinginstruction: js.Function0[Unit] = js.native
+  var onprocessinginstruction: js.Function1[JsProcessingInstruction, Unit] = js.native
   var onsgmldeclaration: js.Function0[Unit] = js.native
   var ondoctype: js.Function0[Unit] = js.native
   var oncomment: js.Function0[Unit] = js.native
@@ -38,6 +38,12 @@ private [parsing] trait parser extends js.Object {
   var onclosenamespac: js.Function0[Unit] = js.native
 
   def write(input: String): Writer = js.native
+}
+
+@js.native
+private [parsing] trait JsProcessingInstruction extends js.Object {
+  val name: String = js.native
+  val body: String = js.native
 }
 
 @js.native
