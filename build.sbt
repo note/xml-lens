@@ -35,7 +35,8 @@ lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) i
   .jsSettings(
     npmDependencies in Compile += "sax" -> "1.2.4",
     // with `-Ywarn-dead-code` enabled `var onerror: js.Function1[js.Any, Unit] = js.native` fails
-    scalacOptions  -= "-Ywarn-dead-code"
+    scalacOptions  -= "-Ywarn-dead-code",
+    libraryDependencies += "com.lihaoyi" %%% "fastparse" % "1.0.0"
   )
   .dependsOn(ast, testsCommon % "test->test")
 
