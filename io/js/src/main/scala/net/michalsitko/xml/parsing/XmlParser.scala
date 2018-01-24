@@ -9,12 +9,26 @@ object XmlParser {
     val options = JsParserOptions(xmlns = Some(true))
     val parser = JsParser.apply(strict = true, options = options)
 
-    var root: LabeledElementBuilder = null
+    var root = Option.empty[LabeledElementBuilder]
+    var xmlDeclaration = Option.empty[XmlDeclaration]
+
     var elementStack = List.empty[LabeledElementBuilder]
+
+    // This is hacky. sax-js handles xml declaration as processing instruction even though
+    // technically it is not. Also, it does not parse the content of xml declaration at all
+    // so for `<?xml version="1.0" encoding="UTF-8"?>` we got JsProcessingInstruction(name="xml", body = "version="1.0" encoding="UTF-8")
+    parser.onprocessinginstruction = { pi =>
+      if (root.isEmpty && pi.name.toLowerCase == "xml") {
+        xmlDeclaration = parseAsXmlDeclaration(pi)
+      } else {
+        elementStack.headOption.foreach(_.addChild(ProcessingInstruction(pi.name, pi.body)))
+      }
+    }
+
     parser.onopentag = { node =>
       if(elementStack.isEmpty) {
-        root = newElementBuilder(node)
-        elementStack = root :: elementStack
+        root = Some(newElementBuilder(node))
+        elementStack = root.get :: elementStack
       } else {
         elementStack = newElementBuilder(node) :: elementStack
       }
@@ -34,8 +48,19 @@ object XmlParser {
     parser.write(input).close()
 
     println("xmlparser here!")
-    val prolog = Prolog(None, Seq.empty, None)
-    Right(XmlDocument(prolog, root.build))
+    val prolog = Prolog(xmlDeclaration, Seq.empty, None)
+
+    root match {
+      case Some(r)  => Right(XmlDocument(prolog, r.build))
+      case None     => Left(ParsingException("no root element found", new IllegalArgumentException))
+    }
+
+  }
+
+  private def parseAsXmlDeclaration(pi: JsProcessingInstruction): Option[XmlDeclaration] = {
+    // TODO: that's very hacky, rethink it
+    pi.body.split("=")
+    ???
   }
 
   private def fromNode(node: JsNode): ResolvedName =

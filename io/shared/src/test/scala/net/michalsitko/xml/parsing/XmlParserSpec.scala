@@ -97,6 +97,21 @@ trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
       test("ISO-8859-1")
     }
 
+    "parse XML Declaration again" in {
+      def test(encoding: String) = {
+        val xml =
+          s"""<?xml version  = '1.0' encoding="$encoding" ?>
+             |<a></a>
+          """.stripMargin
+
+        parse(xml) should === (XmlDocumentFactory.withProlog("1.0", Some(encoding), labeledElement("a")))
+      }
+
+      test("UTF-8")
+      test("ISO-8859-1")
+    }
+
+
     "parse XML Declaration without encoding" in {
       val xml =
         """<?xml version="1.0"?>
