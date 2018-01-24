@@ -33,7 +33,10 @@ lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) i
   )
   .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin))
   .jsSettings(
-    npmDependencies in Compile += "sax" -> "1.2.4",
+    npmDependencies in Compile ++= Seq(
+      "sax"         -> "1.2.4",
+      "xmlbuilder"  -> "9.0.4"
+    ),
     // with `-Ywarn-dead-code` enabled `var onerror: js.Function1[js.Any, Unit] = js.native` fails
     scalacOptions  -= "-Ywarn-dead-code",
     libraryDependencies += "com.lihaoyi" %%% "fastparse" % "1.0.0"

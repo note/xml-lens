@@ -22,7 +22,17 @@ object XmlDeclarationParser {
   val encodingName = P (( CharIn(List('"')) ~ encName ~ CharIn(List('"'))) | (CharIn("'") ~ encName ~ CharIn("'")))
   val encodingDecl = P ( "encoding" ~ "=" ~ encodingName )
 
-  val xmlDecl = P (versionInfo ~ encodingDecl.rep(min = 0, max = 1)).map(v => (v._1, v._2.headOption))
+  val xmlDecl = {
+    val wsMatters = WhitespaceApi.Wrapper {
+      import fastparse.all._
+      NoTrace(Pass)
+    }
+    import wsMatters._
+
+    val ws = P(CharIn(" \t").rep(min = 1))
+
+    P ( (ws.rep ~ versionInfo ~ ws.rep ~ End).map(v => (v, Option.empty[String])) | (ws.rep ~ versionInfo ~ ws.rep(min = 1) ~ encodingDecl ~ ws.rep ~ End).map(t => (t._1, Some(t._2))) )
+  }
 
 
   def parse(input: String): Option[XmlDeclaration] =
