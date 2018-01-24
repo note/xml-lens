@@ -97,10 +97,11 @@ trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
       test("ISO-8859-1")
     }
 
+    // TODO: to remove
     "parse XML Declaration again" in {
       def test(encoding: String) = {
         val xml =
-          s"""<?xml version  = '1.0' encoding="$encoding" ?>
+          s"""<?xml version='1.0' encoding="$encoding" ?>
              |<a></a>
           """.stripMargin
 

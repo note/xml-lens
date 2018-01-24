@@ -22,7 +22,7 @@ object XmlDeclarationParser {
   val encodingName = P (( CharIn(List('"')) ~ encName ~ CharIn(List('"'))) | (CharIn("'") ~ encName ~ CharIn("'")))
   val encodingDecl = P ( "encoding" ~ "=" ~ encodingName )
 
-  val xmlDecl: all.Parser[(String, Option[String])] = P (versionInfo ~ encodingDecl.?)
+  val xmlDecl = P (versionInfo ~ encodingDecl.rep(min = 0, max = 1)).map(v => (v._1, v._2.headOption))
 
 
   def parse(input: String): Option[XmlDeclaration] =
