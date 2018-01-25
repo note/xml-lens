@@ -21,14 +21,14 @@ private [parsing] trait parser extends js.Object {
   var ontext: js.Function1[String, Unit] = js.native
   var onprocessinginstruction: js.Function1[JsProcessingInstruction, Unit] = js.native
   var onsgmldeclaration: js.Function0[Unit] = js.native
-  var ondoctype: js.Function0[Unit] = js.native
-  var oncomment: js.Function0[Unit] = js.native
+  var ondoctype: js.Function1[String, Unit] = js.native
+  var oncomment: js.Function1[String, Unit] = js.native
   var onopentagstart: js.Function0[Unit] = js.native
   var onattribute: js.Function1[JsAttribute, Unit] = js.native
   var onopentag: js.Function1[JsNode, Unit] = js.native
   var onclosetag: js.Function0[Unit] = js.native
   var onopencdata: js.Function0[Unit] = js.native
-  var oncdata: js.Function0[Unit] = js.native
+  var oncdata: js.Function1[String, Unit] = js.native
   var onclosecdata: js.Function0[Unit] = js.native
   var onerror: js.Function1[js.Error, Unit] = js.native
   var onend: js.Function0[Unit] = js.native
