@@ -19,7 +19,7 @@ object XmlParser {
     // so for `<?xml version="1.0" encoding="UTF-8"?>` we got JsProcessingInstruction(name="xml", body = "version="1.0" encoding="UTF-8")
     parser.onprocessinginstruction = { pi =>
       if (root.isEmpty && pi.name.toLowerCase == "xml") {
-        xmlDeclaration = parseAsXmlDeclaration(pi)
+        xmlDeclaration = XmlDeclarationParser.parse(pi.body)
       } else {
         elementStack.headOption.foreach(_.addChild(ProcessingInstruction(pi.name, pi.body)))
       }
@@ -35,14 +35,15 @@ object XmlParser {
     }
 
     parser.onclosetag = { () =>
+      println("Bazinga on closetag before")
       val current = elementStack.head
-      println("Bazinga on closetag: " + current.build)
+      println("Bazinga on closetag after: " + current.build)
       elementStack.tail.headOption.foreach(_.addChild(current.build))
       elementStack = elementStack.tail
     }
 
     parser.ontext = { txt =>
-      elementStack.head.addChild(Text(txt))
+      elementStack.headOption.foreach(_.addChild(Text(txt)))
     }
 
     parser.write(input).close()
@@ -57,12 +58,6 @@ object XmlParser {
 
   }
 
-  private def parseAsXmlDeclaration(pi: JsProcessingInstruction): Option[XmlDeclaration] = {
-    // TODO: that's very hacky, rethink it
-    pi.body.split("=")
-    ???
-  }
-
   private def fromNode(node: JsNode): ResolvedName =
     ResolvedName(node.prefix, node.uri, node.local)
 
@@ -70,10 +65,23 @@ object XmlParser {
     Attribute(ResolvedName(attr.prefix, attr.uri, attr.local), attr.value)
 
   private def newElementBuilder(node: JsNode): LabeledElementBuilder = {
+    def toNamespaceDeclaration(attr: JsAttribute): NamespaceDeclaration = {
+      val prefix = attr.name.split(':').tail.headOption.getOrElse("")
+      NamespaceDeclaration(prefix, attr.value)
+    }
+
     val name = fromNode(node)
-    val attrs = node.attributes.values.map(fromAttr).toSeq
-    val ns = node.ns.map(t => NamespaceDeclaration(t._1, t._2)).toSeq
-    new LabeledElementBuilder(name, attrs, ns)
+
+    // we're not using node.ns for namespaces as JsNode.ns does not contain namespace declarations but namespaces
+    // available in current scope which is useless for our purposes
+    val (nsDeclarations, attrs) = node.attributes.values.partition { attr =>
+      // attributes (and xmlns) are case sensitive (that's why we don't `toLowerCase`)
+      attr.name == "xmlns" || attr.name.startsWith("xmlns:")
+    }
+
+    val actualAttrs = attrs.map(fromAttr).toSeq
+    val ns = nsDeclarations.map(toNamespaceDeclaration).toSeq
+    new LabeledElementBuilder(name, actualAttrs, ns)
   }
 }
 

@@ -79,7 +79,7 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
 
     Example(
       """<?xml version="1.0" encoding="UTF-8"?>
-        |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com">
+        |<a xmlns="http://www.develop.com/student" xmlns:xyz="http://www.example.com" XMLNS="http://a.com">
         |   <c1>
         |      <f>item1</f>
         |      <g>item2</g>
@@ -92,6 +92,7 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
       """.stripMargin,
       LabeledElement(ResolvedName("", defaultNs, "a"),
         Element(
+          attributes = List(Attribute(ResolvedName.unprefixed("XMLNS"), "http://a.com")),
           children = List(
             indent(1),
             LabeledElement(ResolvedName("", defaultNs, "c1"), element(
@@ -123,6 +124,26 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
     Example(
       """<?xml version="1.0" encoding="UTF-8"?>
         |<a><c1><f name="abc" name2="something else">item1</f><g>item2</g></c1><c1 name=""><f>item1</f><h>item2</h></c1></a>""".stripMargin,
+      labeledElement("a",
+        labeledElement("c1",
+          LabeledElement.unprefixed("f", Element(fAttributes, List(Text("item1")), Seq.empty)),
+          labeledElement("g", Text("item2"))
+        ),
+        LabeledElement.unprefixed("c1", Element(c1Attributes, List(
+          labeledElement("f", Text("item1")),
+          labeledElement("h", Text("item2"))
+        ), Seq.empty))
+      )
+    )
+  }
+
+  val attributesXmlStringExampleCaseSensitive = {
+    val fAttributes = List(Attribute.unprefixed("name", "abc"), Attribute.unprefixed("NaMe", "Hello"), Attribute.unprefixed("name2", "something else"))
+    val c1Attributes = List(Attribute.unprefixed("name", ""))
+
+    Example(
+      """<?xml version="1.0" encoding="UTF-8"?>
+        |<a><c1><f name="abc" "NaMe"="Hello" name2="something else">item1</f><g>item2</g></c1><c1 name=""><f>item1</f><h>item2</h></c1></a>""".stripMargin,
       labeledElement("a",
         labeledElement("c1",
           LabeledElement.unprefixed("f", Element(fAttributes, List(Text("item1")), Seq.empty)),
