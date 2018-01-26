@@ -24,7 +24,12 @@ object XmlParser {
       // so for `<?xml version="1.0" encoding="UTF-8"?>` we got JsProcessingInstruction(name="xml", body = "version="1.0" encoding="UTF-8")
       parser.onprocessinginstruction = { pi =>
         if (root.isEmpty && pi.name.toLowerCase == "xml") {
-          xmlDeclaration = XmlDeclarationParser.parse(pi.body)
+          XmlDeclarationParser.parse(pi.body) match {
+            case Some(decl) =>
+              xmlDeclaration = Some(decl)
+            case None =>
+              throw new ParsingException("Cannot read xml declaration", new RuntimeException)
+          }
         } else {
           val processingInstruction = ProcessingInstruction(pi.name, pi.body)
           elementStack.headOption match {
