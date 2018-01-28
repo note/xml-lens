@@ -16,7 +16,6 @@ private [parsing] trait Writer extends js.Object {
 }
 
 @js.native
-//@JSImport("sax.js", "parser") // TODO: probably to remove
 private [parsing] trait parser extends js.Object {
   var ontext: js.Function1[String, Unit] = js.native
   var onprocessinginstruction: js.Function1[JsProcessingInstruction, Unit] = js.native
