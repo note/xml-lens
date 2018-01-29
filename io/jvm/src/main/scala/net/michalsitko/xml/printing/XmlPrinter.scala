@@ -1,60 +1,44 @@
 package net.michalsitko.xml.printing
-
-import java.io.StringWriter
 import net.michalsitko.xml.entities._
+import net.michalsitko.xml.printing.CommonXmlWriter._
 
-object XmlPrinter {
-  def print(doc: XmlDocument)(implicit cfg: PrinterConfig = PrinterConfig.Default): String = {
-    val stringOutput = new StringWriter()
-    val writer = cfg.indent match {
-      case _: Indent.IndentWith  => new PrettyXmlWriter(stringOutput, cfg)
-      case Indent.Remain         => new JavaXmlWriter(stringOutput, cfg)
-    }
+object XmlPrinter extends CommonXmlPrinter {
+  override def print(doc: XmlDocument)(implicit cfg: PrinterConfig): String = {
+    import InternalMonoid._
 
-    writer.writeProlog(doc.prolog)
-    writeLabeledElement(doc.root, writer)
+    var writer = CommonXmlWriter.writeProlog[String](doc.prolog, cfg.eolAfterXmlDecl)(InternalMonoid[String].zero)
 
-    val res = stringOutput.toString()
-    stringOutput.close() // has no effect because of nature of StringWriter, but let's keep it in case of change
-    res
-  }
-
-  private def writeLabeledElement(root: LabeledElement, writer: XmlWriter): Unit = {
-    var toVisit = List[Node](root)
+    var toVisit = List[Node](doc.root)
     var toEnd = List.empty[LabeledElement]
 
-    while(toVisit.nonEmpty) {
+    while (toVisit.nonEmpty) {
       val current = toVisit.head
       toVisit = toVisit.tail
-      current match {
+
+      writer = current match {
         case elem: LabeledElement =>
-          writer.writeLabeled(elem)
+          val r = writeElement(elem)(writer)
           val toAdd = elem.element.children
           toVisit = toAdd.toList ++ (null.asInstanceOf[Node] +: toVisit)
           toEnd = elem :: toEnd
-
-        case text: Text =>
-          writer.writeText(text)
-
-        case comment: Comment =>
-          writer.writeComment(comment)
-
-        case dtd: DoctypeDeclaration =>
-          writer.writeDtd(dtd)
-
+          r
+        case txt: Text =>
+          writeText(txt)(writer)
         case pi: ProcessingInstruction =>
-          writer.writeProcessingInstruction(pi)
-
+          writeProcessingInstruction(pi)(writer)
         case cdata: CData =>
-          writer.writeCData(cdata)
-
+          writeCData(cdata)(writer)
+        case comment: Comment =>
+          writeComment(comment)(writer)
         case entityRef: EntityReference =>
-          writer.writeEntityReference(entityRef)
-
+          writeEntityReference(entityRef)(writer)
         case null =>
-          writer.writeEndElement(toEnd.head)
+          val r = writeEndElement(toEnd.head.label)(writer)
           toEnd = toEnd.tail
+          r
       }
     }
+
+    writer
   }
 }

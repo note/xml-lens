@@ -195,7 +195,7 @@ trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
 
       val res = (root \ "c1" \ "f").childAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
-      print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example18("ITEM"))
+      print(res)(PrinterConfig(Indent.IndentWith("  "), true)) should === (example18("ITEM"))
     }
 
     "elementAt" in {
@@ -215,7 +215,7 @@ trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val newElement = LabeledElement.unprefixed("new", Element())
       val res = (root \ "f").children.modify( ch => newElement +: ch)(parsed)
 
-      print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example20)
+      print(res)(PrinterConfig(Indent.IndentWith("  "), true)) should === (example20)
     }
 
     "insert new node as the last node" in {
@@ -225,7 +225,7 @@ trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val newElement = LabeledElement.unprefixed("new", Element())
       val res = (root \ "f").children.modify( ch => ch :+ newElement)(parsed)
 
-      print(res)(PrinterConfig(Indent.IndentWith("  "))) should === (example21)
+      print(res)(PrinterConfig(Indent.IndentWith("  "), true)) should === (example21)
     }
 
   }

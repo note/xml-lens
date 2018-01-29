@@ -8,7 +8,7 @@ import net.michalsitko.xml.utils.XmlDocumentFactory
 trait XmlPrinterSpec extends BasicSpec with ExampleInputs with XmlGenerator with ExampleBuilderHelper {
   implicit val printerConfig = PrinterConfig.Default
 
-  def prettyCfg(singleIndent: String) = PrinterConfig(Indent.IndentWith(singleIndent))
+  def prettyCfg(singleIndent: String) = PrinterConfig(Indent.IndentWith(singleIndent), true)
 
   "XmlPrinter" should {
     "work for basic example" in {

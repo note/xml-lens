@@ -52,7 +52,7 @@ trait ParserPrinterSpec extends BasicSpec with ExampleInputs {
 
     "pretty print" in {
       val xml = parse(uglyXmlString)
-      val prettyCfg = PrinterConfig(Indent.IndentWith("  "))
+      val prettyCfg = PrinterConfig(Indent.IndentWith("  "), true)
 
       print(xml)(prettyCfg)  should === (prettyXmlString)
       print(xml)             should === (uglyXmlString)
@@ -60,13 +60,13 @@ trait ParserPrinterSpec extends BasicSpec with ExampleInputs {
 
     "pretty print with comments" in {
       val xml = parse(uglyXmlString2)
-      val printed = print(xml)(PrinterConfig(Indent.IndentWith("  ")))
+      val printed = print(xml)(PrinterConfig(Indent.IndentWith("  "), true))
       printed should === (prettyXmlString2)
     }
 
     "PrinterConfig is taken into account" in {
       val xml = parse(uglyXmlString)
-      val printed = print(xml)(PrinterConfig(Indent.IndentWith(" ")))
+      val printed = print(xml)(PrinterConfig(Indent.IndentWith(" "), true))
       printed should === (prettyXmlStringIntendedWithOneSpace)
     }
   }
