@@ -19,7 +19,7 @@ object XmlPrinter {
 object XmlWriter {
   def write(doc: XmlDocument): String = {
     // TODO: introduce default config
-    val config: XmlBuilderConfig = XmlBuilderConfig(false, "  ", 0, newline = "\n", spacebeforeslash = "")
+    val config: XmlBuilderConfig = XmlBuilderConfig(true, "  ", 0, newline = "\n", spacebeforeslash = "")
     XmlBuilder.withWrapper(config) { wrapper =>
       writeProlog(doc.prolog, wrapper)
       writeElement(doc.root, wrapper)
