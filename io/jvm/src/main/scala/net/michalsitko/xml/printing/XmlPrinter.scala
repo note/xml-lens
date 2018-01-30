@@ -10,6 +10,8 @@ object XmlPrinter extends CommonXmlPrinter {
 
     var toVisit = List[Node](doc.root)
     var toEnd = List.empty[LabeledElement]
+    var level = 0
+    val elementWriter = ElementWriter.forConfig(cfg)
 
     while (toVisit.nonEmpty) {
       val current = toVisit.head
@@ -17,13 +19,14 @@ object XmlPrinter extends CommonXmlPrinter {
 
       writer = current match {
         case elem: LabeledElement =>
-          val r = writeElement(elem)(writer)
+          val r = elementWriter.writeElement(elem, level)(writer)
+          level += 1
           val toAdd = elem.element.children
           toVisit = toAdd.toList ++ (null.asInstanceOf[Node] +: toVisit)
           toEnd = elem :: toEnd
           r
         case txt: Text =>
-          writeText(txt)(writer)
+          writeText(txt)(writer, cfg)
         case pi: ProcessingInstruction =>
           writeProcessingInstruction(pi)(writer)
         case cdata: CData =>
@@ -33,7 +36,8 @@ object XmlPrinter extends CommonXmlPrinter {
         case entityRef: EntityReference =>
           writeEntityReference(entityRef)(writer)
         case null =>
-          val r = writeEndElement(toEnd.head.label)(writer)
+          val r = elementWriter.writeEndElement(toEnd.head, level)(writer)
+          level -= 1
           toEnd = toEnd.tail
           r
       }
