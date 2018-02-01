@@ -56,6 +56,13 @@ trait XmlPrinterSpec extends BasicSpec with ExampleInputs with XmlGenerator with
       print(doc) should ===("""<b attr="a&quot;b'c&lt;d&gt;e&amp;f">a"b'c&lt;d&gt;e&amp;f</b>""")
     }
 
+    "escape special characters in namespace declaration value" in {
+      val xml = LabeledElement(ResolvedName("", "", "b"), Element(Seq.empty, List(Text("""hello""")), List(NamespaceDeclaration("some", "http://abc.com?a>3&b<7&a=\"name\"&b='cdf'"))))
+      val doc = XmlDocumentFactory.noProlog(xml)
+
+      print(doc) should ===("""<b xmlns:some="http://abc.com?a&gt;3&amp;b&lt;7&amp;a=&quot;name&quot;&amp;b='cdf'">hello</b>""")
+    }
+
     "not verify output correctness" in {
       val attrs = List(Attribute.unprefixed("attr", "value"), Attribute.unprefixed("attr", "value"), Attribute.unprefixed("attr", "value3"))
       val xml = LabeledElement(ResolvedName("", "", "b"), Element(attrs, List(Text("something")), Seq.empty))
