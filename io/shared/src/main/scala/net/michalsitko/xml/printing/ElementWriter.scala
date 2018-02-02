@@ -10,9 +10,9 @@ trait ElementWriter extends Resolver {
   protected def writeElementBase(element: LabeledElement): String = {
     def singleNsStr(ns: NamespaceDeclaration): String =
       if(ns.prefix.isEmpty) {
-        s"""xmlns="${ns.uri}""""
+        s"""xmlns="${Escaper.escapeAttributeValue(ns.uri)}""""
       } else {
-        s"""xmlns:${ns.prefix}="${ns.uri}""""
+        s"""xmlns:${ns.prefix}="${Escaper.escapeAttributeValue(ns.uri)}""""
       }
 
     def singleAttrStr(attr: Attribute): String =

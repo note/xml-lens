@@ -8,7 +8,6 @@ object Escaper {
       .replace("<", "&lt;")
       .replace(">", "&gt;")
       .replace("\"", "&quot;")
-
   }
 
   def escapeText(text: String): String = {
