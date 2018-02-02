@@ -212,7 +212,7 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
     )
   }
 
-  val xmlWithCData = {
+  val   xmlWithCData = {
     val cdataContent = """
                          |    I can use all sorts of reserved characters
                          |    like > < " and &
