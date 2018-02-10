@@ -123,14 +123,14 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
 
     Example(
       """<?xml version="1.0" encoding="UTF-8"?>
-        |<a><c1><f name="abc" name2="something else">item1</f><g>item2</g></c1><c1 name=""><f>item1</f><h>item2</h></c1></a>""".stripMargin,
+        |<a><c1><f name="abc" name2="something else">item1</f><g>item2</g></c1><c1 name=""><F>item1</F><h>item2</h></c1></a>""".stripMargin,
       labeledElement("a",
         labeledElement("c1",
           LabeledElement.unprefixed("f", Element(fAttributes, List(Text("item1")), Seq.empty)),
           labeledElement("g", Text("item2"))
         ),
         LabeledElement.unprefixed("c1", Element(c1Attributes, List(
-          labeledElement("f", Text("item1")),
+          labeledElement("F", Text("item1")),
           labeledElement("h", Text("item2"))
         ), Seq.empty))
       )
