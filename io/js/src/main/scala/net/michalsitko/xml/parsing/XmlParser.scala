@@ -8,6 +8,8 @@ import scala.util.{Failure, Success, Try}
 object XmlParser {
   def parse(input: String): Either[ParsingException, XmlDocument] = {
     val options = JsParserOptions(xmlns = Some(true))
+
+    // TODO: read more about strict, with strict=true test "preserve entities" fails because of parsing error
     val parser = JsParser.apply(strict = true, options = options)
 
     var root = Option.empty[LabeledElementBuilder]
@@ -93,8 +95,6 @@ object XmlParser {
       }
 
       parser.write(input).close()
-
-      println("xmlparser here!")
       Prolog(xmlDeclaration, f1, doctypeDeclaration.map(v => (v, f2)))
     }
 
