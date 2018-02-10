@@ -2,7 +2,6 @@ package net.michalsitko.xml.bench
 
 import java.util.concurrent.TimeUnit
 
-import net.michalsitko.xml.parsing.XmlParser
 import org.openjdk.jmh.annotations._
 
 import scala.xml.XML

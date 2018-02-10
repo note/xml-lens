@@ -1,5 +1,6 @@
 import sbt._
 import sbt.Keys._
+import sbtcrossproject.CrossProject
 import scoverage.ScoverageKeys.{coverageHighlighting, coverageScalacPluginVersion}
 
 object Common {
@@ -21,29 +22,35 @@ object Common {
   )
 
   val commonScalaVersion =  "2.12.2"
-  val commonCrossScalaVersions = Seq("2.12.2", "2.11.11")
+  val commonCrossScalaVersions = Seq("2.12.4", "2.11.12")
+
+  implicit class CrossProjectFrom(project: CrossProject) {
+    def commonSettings: CrossProject = project.settings(_commonSettings)
+  }
 
   implicit class ProjectFrom(project: Project) {
-    def commonSettings: Project = project.settings(
-      scalacOptions ++= commonScalacOptions,
-      scalacOptions in (Compile, console) ~= {
-        _.filterNot(Set("-Ywarn-unused-import")).map {
-          case "-Xlint" => "-Xlint:-unused,_"
-          case another => another
-        }
-      },
-      scalacOptions in (Test, console) ~= {
-        _.filterNot(Set("-Ywarn-unused-import")).map {
-          case "-Xlint" => "-Xlint:-unused,_"
-          case another => another
-        }
-      },
-      scalaVersion := commonScalaVersion,
-      crossScalaVersions := commonCrossScalaVersions,
-      coverageHighlighting := true,
-      coverageScalacPluginVersion := "1.3.0",
-      version := "0.1.0"
-    )
+    def commonSettings: Project = project.settings(_commonSettings)
   }
+
+  private val _commonSettings = Seq(
+    scalacOptions ++= commonScalacOptions,
+    scalacOptions in (Compile, console) ~= {
+      _.filterNot(Set("-Ywarn-unused-import")).map {
+        case "-Xlint" => "-Xlint:-unused,_"
+        case another => another
+      }
+    },
+    scalacOptions in (Test, console) ~= {
+      _.filterNot(Set("-Ywarn-unused-import")).map {
+        case "-Xlint" => "-Xlint:-unused,_"
+        case another => another
+      }
+    },
+    scalaVersion := commonScalaVersion,
+    crossScalaVersions := commonCrossScalaVersions,
+    coverageHighlighting := true,
+    coverageScalacPluginVersion := "1.3.0",
+    version := "0.1.0-SNAPSHOT"
+  )
 
 }
