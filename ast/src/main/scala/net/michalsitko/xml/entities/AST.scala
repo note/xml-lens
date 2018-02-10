@@ -87,4 +87,8 @@ case class XmlDeclaration(version: String, encoding: Option[String])
 // Document type declaration according to https://www.w3.org/TR/xml/#NT-doctypedecl
 case class DoctypeDeclaration(text: String)
 
+
+// TODO: make it clear in docs that we don't support Misc as it goes here:
+// document	   ::=   	prolog element Misc*
+// (according to https://www.w3.org/TR/xml/#sec-well-formed)
 case class XmlDocument(prolog: Prolog, root: LabeledElement)

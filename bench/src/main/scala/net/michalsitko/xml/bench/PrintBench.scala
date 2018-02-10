@@ -4,8 +4,6 @@ import java.io.StringWriter
 import java.util.concurrent.TimeUnit
 
 import net.michalsitko.xml.entities.LabeledElement
-import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.XmlPrinter
 import org.openjdk.jmh.annotations._
 
 import scala.xml.{Elem, XML}

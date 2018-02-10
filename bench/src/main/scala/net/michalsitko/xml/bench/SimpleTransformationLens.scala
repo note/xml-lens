@@ -1,7 +1,5 @@
 package net.michalsitko.xml.bench
 
-import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.syntax.OpticsBuilder.root
 
 object SimpleTransformationLens extends SimpleTransformation {
