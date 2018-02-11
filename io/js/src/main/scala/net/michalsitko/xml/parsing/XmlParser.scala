@@ -77,6 +77,11 @@ object XmlParser {
         elementStack.headOption.foreach(_.addChild(Text(txt)))
       }
 
+      parser.onentityreference = { name =>
+        // TODO: document in user docs that `EntityReference.replacement` is always "" in js!
+        elementStack.headOption.foreach(_.addChild(EntityReference(name, "")))
+      }
+
       parser.oncomment = { txt =>
         elementStack.headOption match {
           case Some(parent) => parent.addChild(Comment(txt))

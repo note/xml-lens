@@ -5,7 +5,7 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSImport
 
 @js.native
-@JSImport("sax/lib/sax.js", JSImport.Namespace)
+@JSImport("@msitko/sax/lib/sax.js", JSImport.Namespace)
 private [parsing] object sax extends js.Object {
   def parser(strict: Boolean, dictionary: js.Dictionary[Boolean]): parser = js.native
 }
@@ -34,7 +34,7 @@ private [parsing] trait parser extends js.Object {
   var onready: js.Function0[Unit] = js.native
   var onscript: js.Function0[Unit] = js.native
   var onopennamespace: js.Function0[Unit] = js.native
-  var onclosenamespac: js.Function0[Unit] = js.native
+  var onentityreference: js.Function1[String, Unit] = js.native
 
   def write(input: String): Writer = js.native
 }
