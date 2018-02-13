@@ -141,19 +141,6 @@ trait ParserPrinterSpec extends BasicSpec with ExampleInputs {
       |</body>
       |</html>""".stripMargin
 
-  val xmlWithEntityInAttrValueOutput =
-    """<?xml version="1.0" encoding="UTF-8"?>
-      |<!DOCTYPE html
-      |    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-      |    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
-      |[
-      |    <!ENTITY test-entity "EntityVal">
-      |]><html xmlns="http://www.w3.org/1999/xhtml">
-      |<body>
-      |    <h1 attr="someEntityValthing">Entities in XML</h1>
-      |</body>
-      |</html>""".stripMargin
-
   val numericEntity =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<a><b>&#xd;&#x0d;</b></a>""".stripMargin
