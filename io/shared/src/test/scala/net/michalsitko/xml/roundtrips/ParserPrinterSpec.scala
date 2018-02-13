@@ -50,14 +50,6 @@ trait ParserPrinterSpec extends BasicSpec with ExampleInputs {
       printed should === (xmlWithEntity)
     }
 
-    // this behavior is dictated by XMLStreamReader API - I see no way of having different behavior with that API
-    // TODO: move it to platform-specific test
-    "do not preserve entities in attr values" in {
-      val parsed = parse(xmlWithEntityInAttrValueInput)
-      val printed = print(parsed)
-      printed should === (xmlWithEntityInAttrValueOutput)
-    }
-
     // inspired by https://github.com/isaacs/sax-js/issues/35
     // resolved here: https://github.com/isaacs/sax-js/commit/966e19c2e7aa7a605498362f6322038eb87505ec
     // seems like XMLStreamReader does some strange things for numeric entities, getting very unexpected result
