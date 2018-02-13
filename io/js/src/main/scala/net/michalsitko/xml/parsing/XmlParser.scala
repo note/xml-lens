@@ -24,7 +24,7 @@ object XmlParser {
       // This is hacky. sax-js handles xml declaration as processing instruction even though
       // technically it is not. Also, it does not parse the content of xml declaration at all
       // so for `<?xml version="1.0" encoding="UTF-8"?>` we got JsProcessingInstruction(name="xml", body = "version="1.0" encoding="UTF-8")
-      parser.onprocessinginstruction = { pi =>
+      parser.onprocessinginstruction = { pi: JsProcessingInstruction =>
         if (root.isEmpty && pi.name.toLowerCase == "xml") {
           XmlDeclarationParser.parse(pi.body) match {
             case Some(decl) =>
@@ -48,7 +48,7 @@ object XmlParser {
         }
       }
 
-      parser.ondoctype = { txt =>
+      parser.ondoctype = { txt: String =>
         (root) match {
           case None =>
             val txtStr = s"<!DOCTYPE$txt>"
@@ -58,7 +58,7 @@ object XmlParser {
         }
       }
 
-      parser.onopentag = { node =>
+      parser.onopentag = { node: JsNode =>
         if(elementStack.isEmpty) {
           root = Some(newElementBuilder(node))
           elementStack = root.get :: elementStack
@@ -73,16 +73,16 @@ object XmlParser {
         elementStack = elementStack.tail
       }
 
-      parser.ontext = { txt =>
+      parser.ontext = { txt: String =>
         elementStack.headOption.foreach(_.addChild(Text(txt)))
       }
 
-      parser.onentityreference = { name =>
+      parser.onentityreference = { name: String =>
         // TODO: document in user docs that `EntityReference.replacement` is always "" in js!
         elementStack.headOption.foreach(_.addChild(EntityReference(name, "")))
       }
 
-      parser.oncomment = { txt =>
+      parser.oncomment = { txt: String =>
         elementStack.headOption match {
           case Some(parent) => parent.addChild(Comment(txt))
           case None =>
@@ -95,7 +95,7 @@ object XmlParser {
         }
       }
 
-      parser.oncdata = { txt =>
+      parser.oncdata = { txt: String =>
         elementStack.headOption.foreach(_.addChild(CData(txt)))
       }
 

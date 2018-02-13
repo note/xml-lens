@@ -7,6 +7,8 @@ object Escaper {
   // val raw = raw"\&(?![a-zA-Z:_][a-zA-Z0-9:_\-\.]*;)".r
   // it's not used at the moment as the effect on performance is unknown (esp. relevant for escaping text
   // nodes which may be huge
+  // I noticed javax.xml.stream.XMLStreamWriter does the same naive thing Escaper does here so
+  // probably it's not that bad
 
   def escapeAttributeValue(value: String): String = {
     value
