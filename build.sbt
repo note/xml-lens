@@ -39,7 +39,7 @@ lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) i
     // with `-Ywarn-dead-code` enabled `var onerror: js.Function1[js.Any, Unit] = js.native` fails
     scalacOptions  -= "-Ywarn-dead-code",
     libraryDependencies += "com.lihaoyi" %%% "fastparse" % "1.0.0",
-    scalaJSModuleKind := ModuleKind.CommonJSModule
+    coverageEnabled := false
   )
   .dependsOn(ast, testsCommon % "test->test")
 
@@ -54,10 +54,7 @@ lazy val optics = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Ful
   )
   .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin))
   .jsSettings(
-//    scalaJSModuleKind := ModuleKind.CommonJSModule,
-    npmDependencies in Test ++= Seq(
-       "@msitko/sax"         -> "1.2.5-2"
-    )
+    coverageEnabled := false
   )
   .dependsOn(ast, testsCommon % "test->test", io % "test->test")
 
@@ -125,4 +122,4 @@ lazy val root = (project in file("."))
   .settings(
     name := "xml-lens"
   )
-  .aggregate(ioJVM, ioJS, opticsJVM, opticsJS)
+  .aggregate(astJVM, astJS, ioJVM, ioJS, opticsJVM, opticsJS)
