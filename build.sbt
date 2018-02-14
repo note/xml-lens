@@ -19,7 +19,7 @@ lazy val testsCommon = (crossProject(JSPlatform, JVMPlatform).crossType(CrossTyp
   .commonSettings
   .settings(
     name := "xml-lens-tests-common",
-    libraryDependencies ++= Seq(scalacheck, scalaTest.value)
+    libraryDependencies ++= Seq(scalacheck.value, scalaTest.value)
   )
   .dependsOn(ast)
 
@@ -34,11 +34,12 @@ lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) i
   .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin))
   .jsSettings(
     npmDependencies in Compile ++= Seq(
-      "sax"         -> "1.2.4"
+      "@msitko/sax"         -> "1.2.5-2"
     ),
     // with `-Ywarn-dead-code` enabled `var onerror: js.Function1[js.Any, Unit] = js.native` fails
     scalacOptions  -= "-Ywarn-dead-code",
-    libraryDependencies += "com.lihaoyi" %%% "fastparse" % "1.0.0"
+    libraryDependencies += "com.lihaoyi" %%% "fastparse" % "1.0.0",
+    scalaJSModuleKind := ModuleKind.CommonJSModule
   )
   .dependsOn(ast, testsCommon % "test->test")
 
@@ -49,7 +50,14 @@ lazy val optics = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Ful
   .commonSettings
   .settings(
     name := "xml-lens-optics",
-    libraryDependencies ++= Seq(monocleCore, monocleLaw)
+    libraryDependencies ++= Seq(monocleCore.value, monocleLaw.value)
+  )
+  .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin))
+  .jsSettings(
+//    scalaJSModuleKind := ModuleKind.CommonJSModule,
+    npmDependencies in Test ++= Seq(
+       "@msitko/sax"         -> "1.2.5-2"
+    )
   )
   .dependsOn(ast, testsCommon % "test->test", io % "test->test")
 

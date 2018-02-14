@@ -44,10 +44,20 @@ trait ParserPrinterSpec extends BasicSpec with ExampleInputs {
       }
     }
 
-    "preserve entities" in {
+    "preserve entities in text" in {
       val parsed = parse(xmlWithEntity)
       val printed = print(parsed)
       printed should === (xmlWithEntity)
+    }
+
+    // inspired by https://github.com/isaacs/sax-js/issues/35
+    // resolved here: https://github.com/isaacs/sax-js/commit/966e19c2e7aa7a605498362f6322038eb87505ec
+    // seems like XMLStreamReader does some strange things for numeric entities, getting very unexpected result
+    // have not investigated it yet
+    "handle numeric entities" ignore {
+      val parsed = parse(numericEntity)
+      val printed = print(parsed)
+      printed should === (numericEntity)
     }
 
     "pretty print" in {
@@ -98,7 +108,7 @@ trait ParserPrinterSpec extends BasicSpec with ExampleInputs {
       |    <band height="20"></band>
       |</detail>""".stripMargin
 
-    val xmlWithEntity =
+  val xmlWithEntity =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<!DOCTYPE html
       |    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -112,11 +122,28 @@ trait ParserPrinterSpec extends BasicSpec with ExampleInputs {
       |</head>
       |<body>
       |    <h1>Entities in XML</h1>
-      |    <p>&test-entity;</p>
+      |    <p>abc &test-entity; def</p>
       |    <p>You can use it anywhere you'd use a standard XHTML entity:</p>
       |    <pre>&test-entity;</pre>
       |</body>
       |</html>""".stripMargin
+
+  val xmlWithEntityInAttrValueInput =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<!DOCTYPE html
+      |    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      |    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+      |[
+      |    <!ENTITY test-entity "EntityVal">
+      |]><html xmlns="http://www.w3.org/1999/xhtml">
+      |<body>
+      |    <h1 attr="some&test-entity;thing">Entities in XML</h1>
+      |</body>
+      |</html>""".stripMargin
+
+  val numericEntity =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a><b>&#xd;&#x0d;</b></a>""".stripMargin
 
   val exampleXmlString2 =
     """<?xml version="1.0" encoding="UTF-8"?>
