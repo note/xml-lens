@@ -5,7 +5,7 @@ import net.michalsitko.xml.entities.{LabeledElement, _}
 case class Example(stringRepr: String, document: XmlDocument)
 
 object Example {
-  private val defaultDecl = XmlDeclaration("1.0", Some("UTF-8"))
+  val defaultDecl = XmlDeclaration("1.0", Some("UTF-8"))
 
   def apply(stringRepr: String, root: LabeledElement): Example = {
     val prolog = Prolog(Some(defaultDecl), List.empty, None)

@@ -14,5 +14,5 @@ position: 2
 independent
 * `optics` - module containing all `Optics` and DSL implemented in terms of those Optics. It depends on Monocle and is 
 platform independent
-* `io` - module containing parser and printer implementations. It is platform dependent. As for now only JVM
-implementation exists.
+* `io` - module containing parser and printer implementations. It is platform dependent. As of now implementations
+for JVM and scala.js exist
