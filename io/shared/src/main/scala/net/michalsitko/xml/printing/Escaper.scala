@@ -1,7 +1,7 @@
 package net.michalsitko.xml.printing
 
 // https://stackoverflow.com/questions/1091945/what-characters-do-i-need-to-escape-in-xml-documents
-object Escaper {
+private [printing] object Escaper {
   // instead of simplistic `.replace("&", "&amp;")` which is incorrect as will do substitution even
   // for entity references we should consider using sth like following regex:
   // val raw = raw"\&(?![a-zA-Z:_][a-zA-Z0-9:_\-\.]*;)".r

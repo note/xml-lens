@@ -1,12 +1,11 @@
 package net.michalsitko.xml.parsing
 
 import net.michalsitko.xml.BasicSpec
+import net.michalsitko.xml.entities.{Text, XmlDocument}
 import net.michalsitko.xml.printing.PrinterConfig
 import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
-import net.michalsitko.xml.utils.XmlDocumentFactory
 
 trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
-  implicit val parserConfig = ParserConfig.Default
   implicit val printerConfig = PrinterConfig.Default
 
   "parse" should {
@@ -64,7 +63,7 @@ trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
     }
 
     "deal with very deep XML" in {
-      val input = print(XmlDocumentFactory.noProlog(elementOfDepth(4000)))
+      val input = print(XmlDocument.noProlog(elementOfDepth(4000)))
 
       parseEither(input).isRight should === (true)
     }
@@ -94,36 +93,20 @@ trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
             |<a></a>
           """.stripMargin
 
-        parse(xml) should === (XmlDocumentFactory.withProlog("1.0", Some(encoding), labeledElement("a")))
+        parse(xml) should === (XmlDocument.withProlog("1.0", Some(encoding), labeledElement("a")))
       }
 
       test("UTF-8")
       test("ISO-8859-1")
     }
-//
-//    // TODO: to remove
-//    "parse XML Declaration again" in {
-//      def test(encoding: String) = {
-//        val xml =
-//          s"""<?xml version='1.0' encoding="$encoding" ?>
-//             |<a></a>
-//          """.stripMargin
-//
-//        parse(xml) should === (XmlDocumentFactory.withProlog("1.0", Some(encoding), labeledElement("a")))
-//      }
-//
-//      test("UTF-8")
-//      test("ISO-8859-1")
-//    }
-//
-//
+
     "parse XML Declaration without encoding" in {
       val xml =
         """<?xml version="1.0"?>
           |<a></a>
         """.stripMargin
 
-      parse(xml) should === (XmlDocumentFactory.withProlog("1.0", None, labeledElement("a")))
+      parse(xml) should === (XmlDocument.withProlog("1.0", None, labeledElement("a")))
     }
 
     "fail to parse for XML Declaration with empty encoding" in {
@@ -140,7 +123,7 @@ trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
         """<a></a>
         """.stripMargin
 
-      parse(xml) should === (XmlDocumentFactory.noProlog(labeledElement("a")))
+      parse(xml) should === (XmlDocument.noProlog(labeledElement("a")))
     }
 
     "fail to parse XML with Declaration with no XML version specified" in {
@@ -160,6 +143,24 @@ trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
         parseEither(xml).isLeft should === (true)
       }
     }
+
+    "parse basic XML entities as text" in {
+      val xml = "<a>&amp;&gt;&lt;&quot;&apos;</a>"
+
+      parse(xml) should === (XmlDocument.noProlog(labeledElement("a",
+        Text("&"), Text(">"), Text("<"), Text("\""), Text("'")
+      )))
+    }
   }
+
+  val xmlWithEntityJsVsJvm =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<!DOCTYPE html
+      |    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      |    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+      |[
+      |    <!ENTITY test-entity "This <em>is</em> an entity.">
+      |    <!ENTITY simple "replacement">
+      |]><html><body><p>&simple; abc &test-entity; def&lt;</p></body></html>""".stripMargin
 
 }

@@ -3,7 +3,6 @@ package net.michalsitko.xml.printing
 import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities._
 import net.michalsitko.xml.test.utils._
-import net.michalsitko.xml.utils.XmlDocumentFactory
 
 trait XmlPrinterSpec extends BasicSpec with ExampleInputs with XmlGenerator with ExampleBuilderHelper {
   implicit val printerConfig = PrinterConfig.Default
@@ -33,7 +32,7 @@ trait XmlPrinterSpec extends BasicSpec with ExampleInputs with XmlGenerator with
 
     "deal with very deep XML" in {
       val deepXml = elementOfDepth(4000)
-      val doc = XmlDocumentFactory.noProlog(deepXml)
+      val doc = XmlDocument.noProlog(deepXml)
 
       print(doc)
     }
@@ -42,7 +41,7 @@ trait XmlPrinterSpec extends BasicSpec with ExampleInputs with XmlGenerator with
       val xml = labeledElement("b",
         LabeledElement(ResolvedName("undeclaredPrefix", "http://abc.com", "a"), Element(Seq.empty, Seq.empty, Seq.empty))
       )
-      val doc = XmlDocumentFactory.noProlog(xml)
+      val doc = XmlDocument.noProlog(xml)
 
       // the result is not a valid XML (it's not XmlPrinter responsibility to verify output correctness)
       print(doc) should ===("<b><undeclaredPrefix:a></undeclaredPrefix:a></b>")
@@ -50,7 +49,7 @@ trait XmlPrinterSpec extends BasicSpec with ExampleInputs with XmlGenerator with
 
     "escape special characters in XML" in {
       val xml = LabeledElement(ResolvedName("", "", "b"), Element(List(Attribute.unprefixed("attr", """a"b'c<d>e&f""")), List(Text("""a"b'c<d>e&f""")), Seq.empty))
-      val doc = XmlDocumentFactory.noProlog(xml)
+      val doc = XmlDocument.noProlog(xml)
 
       // as you see `"` and `'` are not escaped as they do not have to be escaped in text node
       print(doc) should ===("""<b attr="a&quot;b'c&lt;d&gt;e&amp;f">a"b'c&lt;d&gt;e&amp;f</b>""")
@@ -58,7 +57,7 @@ trait XmlPrinterSpec extends BasicSpec with ExampleInputs with XmlGenerator with
 
     "escape special characters in namespace declaration value" in {
       val xml = LabeledElement(ResolvedName("", "", "b"), Element(Seq.empty, List(Text("""hello""")), List(NamespaceDeclaration("some", "http://abc.com?a>3&b<7&a=\"name\"&b='cdf'"))))
-      val doc = XmlDocumentFactory.noProlog(xml)
+      val doc = XmlDocument.noProlog(xml)
 
       print(doc) should ===("""<b xmlns:some="http://abc.com?a&gt;3&amp;b&lt;7&amp;a=&quot;name&quot;&amp;b='cdf'">hello</b>""")
     }
@@ -66,7 +65,7 @@ trait XmlPrinterSpec extends BasicSpec with ExampleInputs with XmlGenerator with
     "not verify output correctness" in {
       val attrs = List(Attribute.unprefixed("attr", "value"), Attribute.unprefixed("attr", "value"), Attribute.unprefixed("attr", "value3"))
       val xml = LabeledElement(ResolvedName("", "", "b"), Element(attrs, List(Text("something")), Seq.empty))
-      val doc = XmlDocumentFactory.noProlog(xml)
+      val doc = XmlDocument.noProlog(xml)
 
       // the result is not a valid XML (it's not XmlPrinter responsibility to verify output correctness)
       print(doc) should ===("""<b attr="value" attr="value" attr="value3">something</b>""")

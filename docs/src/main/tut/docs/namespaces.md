@@ -56,14 +56,15 @@ val xml = XmlParser.parse(input).right.get
 
 For sake of this example, we define helper method `withCriteria`:
 
-```tut:silent
+```tut
 import monocle.Traversal
 import net.michalsitko.xml.entities.{Element, LabeledElement}
 import net.michalsitko.xml.optics.LabeledElementOptics._
 import net.michalsitko.xml.optics.ElementOptics._
+import net.michalsitko.xml.optics.XmlDocumentOptics._
 
-def withCriteria(criteria: Traversal[Element, Element]): Traversal[LabeledElement, String] = {
-  deep("c1").composeTraversal(criteria).composeOptional(hasTextOnly)
+def withCriteria(criteria: Traversal[Element, Element]) = {
+  rootLens.composeTraversal(deep("c1").composeTraversal(criteria).composeOptional(hasTextOnly))
 }
 ```
 

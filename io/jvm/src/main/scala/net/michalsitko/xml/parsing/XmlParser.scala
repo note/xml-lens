@@ -23,10 +23,17 @@ private [parsing] class LabeledElementBuilder(label: ResolvedName, attributes: S
   }
 }
 
+// TODO: document it
 private [parsing] object BlankingResolver extends XMLResolver {
   override def resolveEntity(publicID: String, systemID: String, baseURI: String, namespace: String): AnyRef = {
     new ByteArrayInputStream("".getBytes)
   }
+}
+
+case class ParserConfig(replaceEntityReferences: Boolean)
+
+object ParserConfig {
+  val Default = ParserConfig(replaceEntityReferences = false)
 }
 
 object XmlParser {
@@ -49,7 +56,7 @@ object XmlParser {
 
       // see more at https://docs.oracle.com/javase/7/docs/api/javax/xml/stream/XMLInputFactory.html
       // TODO: do we really need to set those properties? Understand them better and either remove or document it better here
-      xmlFactory.setProperty("javax.xml.stream.isReplacingEntityReferences", false)
+      xmlFactory.setProperty("javax.xml.stream.isReplacingEntityReferences", config.replaceEntityReferences)
       xmlFactory.setProperty("javax.xml.stream.isValidating", false)
       xmlFactory.setXMLResolver(BlankingResolver)
 
