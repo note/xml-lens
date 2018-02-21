@@ -130,6 +130,40 @@ read API docs of it.
 
 #### How to print back output which is possibly the most similar to input
 
+There may be situations in which you want to introduce as few formatting changes as possible. In fact default
+configurations for both parser and printer are well suited for that purpose so the following code will do that:
+
+```tut:book
+import net.michalsitko.xml.parsing.XmlParser
+import net.michalsitko.xml.printing.XmlPrinter
+
+// xml formatting is strange here, let's assume we want to keep it
+val input = """|<a someAttr="someVal">
+               |       <b>someText  </b>
+               |<c>otherText</c></a>""".stripMargin
+               
+XmlParser.parse(input).map { doc =>
+  XmlPrinter.print(doc)
+}
+```
+
+#### How to pretty print
+
+```tut:book
+import net.michalsitko.xml.parsing.XmlParser
+import net.michalsitko.xml.printing.{Indent, PrinterConfig, XmlPrinter}
+
+// xml formatting is strange here, let's assume we want to keep it
+val input = """|<a someAttr="someVal">
+               |       <b>someText  </b>
+               |<c>otherText</c></a>""".stripMargin
+               
+XmlParser.parse(input).map { doc =>
+  implicit val printCfg = PrinterConfig.Default.copy(indent = Indent.IndentWith("  "))
+  XmlPrinter.print(doc)
+}
+```
+
 #### How to print minimized XML
 
 `xml-lens` takes a little bit unusual approach to minimization and considers it not a property of printing but a 
@@ -143,8 +177,9 @@ import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.printing.XmlPrinter
 import net.michalsitko.xml.syntax.document._
 
+// xml formatting is strange here, let's assume we don't care about it and want to have some minimized output
 val input = """|<a someAttr="someVal">
-               |       <b>someText</b>
+               |       <b>someText  </b>
                |<c>otherText</c></a>""".stripMargin
                
 XmlParser.parse(input).map { doc =>
