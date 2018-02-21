@@ -4,7 +4,6 @@ import net.michalsitko.xml.BasicSpec
 import net.michalsitko.xml.entities.{Text, XmlDocument}
 import net.michalsitko.xml.printing.PrinterConfig
 import net.michalsitko.xml.test.utils.{Example, ExampleInputs, XmlGenerator}
-import net.michalsitko.xml.utils.XmlDocumentFactory
 
 trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
   implicit val printerConfig = PrinterConfig.Default
@@ -64,7 +63,7 @@ trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
     }
 
     "deal with very deep XML" in {
-      val input = print(XmlDocumentFactory.noProlog(elementOfDepth(4000)))
+      val input = print(XmlDocument.noProlog(elementOfDepth(4000)))
 
       parseEither(input).isRight should === (true)
     }
@@ -94,7 +93,7 @@ trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
             |<a></a>
           """.stripMargin
 
-        parse(xml) should === (XmlDocumentFactory.withProlog("1.0", Some(encoding), labeledElement("a")))
+        parse(xml) should === (XmlDocument.withProlog("1.0", Some(encoding), labeledElement("a")))
       }
 
       test("UTF-8")
@@ -107,7 +106,7 @@ trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
           |<a></a>
         """.stripMargin
 
-      parse(xml) should === (XmlDocumentFactory.withProlog("1.0", None, labeledElement("a")))
+      parse(xml) should === (XmlDocument.withProlog("1.0", None, labeledElement("a")))
     }
 
     "fail to parse for XML Declaration with empty encoding" in {
@@ -124,7 +123,7 @@ trait XmlParserSpec extends BasicSpec with ExampleInputs with XmlGenerator {
         """<a></a>
         """.stripMargin
 
-      parse(xml) should === (XmlDocumentFactory.noProlog(labeledElement("a")))
+      parse(xml) should === (XmlDocument.noProlog(labeledElement("a")))
     }
 
     "fail to parse XML with Declaration with no XML version specified" in {

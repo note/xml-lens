@@ -96,4 +96,7 @@ final case class XmlDocument(prolog: Prolog, root: LabeledElement)
 object XmlDocument {
   def noProlog(root: LabeledElement) =
     XmlDocument(Prolog(None, Seq.empty, None), root)
+
+  def withProlog(version: String, encoding: Option[String], root: LabeledElement) =
+    XmlDocument(Prolog(Some(XmlDeclaration(version, encoding)), List.empty, None), root)
 }
