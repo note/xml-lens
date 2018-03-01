@@ -5,7 +5,7 @@ import sbtcrossproject.{CrossType, crossProject}
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 
 object Dependencies {
-  lazy val monocleVersion  = "1.4.0"
+  lazy val monocleVersion  = "1.5.0"
   lazy val scalaXmlVersion = "1.0.6"
 
   lazy val monocleCore = Def.setting("com.github.julien-truffaut"  %%% "monocle-core"   % monocleVersion)

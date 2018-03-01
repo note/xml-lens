@@ -1,7 +1,7 @@
 ---
 layout: docs
 title:  "Cookbook"
-position: 1
+position: 3
 ---
 
 ## Cookbook
@@ -14,6 +14,41 @@ All examples presented here should compile fine with following imports:
 import pl.msitko.xml.parsing.XmlParser
 import pl.msitko.xml.printing.XmlPrinter
 import pl.msitko.xml.syntax.OpticsBuilder._
+```
+
+### How to perform a few transformations on the same XML document
+
+In most of examples in that documentation only one transformation to XML document was done. But since transformations
+are plain function `XmlDocument => XmlDocument` you can compose them with `andThen` combinator. Example:
+
+```tut:silent
+val input =
+  s"""<a>
+     |  <c1>
+     |    <f >item1</f>
+     |    <f>item2</f>
+     |  </c1>
+     |</a>""".stripMargin
+     
+val parsed = XmlParser.parse(input).right.get
+
+val modifyAttr = (root \ "c1" \ "f").attr("someKey").set("newValue")
+val modifyText = (root \ "c1" \ "f").hasTextOnly.modify(_.toUpperCase)
+```
+
+`modifyAttr` is setting attribute value while `modifyText` switch text of `f` element to uppercase. We can compose
+those two transformation with `andThen` and apply composed transformation to XML document:
+
+```tut:silent
+val modify = modifyAttr andThen modifyText
+
+val modifiedDoc = modify(parsed)
+```
+
+The result:
+
+```tut:book
+XmlPrinter.print(modifiedDoc)
 ```
 
 ### How to access n-th item of current focus

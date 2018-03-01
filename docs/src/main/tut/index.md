@@ -10,16 +10,16 @@ section: "home"
 ## About
 
 XML Scala libraries are kind of neglected. That stands in stark contrast to JSON for which Scala has dozens of projects.
-Of course, JSON is much more popular while XML is regarded as a legacy standard. Still, there are many situations when 
+Of course, JSON is much more popular while XML is regarded a legacy standard. Still, there are many situations in which 
 you need to work with XML. `xml-optics` is an attempt to make this experience as painless as possible.
   
-Main focus of `xml-optics` is on traversing and transforming XML trees - something `scala-xml` is not 
+Main focus of `xml-optics` is traversing and transforming XML trees - something `scala-xml` is not 
 really good at. To make those operations easy to express the concept of `Optics` has been used. 
-[Monocle](http://julien-truffaut.github.io/Monocle/) has been used as an `Optics` implementation. 
+[Monocle](http://julien-truffaut.github.io/Monocle/) has been used as an implementation of `Optics`. 
 
 ## <a name="quick_start"></a>Quick start
 
-`xml-lens` is available for both Scala 2.11 and 2.12.
+`xml-lens` is available for both Scala 2.11 and 2.12. It's cross published for both JVM and Scala.js.
 
 TODO: add lines needed in `build.sbt` as soon as library is published.
 
@@ -57,8 +57,8 @@ Next, we narrow down our selection specifically to `f` nodes having only a text 
 After we specified what we want to modify, we can define what it should be modified to. We do this by using `modify`,
 which takes a function from `String` to `String`.
 
-Now, when we have `modify` function declared we can use it on parsed XML. Here the full code which parse input,
-modify it:
+Now, when we have `modify` function declared we can use it on parsed XML. The code which parses input and
+run `modify` tranformation on it looks like this:
 
 ```tut:silent
 import pl.msitko.xml.parsing.XmlParser

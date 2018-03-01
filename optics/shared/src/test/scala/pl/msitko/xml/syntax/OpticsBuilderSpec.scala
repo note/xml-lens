@@ -39,6 +39,18 @@ trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       print(res) should === (expectedRes3)
     }
 
+    "made two modifications with functional `andThen` composition" in {
+      val parsed = parse(input3)
+
+      val modifyAttr = (root \ "c1" \ "f").attr("someKey").set("newValue")
+      val modifyText = (root \ "c1" \ "f").hasTextOnly.modify(_.toUpperCase)
+      val modify = modifyAttr andThen modifyText
+
+      val res = modify(parsed)
+
+      print(res) should === (expectedRes3Alternative)
+    }
+
     "add attribute" in {
       val parsed = parseExample(noNamespaceXmlStringWithWsExample)
 
@@ -279,6 +291,19 @@ trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       |   </c1>
       |   <c1>
       |      <f someKey="newValue" anotherKey="someValue">item1</f>
+      |      <h>item2</h>
+      |   </c1>
+      |</a>""".stripMargin
+
+  val expectedRes3Alternative =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |   <c1>
+      |      <f someKey="newValue">ITEM1</f>
+      |      <g>item2</g>
+      |   </c1>
+      |   <c1>
+      |      <f someKey="newValue" anotherKey="someValue">ITEM1</f>
       |      <h>item2</h>
       |   </c1>
       |</a>""".stripMargin
