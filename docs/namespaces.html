@@ -14,24 +14,24 @@ you want to make your code namespace sensitive you need to replace those Strings
 <p>Due to the fact the the same prefixes may refer to different namespaces, <code class="highlighter-rouge">xml-lens</code> does not to rely on them. Instead, 
 it relies on namespace’s URL. Thus, to create a namespace it suffices to:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.Namespace</span>
-<span class="c1">// import net.michalsitko.xml.optics.Namespace
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.optics.Namespace</span>
+<span class="c1">// import pl.msitko.xml.optics.Namespace
 </span>
 <span class="k">val</span> <span class="n">a</span> <span class="k">=</span> <span class="nc">Namespace</span><span class="o">(</span><span class="s">"http://a.com"</span><span class="o">)</span>
-<span class="c1">// a: net.michalsitko.xml.optics.Namespace = Namespace(http://a.com)
+<span class="c1">// a: pl.msitko.xml.optics.Namespace = Namespace(http://a.com)
 </span></code></pre></div></div>
 
 <p>And now to create fully qualified name within namespace created above you need to:</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"elementLabel"</span><span class="o">)</span>
-<span class="c1">// res0: net.michalsitko.xml.optics.ResolvedNameMatcher = ResolvedNameMatcher(http://a.com,elementLabel)
+<span class="c1">// res0: pl.msitko.xml.optics.ResolvedNameMatcher = ResolvedNameMatcher(http://a.com,elementLabel)
 </span></code></pre></div></div>
 
 <h3 id="simple-example">Simple example</h3>
 
 <p>To see working with namespace in action, let’s consider following XML:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.parsing.XmlParser</span>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
 
 <span class="k">val</span> <span class="n">input</span> <span class="k">=</span>
     <span class="s">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;
@@ -53,22 +53,22 @@ it relies on namespace’s URL. Thus, to create a namespace it suffices to:</p>
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">monocle.Traversal</span>
 <span class="k">import</span> <span class="nn">monocle.Traversal</span>
 
-<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">net.michalsitko.xml.entities.</span><span class="o">{</span><span class="nc">Element</span><span class="o">,</span> <span class="nc">LabeledElement</span><span class="o">}</span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.entities.</span><span class="o">{</span><span class="nc">Element</span><span class="o">,</span> <span class="nc">LabeledElement</span><span class="o">}</span>
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">pl.msitko.xml.entities.</span><span class="o">{</span><span class="nc">Element</span><span class="o">,</span> <span class="nc">LabeledElement</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.entities.</span><span class="o">{</span><span class="nc">Element</span><span class="o">,</span> <span class="nc">LabeledElement</span><span class="o">}</span>
 
-<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.LabeledElementOptics._</span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.LabeledElementOptics._</span>
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">pl.msitko.xml.optics.LabeledElementOptics._</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.optics.LabeledElementOptics._</span>
 
-<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.ElementOptics._</span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.ElementOptics._</span>
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">pl.msitko.xml.optics.ElementOptics._</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.optics.ElementOptics._</span>
 
-<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.XmlDocumentOptics._</span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.XmlDocumentOptics._</span>
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">pl.msitko.xml.optics.XmlDocumentOptics._</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.optics.XmlDocumentOptics._</span>
 
 <span class="n">scala</span><span class="o">&gt;</span> <span class="k">def</span> <span class="n">withCriteria</span><span class="o">(</span><span class="n">criteria</span><span class="k">:</span> <span class="kt">Traversal</span><span class="o">[</span><span class="kt">Element</span>, <span class="kt">Element</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
      <span class="o">|</span>   <span class="n">rootLens</span><span class="o">.</span><span class="n">composeTraversal</span><span class="o">(</span><span class="n">deep</span><span class="o">(</span><span class="s">"c1"</span><span class="o">).</span><span class="n">composeTraversal</span><span class="o">(</span><span class="n">criteria</span><span class="o">).</span><span class="n">composeOptional</span><span class="o">(</span><span class="n">hasTextOnly</span><span class="o">))</span>
      <span class="o">|</span> <span class="o">}</span>
-<span class="n">withCriteria</span><span class="k">:</span> <span class="o">(</span><span class="kt">criteria:</span> <span class="kt">monocle.Traversal</span><span class="o">[</span><span class="kt">net.michalsitko.xml.entities.Element</span>,<span class="kt">net.michalsitko.xml.entities.Element</span><span class="o">])</span><span class="n">monocle</span><span class="o">.</span><span class="nc">PTraversal</span><span class="o">[</span><span class="kt">net.michalsitko.xml.entities.XmlDocument</span>,<span class="kt">net.michalsitko.xml.entities.XmlDocument</span>,<span class="kt">String</span>,<span class="kt">String</span><span class="o">]</span>
+<span class="n">withCriteria</span><span class="k">:</span> <span class="o">(</span><span class="kt">criteria:</span> <span class="kt">monocle.Traversal</span><span class="o">[</span><span class="kt">pl.msitko.xml.entities.Element</span>,<span class="kt">pl.msitko.xml.entities.Element</span><span class="o">])</span><span class="n">monocle</span><span class="o">.</span><span class="nc">PTraversal</span><span class="o">[</span><span class="kt">pl.msitko.xml.entities.XmlDocument</span>,<span class="kt">pl.msitko.xml.entities.XmlDocument</span>,<span class="kt">String</span>,<span class="kt">String</span><span class="o">]</span>
 </code></pre></div></div>
 
 <p>It returns <code class="highlighter-rouge">Traversal</code> which looks for elements defined by argument <code class="highlighter-rouge">criteria</code>. We will call this method a few times 
@@ -77,7 +77,7 @@ with different <code class="highlighter-rouge">criteria</code>.</p>
 <p>First, let’s analyze the output when we use plain String as element label; consequently ignoring namespaces:</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="n">ignoreNs</span> <span class="k">=</span> <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="s">"f"</span><span class="o">))</span>
-<span class="c1">// ignoreNs: monocle.PTraversal[net.michalsitko.xml.entities.XmlDocument,net.michalsitko.xml.entities.XmlDocument,String,String] = monocle.PTraversal$$anon$2@21070956
+<span class="c1">// ignoreNs: monocle.PTraversal[pl.msitko.xml.entities.XmlDocument,pl.msitko.xml.entities.XmlDocument,String,String] = monocle.PTraversal$$anon$2@58cc6082
 </span>
 <span class="n">ignoreNs</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
 <span class="c1">// res2: List[String] = List(a.com, b.com, c.com, d.com)
@@ -91,7 +91,7 @@ with different <code class="highlighter-rouge">criteria</code>.</p>
   <span class="k">val</span> <span class="n">ns</span> <span class="k">=</span> <span class="nc">Namespace</span><span class="o">(</span><span class="s">"http://a.com"</span><span class="o">)</span>
   <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"f"</span><span class="o">)))</span>
 <span class="o">}</span>
-<span class="c1">// withNsA: monocle.PTraversal[net.michalsitko.xml.entities.XmlDocument,net.michalsitko.xml.entities.XmlDocument,String,String] = monocle.PTraversal$$anon$2@4420bec4
+<span class="c1">// withNsA: monocle.PTraversal[pl.msitko.xml.entities.XmlDocument,pl.msitko.xml.entities.XmlDocument,String,String] = monocle.PTraversal$$anon$2@3f7b01d3
 </span>
 <span class="n">withNsA</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
 <span class="c1">// res3: List[String] = List(a.com)
@@ -128,7 +128,7 @@ text <code class="highlighter-rouge">no namespace</code>) you need to call <code
   <span class="k">val</span> <span class="n">ns</span> <span class="k">=</span> <span class="nc">Namespace</span><span class="o">.</span><span class="n">empty</span>
   <span class="n">withCriteria</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="o">(</span><span class="s">"f"</span><span class="o">)))</span>
 <span class="o">}</span>
-<span class="c1">// defaultNs: monocle.PTraversal[net.michalsitko.xml.entities.XmlDocument,net.michalsitko.xml.entities.XmlDocument,String,String] = monocle.PTraversal$$anon$2@22da972f
+<span class="c1">// defaultNs: monocle.PTraversal[pl.msitko.xml.entities.XmlDocument,pl.msitko.xml.entities.XmlDocument,String,String] = monocle.PTraversal$$anon$2@4f1151fe
 </span>
 <span class="n">defaultNs</span><span class="o">.</span><span class="n">getAll</span><span class="o">(</span><span class="n">xml</span><span class="o">)</span>
 <span class="c1">// res4: List[String] = List(no namespace)
@@ -148,8 +148,8 @@ that ones that, except of accessing attributes, create new attributes. That’s 
 <p>Let’s move to the example that will explain aforementioned considerations. Following code defines operation of replacing
 given attribute value or adding attribute if it’s not present:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.syntax.OpticsBuilder._</span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.optics.PrefixedNamespace</span>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.syntax.OpticsBuilder._</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.optics.PrefixedNamespace</span>
 
 <span class="k">val</span> <span class="n">traversal</span> <span class="k">=</span> <span class="o">(</span><span class="n">root</span> <span class="o">\</span> <span class="s">"c1"</span> <span class="o">\</span> <span class="s">"f"</span><span class="o">)</span>
 
@@ -174,8 +174,8 @@ given attribute value or adding attribute if it’s not present:</p>
 
 <p>Take a look at printed XML:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.printing.XmlPrinter</span>
-<span class="c1">// import net.michalsitko.xml.printing.XmlPrinter
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="c1">// import pl.msitko.xml.printing.XmlPrinter
 </span>
 <span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">replaceOrAddAttr</span><span class="o">(</span><span class="n">xml</span><span class="o">))</span>
 <span class="c1">// res7: String =

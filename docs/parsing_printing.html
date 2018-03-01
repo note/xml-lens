@@ -5,25 +5,25 @@
 <p>For JVM platform <code class="highlighter-rouge">xml-lens-io</code> uses <code class="highlighter-rouge">javax.xml.stream.XMLStreamReader</code>. To include it in your build add the following to 
 your <code class="highlighter-rouge">build.sbt</code>:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "net.michalsitko" %% "xml-lens-io" % xmlLensVersion
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "pl.msitko" %% "xml-lens-io" % xmlLensVersion
 </code></pre></div></div>
 
 <p>For JS platform slightly modified version of <a href="https://github.com/isaacs/sax-js">sax-js</a> is used underneath. To include it
 in your build add the following to your <code class="highlighter-rouge">build.sbt</code>:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "net.michalsitko" %%% "xml-lens-io" % xmlLensVersion
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "pl.msitko" %%% "xml-lens-io" % xmlLensVersion
 </code></pre></div></div>
 
 <p>After you included <code class="highlighter-rouge">io</code> module to your project parsing XML boils down to:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.parsing.XmlParser</span>
-<span class="c1">// import net.michalsitko.xml.parsing.XmlParser
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
+<span class="c1">// import pl.msitko.xml.parsing.XmlParser
 </span>
 <span class="k">val</span> <span class="n">input</span> <span class="k">=</span> <span class="s">"&lt;a&gt;&lt;b&gt;this is xml&lt;/b&gt;&lt;/a&gt;"</span>
 <span class="c1">// input: String = &lt;a&gt;&lt;b&gt;this is xml&lt;/b&gt;&lt;/a&gt;
 </span>
 <span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input</span><span class="o">)</span>
-<span class="c1">// res0: Either[net.michalsitko.xml.parsing.ParsingException,net.michalsitko.xml.entities.XmlDocument] = Right(XmlDocument(Prolog(None,Vector(),None),LabeledElement(ResolvedName(,,a),Element(Vector(),List(LabeledElement(ResolvedName(,,b),Element(Vector(),List(Text(this is xml)),Vector()))),Vector()))))
+<span class="c1">// res0: Either[pl.msitko.xml.parsing.ParsingException,pl.msitko.xml.entities.XmlDocument] = Right(XmlDocument(Prolog(None,Vector(),None),LabeledElement(ResolvedName(,,a),Element(Vector(),List(LabeledElement(ResolvedName(,,b),Element(Vector(),List(Text(this is xml)),Vector()))),Vector()))))
 </span></code></pre></div></div>
 
 <h3 id="differences-between-jvm-and-js">Differences between JVM and JS</h3>
@@ -71,7 +71,7 @@ Here we focus on <code class="highlighter-rouge">replaceEntityReferences = true<
       |    &lt;!ENTITY test-entity "This &lt;em&gt;is&lt;/em&gt; an entity."&gt;
       |]&gt;&lt;html&gt;&lt;body&gt;&lt;p&gt;abc &amp;test-entity; def&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
       
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.parsing.ParserConfig</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.ParserConfig</span>
 
 <span class="k">implicit</span> <span class="k">val</span> <span class="n">cfg</span> <span class="k">=</span> <span class="nc">ParserConfig</span><span class="o">.</span><span class="nc">Default</span><span class="o">.</span><span class="n">copy</span><span class="o">(</span><span class="n">replaceEntityReferences</span> <span class="k">=</span> <span class="kc">true</span><span class="o">)</span>
 
@@ -88,12 +88,12 @@ Here we focus on <code class="highlighter-rouge">replaceEntityReferences = true<
 
 <p>To add it to your build add following to your <code class="highlighter-rouge">build.sbt</code>:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "net.michalsitko" %% "xml-lens-io" % xmlLensVersion
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "pl.msitko" %% "xml-lens-io" % xmlLensVersion
 </code></pre></div></div>
 
 <p>Or (in case of scala.js build):</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "net.michalsitko" %%% "xml-lens-io" % xmlLensVersion
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "pl.msitko" %%% "xml-lens-io" % xmlLensVersion
 </code></pre></div></div>
 
 <p>The same printing code written in Scala is used for both JVM and JS. Thus, no differences between platforms is expected
@@ -101,14 +101,14 @@ in terms of printing.</p>
 
 <p>To print XML:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.entities.</span><span class="o">{</span><span class="nc">LabeledElement</span><span class="o">,</span> <span class="nc">XmlDocument</span><span class="o">}</span>
-<span class="c1">// import net.michalsitko.xml.entities.{LabeledElement, XmlDocument}
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.entities.</span><span class="o">{</span><span class="nc">LabeledElement</span><span class="o">,</span> <span class="nc">XmlDocument</span><span class="o">}</span>
+<span class="c1">// import pl.msitko.xml.entities.{LabeledElement, XmlDocument}
 </span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.printing.XmlPrinter</span>
-<span class="c1">// import net.michalsitko.xml.printing.XmlPrinter
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="c1">// import pl.msitko.xml.printing.XmlPrinter
 </span>
 <span class="k">val</span> <span class="n">document</span> <span class="k">=</span> <span class="nc">XmlDocument</span><span class="o">.</span><span class="n">noProlog</span><span class="o">(</span><span class="nc">LabeledElement</span><span class="o">.</span><span class="n">unprefixed</span><span class="o">(</span><span class="s">"root"</span><span class="o">))</span>
-<span class="c1">// document: net.michalsitko.xml.entities.XmlDocument = XmlDocument(Prolog(None,List(),None),LabeledElement(ResolvedName(,,root),Element(List(),List(),List())))
+<span class="c1">// document: pl.msitko.xml.entities.XmlDocument = XmlDocument(Prolog(None,List(),None),LabeledElement(ResolvedName(,,root),Element(List(),List(),List())))
 </span>
 <span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">document</span><span class="o">)</span>
 <span class="c1">// res5: String = &lt;root&gt;&lt;/root&gt;
@@ -127,11 +127,11 @@ read API docs of it.</p>
 <p>There may be situations in which you want to introduce as few formatting changes as possible. In fact default
 configurations for both parser and printer are well suited for that purpose so the following code will do that:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.parsing.XmlParser</span>
-<span class="c1">// import net.michalsitko.xml.parsing.XmlParser
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
+<span class="c1">// import pl.msitko.xml.parsing.XmlParser
 </span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.printing.XmlPrinter</span>
-<span class="c1">// import net.michalsitko.xml.printing.XmlPrinter
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="c1">// import pl.msitko.xml.printing.XmlPrinter
 </span>
 <span class="c1">// xml formatting is strange here, let's assume we want to keep it
 </span><span class="k">val</span> <span class="n">input</span> <span class="k">=</span> <span class="s">"""|&lt;a someAttr="someVal"&gt;
@@ -145,7 +145,7 @@ configurations for both parser and printer are well suited for that purpose so t
 <span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input</span><span class="o">).</span><span class="n">map</span> <span class="o">{</span> <span class="n">doc</span> <span class="k">=&gt;</span>
   <span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">doc</span><span class="o">)</span>
 <span class="o">}</span>
-<span class="c1">// res7: scala.util.Either[net.michalsitko.xml.parsing.ParsingException,String] =
+<span class="c1">// res7: scala.util.Either[pl.msitko.xml.parsing.ParsingException,String] =
 // Right(&lt;a someAttr="someVal"&gt;
 //        &lt;b&gt;someText  &lt;/b&gt;
 // &lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;)
@@ -153,11 +153,11 @@ configurations for both parser and printer are well suited for that purpose so t
 
 <h4 id="how-to-pretty-print">How to pretty print</h4>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.parsing.XmlParser</span>
-<span class="c1">// import net.michalsitko.xml.parsing.XmlParser
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
+<span class="c1">// import pl.msitko.xml.parsing.XmlParser
 </span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.printing.</span><span class="o">{</span><span class="nc">Indent</span><span class="o">,</span> <span class="nc">PrinterConfig</span><span class="o">,</span> <span class="nc">XmlPrinter</span><span class="o">}</span>
-<span class="c1">// import net.michalsitko.xml.printing.{Indent, PrinterConfig, XmlPrinter}
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.</span><span class="o">{</span><span class="nc">Indent</span><span class="o">,</span> <span class="nc">PrinterConfig</span><span class="o">,</span> <span class="nc">XmlPrinter</span><span class="o">}</span>
+<span class="c1">// import pl.msitko.xml.printing.{Indent, PrinterConfig, XmlPrinter}
 </span>
 <span class="c1">// xml formatting is strange here, let's assume we want to keep it
 </span><span class="k">val</span> <span class="n">input</span> <span class="k">=</span> <span class="s">"""|&lt;a someAttr="someVal"&gt;
@@ -172,7 +172,7 @@ configurations for both parser and printer are well suited for that purpose so t
   <span class="k">implicit</span> <span class="k">val</span> <span class="n">printCfg</span> <span class="k">=</span> <span class="nc">PrinterConfig</span><span class="o">.</span><span class="nc">Default</span><span class="o">.</span><span class="n">copy</span><span class="o">(</span><span class="n">indent</span> <span class="k">=</span> <span class="nc">Indent</span><span class="o">.</span><span class="nc">IndentWith</span><span class="o">(</span><span class="s">"  "</span><span class="o">))</span>
   <span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">doc</span><span class="o">)</span>
 <span class="o">}</span>
-<span class="c1">// res9: scala.util.Either[net.michalsitko.xml.parsing.ParsingException,String] =
+<span class="c1">// res9: scala.util.Either[pl.msitko.xml.parsing.ParsingException,String] =
 // Right(&lt;a someAttr="someVal"&gt;
 //   &lt;b&gt;someText  &lt;/b&gt;
 //   &lt;c&gt;otherText&lt;/c&gt;
@@ -187,14 +187,14 @@ sensitive and thus treating whitespaces as printing details does not seem approp
 
 <p>In short to parse XML, minimize it and print it back you need to:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.printing.XmlPrinter</span>
-<span class="c1">// import net.michalsitko.xml.printing.XmlPrinter
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="c1">// import pl.msitko.xml.printing.XmlPrinter
 </span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.printing.XmlPrinter</span>
-<span class="c1">// import net.michalsitko.xml.printing.XmlPrinter
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="c1">// import pl.msitko.xml.printing.XmlPrinter
 </span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.syntax.document._</span>
-<span class="c1">// import net.michalsitko.xml.syntax.document._
+<span class="k">import</span> <span class="nn">pl.msitko.xml.syntax.document._</span>
+<span class="c1">// import pl.msitko.xml.syntax.document._
 </span>
 <span class="c1">// xml formatting is strange here, let's assume we don't care about it and want to have some minimized output
 </span><span class="k">val</span> <span class="n">input</span> <span class="k">=</span> <span class="s">"""|&lt;a someAttr="someVal"&gt;
@@ -209,7 +209,7 @@ sensitive and thus treating whitespaces as printing details does not seem approp
   <span class="k">val</span> <span class="n">minimized</span> <span class="k">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">minimize</span>
   <span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">minimized</span><span class="o">)</span>
 <span class="o">}</span>
-<span class="c1">// res11: scala.util.Either[net.michalsitko.xml.parsing.ParsingException,String] = Right(&lt;a someAttr="someVal"&gt;&lt;b&gt;someText  &lt;/b&gt;&lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;)
+<span class="c1">// res11: scala.util.Either[pl.msitko.xml.parsing.ParsingException,String] = Right(&lt;a someAttr="someVal"&gt;&lt;b&gt;someText  &lt;/b&gt;&lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;)
 </span></code></pre></div></div>
 </section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/xml-lens/highlight/highlight.pack.js"></script><script>hljs.configure({
 languages:['scala','java','bash']

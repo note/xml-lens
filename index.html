@@ -31,11 +31,11 @@ upper case:</p>
 
 <p>We can define transformation in the following way:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.syntax.OpticsBuilder.root</span>
-<span class="c1">// import net.michalsitko.xml.syntax.OpticsBuilder.root
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.syntax.OpticsBuilder.root</span>
+<span class="c1">// import pl.msitko.xml.syntax.OpticsBuilder.root
 </span>
 <span class="k">val</span> <span class="n">modify</span> <span class="k">=</span> <span class="o">(</span><span class="n">root</span> <span class="o">\</span> <span class="s">"f"</span><span class="o">).</span><span class="n">hasTextOnly</span><span class="o">.</span><span class="n">modify</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">toUpperCase</span><span class="o">)</span>
-<span class="c1">// modify: net.michalsitko.xml.entities.XmlDocument =&gt; net.michalsitko.xml.entities.XmlDocument = monocle.PTraversal$$Lambda$4763/178832882@cf20738
+<span class="c1">// modify: pl.msitko.xml.entities.XmlDocument =&gt; pl.msitko.xml.entities.XmlDocument = monocle.PTraversal$$Lambda$11146/1075313691@64912c8e
 </span></code></pre></div></div>
 
 <p><code class="highlighter-rouge">root</code> stands for root element of XML document. Every XML document should contain exactly one root element. In case
@@ -54,8 +54,8 @@ which takes a function from <code class="highlighter-rouge">String</code> to <co
 <p>Now, when we have <code class="highlighter-rouge">modify</code> function declared we can use it on parsed XML. Here the full code which parse input,
 modify it:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">net.michalsitko.xml.parsing.XmlParser</span>
-<span class="k">import</span> <span class="nn">net.michalsitko.xml.printing.XmlPrinter</span>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
 
 <span class="k">val</span> <span class="n">parsed</span> <span class="k">=</span> <span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input</span><span class="o">).</span><span class="n">right</span><span class="o">.</span><span class="n">get</span>
 
