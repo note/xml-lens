@@ -11,9 +11,9 @@ This chapter provides examples of common operations you may find useful when tra
 All examples presented here should compile fine with following imports:
 
 ```tut:silent
-import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.XmlPrinter
-import net.michalsitko.xml.syntax.OpticsBuilder._
+import pl.msitko.xml.parsing.XmlParser
+import pl.msitko.xml.printing.XmlPrinter
+import pl.msitko.xml.syntax.OpticsBuilder._
 ```
 
 ### How to access n-th item of current focus

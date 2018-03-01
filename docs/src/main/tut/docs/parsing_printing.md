@@ -12,20 +12,20 @@ For JVM platform `xml-lens-io` uses `javax.xml.stream.XMLStreamReader`. To inclu
 your `build.sbt`:
 
 ```
-libraryDependencies += "net.michalsitko" %% "xml-lens-io" % xmlLensVersion
+libraryDependencies += "pl.msitko" %% "xml-lens-io" % xmlLensVersion
 ```
 
 For JS platform slightly modified version of [sax-js](https://github.com/isaacs/sax-js) is used underneath. To include it
 in your build add the following to your `build.sbt`:
 
 ```
-libraryDependencies += "net.michalsitko" %%% "xml-lens-io" % xmlLensVersion
+libraryDependencies += "pl.msitko" %%% "xml-lens-io" % xmlLensVersion
 ```
 
 After you included `io` module to your project parsing XML boils down to:
 
 ```tut:book
-import net.michalsitko.xml.parsing.XmlParser
+import pl.msitko.xml.parsing.XmlParser
 
 val input = "<a><b>this is xml</b></a>"
 
@@ -79,7 +79,7 @@ val input =
       |    <!ENTITY test-entity "This <em>is</em> an entity.">
       |]><html><body><p>abc &test-entity; def</p></body></html>""".stripMargin
       
-import net.michalsitko.xml.parsing.ParserConfig
+import pl.msitko.xml.parsing.ParserConfig
 
 implicit val cfg = ParserConfig.Default.copy(replaceEntityReferences = true)
 
@@ -97,13 +97,13 @@ You need to have `xml-lens-io` included.
 To add it to your build add following to your `build.sbt`:
 
 ```
-libraryDependencies += "net.michalsitko" %% "xml-lens-io" % xmlLensVersion
+libraryDependencies += "pl.msitko" %% "xml-lens-io" % xmlLensVersion
 ```
 
 Or (in case of scala.js build):
 
 ```
-libraryDependencies += "net.michalsitko" %%% "xml-lens-io" % xmlLensVersion
+libraryDependencies += "pl.msitko" %%% "xml-lens-io" % xmlLensVersion
 ``` 
 
 The same printing code written in Scala is used for both JVM and JS. Thus, no differences between platforms is expected
@@ -112,8 +112,8 @@ in terms of printing.
 To print XML:
 
 ```tut:book
-import net.michalsitko.xml.entities.{LabeledElement, XmlDocument}
-import net.michalsitko.xml.printing.XmlPrinter
+import pl.msitko.xml.entities.{LabeledElement, XmlDocument}
+import pl.msitko.xml.printing.XmlPrinter
 
 val document = XmlDocument.noProlog(LabeledElement.unprefixed("root"))
 
@@ -134,8 +134,8 @@ There may be situations in which you want to introduce as few formatting changes
 configurations for both parser and printer are well suited for that purpose so the following code will do that:
 
 ```tut:book
-import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.XmlPrinter
+import pl.msitko.xml.parsing.XmlParser
+import pl.msitko.xml.printing.XmlPrinter
 
 // xml formatting is strange here, let's assume we want to keep it
 val input = """|<a someAttr="someVal">
@@ -150,8 +150,8 @@ XmlParser.parse(input).map { doc =>
 #### How to pretty print
 
 ```tut:book
-import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.{Indent, PrinterConfig, XmlPrinter}
+import pl.msitko.xml.parsing.XmlParser
+import pl.msitko.xml.printing.{Indent, PrinterConfig, XmlPrinter}
 
 // xml formatting is strange here, let's assume we want to keep it
 val input = """|<a someAttr="someVal">
@@ -173,9 +173,9 @@ sensitive and thus treating whitespaces as printing details does not seem approp
 In short to parse XML, minimize it and print it back you need to:
 
 ```tut:book
-import net.michalsitko.xml.printing.XmlPrinter
-import net.michalsitko.xml.printing.XmlPrinter
-import net.michalsitko.xml.syntax.document._
+import pl.msitko.xml.printing.XmlPrinter
+import pl.msitko.xml.printing.XmlPrinter
+import pl.msitko.xml.syntax.document._
 
 // xml formatting is strange here, let's assume we don't care about it and want to have some minimized output
 val input = """|<a someAttr="someVal">

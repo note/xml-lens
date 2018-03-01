@@ -39,7 +39,7 @@ val input =
 We can define transformation in the following way: 
 
 ```tut:book
-import net.michalsitko.xml.syntax.OpticsBuilder.root
+import pl.msitko.xml.syntax.OpticsBuilder.root
 
 val modify = (root \ "f").hasTextOnly.modify(_.toUpperCase)
 ```
@@ -61,8 +61,8 @@ Now, when we have `modify` function declared we can use it on parsed XML. Here t
 modify it:
 
 ```tut:silent
-import net.michalsitko.xml.parsing.XmlParser
-import net.michalsitko.xml.printing.XmlPrinter
+import pl.msitko.xml.parsing.XmlParser
+import pl.msitko.xml.printing.XmlPrinter
 
 val parsed = XmlParser.parse(input).right.get
 
