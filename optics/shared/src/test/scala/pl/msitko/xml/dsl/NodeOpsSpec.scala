@@ -1,7 +1,5 @@
-package pl.msitko.xml.syntax
+package pl.msitko.xml.dsl
 
-import pl.msitko.xml.syntax.document._
-import pl.msitko.xml.syntax.node._
 import pl.msitko.xml.BasicSpec
 import pl.msitko.xml.entities.Text
 import pl.msitko.xml.printing.PrinterConfig

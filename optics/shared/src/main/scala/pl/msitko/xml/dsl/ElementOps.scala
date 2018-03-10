@@ -1,4 +1,4 @@
-package pl.msitko.xml.syntax
+package pl.msitko.xml.dsl
 
 import monocle.Traversal
 import pl.msitko.xml.entities._
@@ -6,7 +6,7 @@ import pl.msitko.xml.optics.ElementOptics.allLabeledElements
 import pl.msitko.xml.optics._
 
 trait ElementOps {
-  def current: Traversal[XmlDocument, Element]
+  protected def current: Traversal[XmlDocument, Element]
 
   def attr(nameMatcher: String): TextBuilder =
     attr(NameMatcher.fromString(nameMatcher))

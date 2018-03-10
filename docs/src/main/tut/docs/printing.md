@@ -89,7 +89,7 @@ In short to parse XML, minimize it and print it back you need to:
 ```tut:book
 import pl.msitko.xml.printing.XmlPrinter
 import pl.msitko.xml.printing.XmlPrinter
-import pl.msitko.xml.syntax.document._
+import pl.msitko.xml.dsl._
 
 // xml formatting is strange here, let us assume we don't care about it and want to have some minimized output
 val input = """|<a someAttr="someVal">

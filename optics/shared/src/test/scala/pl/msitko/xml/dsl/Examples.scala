@@ -1,4 +1,4 @@
-package pl.msitko.xml.syntax
+package pl.msitko.xml.dsl
 
 trait Examples {
   val inputWithComments =

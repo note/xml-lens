@@ -142,7 +142,7 @@ Let's move to the example that will explain aforementioned considerations. Follo
 given attribute value or adding attribute if it's not present: 
 
 ```tut:silent
-import pl.msitko.xml.syntax.OpticsBuilder._
+import pl.msitko.xml.dsl._
 import pl.msitko.xml.optics.PrefixedNamespace
 
 val traversal = (root \ "c1" \ "f")

@@ -1,11 +1,9 @@
-package pl.msitko.xml.syntax
+package pl.msitko.xml.dsl
 
 import pl.msitko.xml.BasicSpec
 import pl.msitko.xml.entities.{Attribute, Element, LabeledElement}
 import pl.msitko.xml.optics.{LabeledElementOptics, Namespace, NodeOptics, PrefixedNamespace}
 import pl.msitko.xml.printing.{Indent, PrinterConfig}
-import pl.msitko.xml.syntax.OpticsBuilder.root
-import pl.msitko.xml.syntax.document._
 import pl.msitko.xml.test.utils.ExampleInputs
 
 trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {

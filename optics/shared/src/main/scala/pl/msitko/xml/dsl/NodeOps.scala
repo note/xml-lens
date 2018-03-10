@@ -1,7 +1,8 @@
-package pl.msitko.xml.optics
+package pl.msitko.xml.dsl
 
 import monocle.function.Plated
 import pl.msitko.xml.entities.{LabeledElement, Node, Text}
+import pl.msitko.xml.optics.{LabeledElementOptics, OpticsInstances}
 
 final class NodeOps (root: LabeledElement) {
   import OpticsInstances._

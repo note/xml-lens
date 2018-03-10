@@ -1,7 +1,6 @@
-package pl.msitko.xml.syntax
+package pl.msitko.xml.dsl
 
 import pl.msitko.xml.entities.XmlDocument
-import pl.msitko.xml.optics.XmlDocumentOps
 
 trait ToDocumentOps {
   implicit def toDocumentOps(xmlDocument: XmlDocument): XmlDocumentOps =

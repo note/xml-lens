@@ -105,7 +105,7 @@ We'll rewrite the same transformation as described [here](#exemplary-usage-optic
 ```tut:silent
 import pl.msitko.xml.parsing.XmlParser
 import pl.msitko.xml.printing.XmlPrinter
-import pl.msitko.xml.syntax.OpticsBuilder.root // TODO: change it in code to sth more user friendly
+import pl.msitko.xml.dsl._
 
 
 val exampleXml = """<?xml version="1.0" encoding="UTF-8"?>

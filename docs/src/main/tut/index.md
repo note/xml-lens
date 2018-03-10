@@ -39,7 +39,7 @@ val input =
 We can define transformation in the following way: 
 
 ```tut:book
-import pl.msitko.xml.syntax.OpticsBuilder.root
+import pl.msitko.xml.dsl._
 
 val modify = (root \ "f").hasTextOnly.modify(_.toUpperCase)
 ```

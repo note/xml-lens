@@ -1,4 +1,4 @@
-package pl.msitko.xml.syntax
+package pl.msitko.xml.dsl
 
 import monocle._
 import pl.msitko.xml.entities._
@@ -82,7 +82,7 @@ case class DeepBuilder(current: Traversal[XmlDocument, Element]) extends AnyRef 
   }
 }
 
-private [syntax] class Indexed(idx: Int, newValue: Element) extends (Element => Element) {
+private [dsl] class Indexed(idx: Int, newValue: Element) extends (Element => Element) {
   private var counter = 0
 
   override def apply(v1: Element): Element = {
@@ -117,7 +117,7 @@ case class DeepBuilderOptional(currentOptional: Optional[XmlDocument, Element]) 
   // It would be useful only for such constructs:
   // (root \ "some").having(predicate1).having(predicate2)
   // Namely, only while one `having` follows directly another `having`
-  // It's not needed as we can express abovementioned snippet with:
+  // It's not needed as we can express above mentioned snippet with:
   // (root \ "some").having(n => predicate1(n) && predicate2(n))
 }
 

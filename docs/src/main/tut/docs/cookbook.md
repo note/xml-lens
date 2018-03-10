@@ -14,7 +14,7 @@ covered in example code:
 ```tut:silent
 import pl.msitko.xml.parsing.XmlParser
 import pl.msitko.xml.printing.XmlPrinter
-import pl.msitko.xml.syntax.OpticsBuilder._
+import pl.msitko.xml.dsl._
 ```
 
 ### How to perform a few transformations on the same XML document

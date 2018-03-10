@@ -1,7 +1,6 @@
-package pl.msitko.xml.syntax
+package pl.msitko.xml.dsl
 
 import pl.msitko.xml.entities.LabeledElement
-import pl.msitko.xml.optics.NodeOps
 
 trait ToNodeOps {
   implicit def toNodeOps(node: LabeledElement): NodeOps =
