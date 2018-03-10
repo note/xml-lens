@@ -2,7 +2,7 @@ package pl.msitko.xml.optics
 
 import monocle.function.Plated
 import pl.msitko.xml.BasicSpec
-import pl.msitko.xml.entities.{LabeledElement, Node, ResolvedName, Text}
+import pl.msitko.xml.entities.{LabeledElement, ResolvedName, Text}
 import pl.msitko.xml.optics.XmlDocumentOptics.rootLens
 import pl.msitko.xml.printing.PrinterConfig
 import pl.msitko.xml.test.utils.ExampleBuilderHelper
@@ -12,75 +12,59 @@ trait PlatedSpec extends BasicSpec with ExampleBuilderHelper {
 
   implicit val printerConfig = PrinterConfig.Default
 
-  def testPlated(plated: Node => Node, input: String, expectedOutput: String) = {
-    // TODO: get rid of instanceOf
-    val res = rootLens.modify(plated andThen(_.asInstanceOf[LabeledElement]))(parse(input))
+  def testPlated(plated: LabeledElement => LabeledElement, input: String, expectedOutput: String) = {
+    val res = rootLens.modify(plated)(parse(input))
     print(res) should === (expectedOutput)
   }
 
   "nodePlated" should {
-    "be able to transform all Text nodes" in testPlated(
-      Plated.transform[Node] {
-        case Text(txt) => Text(txt.toUpperCase)
-        case node => node
-      }, input1, output1
+    "just test" in testPlated(
+      Plated.transform[LabeledElement] {
+        LabeledElementOptics.allTexts.composeIso(TextOptics.textIso).modify(_.toUpperCase)
+      },
+      input1, output1
     )
 
     "be able to transform all nodes with `f` label" in testPlated(
-      Plated.transform[Node] {
+      Plated.transform[LabeledElement] {
         case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
           LabeledElementOptics.children.set(List(Text("something")))(el)
-        case node => node
+        case element => element
       },
       input2, output2
     )
 
     "be able to transform all `f` labels to `xyz`" in testPlated(
-      Plated.transform[Node] {
+      Plated.transform[LabeledElement] {
         case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
           el.copy(label = ResolvedName.unprefixed("xyz"))
-        case node => node
+        case element => element
       },
       input2, output3
     )
 
     "be able to transform all `f` labels to `xyz` (even at top level)" in testPlated(
-      Plated.rewrite[Node] {
+      Plated.rewrite[LabeledElement] {
         case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
           Some(el.copy(label = ResolvedName.unprefixed("xyz")))
-        case node => None
+        case _ => None
       },
       input4, output4
     )
-
-    // TODO: it does not work on top level.
-    // Probably Plated works like this but it should be either well documented here or
-    // we should provide facade that take care of that
-    // See also at implementation of NodeOps.minimize where there's a similar problem
-    // TODO: investigate different behavior for rewrite and transform and either document or abstract this difference
-    "be able to transform all `f` labels to `xyz` (even at top level) 2" ignore {
-      testPlated(
-        Plated.transform[Node] {
-          case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
-            el.copy(label = ResolvedName.unprefixed("xyz"))
-        },
-        input4, output4
-      )
-    }
 
     // TODO: there's no possibility to compose Optics with Plated as deep, deeper and so on have `Element` as a target
     // and
     "be able to transform text of all `f` elements in selected, known subtree" ignore {
       testPlated(
-        Plated.transform[Node] {
+        Plated.transform[LabeledElement] {
           case el: LabeledElement if el.label == ResolvedName.unprefixed("f") =>
             el.copy(label = ResolvedName.unprefixed("xyz"))
-          case node => node
+          case element => element
         },
         input5, output5
       )
     }
-
+    // we should provide facade that take care of that
   }
 
   val input1 =

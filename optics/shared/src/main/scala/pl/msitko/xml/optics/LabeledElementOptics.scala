@@ -4,6 +4,8 @@ import monocle.function.Index
 import monocle.{Lens, Optional, Traversal}
 import pl.msitko.xml.entities._
 
+import scalaz.Applicative
+
 trait LabeledElementOptics {
   def deep(elementMatcher: NameMatcher): Traversal[LabeledElement, Element] =
     element.composeTraversal(ElementOptics.deeper(elementMatcher))
@@ -52,6 +54,12 @@ trait LabeledElementOptics {
 
   val allLabeledElements: Traversal[LabeledElement, LabeledElement] = element.composeTraversal(ElementOptics.allLabeledElements)
   val allTexts: Traversal[LabeledElement, Text] = element.composeTraversal(ElementOptics.allTexts)
+
+  val labeledElementTraversal = new Traversal[LabeledElement, LabeledElement] {
+    def modifyF[F[_]: Applicative](fun: LabeledElement => F[LabeledElement])(from: LabeledElement): F[LabeledElement] = {
+      element.composeTraversal(ElementOptics.allLabeledElements).modifyF(fun)(from)
+    }
+  }
 }
 
 object LabeledElementOptics extends LabeledElementOptics

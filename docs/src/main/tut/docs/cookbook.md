@@ -8,7 +8,8 @@ position: 3
 
 This chapter provides examples of common operations you may find useful when traversing and modifying XML trees.
 
-All examples presented here should compile fine with following imports:
+All examples presented here should compile fine with following imports, if some additional import is needed it will be
+covered in example code:
 
 ```tut:silent
 import pl.msitko.xml.parsing.XmlParser
@@ -123,4 +124,37 @@ val res = secondChildren.hasTextOnly.modify(_.toUpperCase)(parsed)
 XmlPrinter.print(res)
 ```
 
+### Transformation in scope of whole document
 
+In previous examples we were always performing transformations on given path. In case when you need to do some modification
+in scope of whole document `monocle.function.Plated` may be useful. `xml-lens` defined instances of `Plated` for its types in
+`pl.msitko.xml.optics.OpticsInstances`.
+
+For example, to change all `Text` nodes to uppercase you can use following code:
+
+```tut:silent
+import monocle.function.Plated
+import pl.msitko.xml.optics.OpticsInstances._
+import pl.msitko.xml.entities.LabeledElement
+import pl.msitko.xml.optics.LabeledElementOptics
+import pl.msitko.xml.optics.TextOptics
+import pl.msitko.xml.optics.XmlDocumentOptics.rootLens
+
+val input = """<a>
+               |  <b>some text</b>
+               |  <c>
+               |    <d>another text</d>
+               |  </c>
+               |</a>""".stripMargin
+
+val parsed = XmlParser.parse(input).right.get
+
+val transformation = Plated.transform[LabeledElement]{
+  LabeledElementOptics.allTexts.composeIso(TextOptics.textIso).modify(_.toUpperCase)
+}_
+val res = rootLens.modify(transformation)(parsed)
+```
+
+```tut:book
+XmlPrinter.print(res)
+```

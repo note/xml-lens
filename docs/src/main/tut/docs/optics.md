@@ -90,8 +90,6 @@ Unfortunately `xml-lens` cannot define package object that would define all opti
 with one import. The reason for that is that some names of optics are the same between different source type, e.g.
 `LabeledElementOptics.children` and `ElementOptics.children`.
 
-### Plated
-
 ### Resources on Optics
 
 ## DSL (high-level API)
