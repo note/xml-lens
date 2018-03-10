@@ -2,6 +2,7 @@ package pl.msitko.xml.dsl
 
 import monocle._
 import pl.msitko.xml.entities._
+import pl.msitko.xml.matchers.NameMatcher
 import pl.msitko.xml.optics._
 
 import scalaz.Applicative

@@ -2,7 +2,8 @@ package pl.msitko.xml.dsl
 
 import pl.msitko.xml.BasicSpec
 import pl.msitko.xml.entities.{Attribute, Element, LabeledElement}
-import pl.msitko.xml.optics.{LabeledElementOptics, Namespace, NodeOptics, PrefixedNamespace}
+import pl.msitko.xml.matchers.{Namespace, PrefixedNamespace}
+import pl.msitko.xml.optics.{LabeledElementOptics, NodeOptics}
 import pl.msitko.xml.printing.{Indent, PrinterConfig}
 import pl.msitko.xml.test.utils.ExampleInputs
 

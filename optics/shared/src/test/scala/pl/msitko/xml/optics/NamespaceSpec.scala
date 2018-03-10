@@ -1,6 +1,7 @@
 package pl.msitko.xml.optics
 
 import pl.msitko.xml.BasicSpec
+import pl.msitko.xml.matchers.Namespace
 import pl.msitko.xml.optics.ElementOptics.deeper
 
 trait NamespaceSpec extends BasicSpec {

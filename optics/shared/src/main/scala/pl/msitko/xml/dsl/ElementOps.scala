@@ -2,6 +2,7 @@ package pl.msitko.xml.dsl
 
 import monocle.Traversal
 import pl.msitko.xml.entities._
+import pl.msitko.xml.matchers.{NameMatcher, PrefixedResolvedNameMatcher, ToResolvedName}
 import pl.msitko.xml.optics.ElementOptics.allLabeledElements
 import pl.msitko.xml.optics._
 

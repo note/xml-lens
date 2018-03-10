@@ -1,6 +1,7 @@
 package pl.msitko.xml.optics
 
 import pl.msitko.xml.entities.ResolvedName
+import pl.msitko.xml.matchers.{IgnoreNamespaceMatcher, ResolvedNameMatcher}
 import pl.msitko.xml.test.utils.BaseSpec
 
 class NameMatcherSpec extends BaseSpec {

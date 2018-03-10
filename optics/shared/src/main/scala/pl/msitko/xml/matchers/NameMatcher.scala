@@ -1,4 +1,4 @@
-package pl.msitko.xml.optics
+package pl.msitko.xml.matchers
 
 import pl.msitko.xml.entities.ResolvedName
 
@@ -40,17 +40,6 @@ final case class ResolvedNameMatcher(uri: String, localName: String) extends Nam
     uri == resolvedName.uri && localName == resolvedName.localName
 }
 
-// TODO: probably should be package-private
-final case class PrefixedResolvedNameMatcher(prefix: String, uri: String, localName: String) extends NameMatcher with ToResolvedName {
-  // TODO: implement according to https://www.w3.org/TR/xml-names11/#NSNameComparison and
-  // https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
-  override def matches(resolvedName: ResolvedName): Boolean =
-  uri == resolvedName.uri && localName == resolvedName.localName
-
-  override def toResolvedName: ResolvedName =
-    ResolvedName(prefix, uri, localName)
-}
-
 final case class Namespace(uri: String) {
   def name(localName: String): ResolvedNameMatcher =
     ResolvedNameMatcher(uri, localName)
@@ -59,6 +48,17 @@ final case class Namespace(uri: String) {
 object Namespace {
   val empty: Namespace =
     Namespace("")
+}
+
+// TODO: probably should be package-private
+final case class PrefixedResolvedNameMatcher(prefix: String, uri: String, localName: String) extends NameMatcher with ToResolvedName {
+  // TODO: implement according to https://www.w3.org/TR/xml-names11/#NSNameComparison and
+  // https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
+  override def matches(resolvedName: ResolvedName): Boolean =
+    uri == resolvedName.uri && localName == resolvedName.localName
+
+  override def toResolvedName: ResolvedName =
+    ResolvedName(prefix, uri, localName)
 }
 
 final case class PrefixedNamespace(prefix: String, uri: String) {

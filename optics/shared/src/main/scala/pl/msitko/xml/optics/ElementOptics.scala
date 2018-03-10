@@ -3,6 +3,7 @@ package pl.msitko.xml.optics
 import monocle.function.Index
 import monocle.{Lens, Optional, Traversal}
 import pl.msitko.xml.entities._
+import pl.msitko.xml.matchers.NameMatcher
 
 import scalaz.Applicative
 import scalaz.std.list._

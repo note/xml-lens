@@ -3,6 +3,7 @@ package pl.msitko.xml.optics
 import monocle.Traversal
 import pl.msitko.xml.BasicSpec
 import pl.msitko.xml.entities._
+import pl.msitko.xml.matchers.NameMatcher
 import pl.msitko.xml.optics.ElementOptics._
 import pl.msitko.xml.optics.LabeledElementOptics._
 import pl.msitko.xml.optics.XmlDocumentOptics._
