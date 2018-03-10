@@ -3,9 +3,9 @@ package pl.msitko.xml.optics
 import monocle.Traversal
 import pl.msitko.xml.BasicSpec
 import pl.msitko.xml.entities._
-import pl.msitko.xml.optics.ElementOptics.{attribute, attributes, deeper, hasTextOnly}
-import pl.msitko.xml.optics.LabeledElementOptics.{deep, localName}
-import pl.msitko.xml.optics.XmlDocumentOptics.rootLens
+import pl.msitko.xml.optics.ElementOptics._
+import pl.msitko.xml.optics.LabeledElementOptics._
+import pl.msitko.xml.optics.XmlDocumentOptics._
 import pl.msitko.xml.printing.PrinterConfig
 import pl.msitko.xml.test.utils.ExampleInputs
 

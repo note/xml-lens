@@ -25,7 +25,7 @@ are plain function `XmlDocument => XmlDocument` you can compose them with `andTh
 val input =
   s"""<a>
      |  <c1>
-     |    <f >item1</f>
+     |    <f someKey="oldValue">item1</f>
      |    <f>item2</f>
      |  </c1>
      |</a>""".stripMargin
