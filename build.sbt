@@ -4,7 +4,7 @@ import Dependencies._
 // shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
 import sbtcrossproject.{crossProject, CrossType}
 
-organization in ThisBuild := "net.michalsitko"
+organization in ThisBuild := "pl.msitko"
 
 lazy val ast = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) in file("ast"))
   .commonSettings

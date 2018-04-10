@@ -3,14 +3,20 @@ options:
   - title: Quick start
     url: index.html#quick_start
 
-  - title: Cookbook
-    url: docs/cookbook.html
-
   - title: Modularity
     url: docs/modularity.html
 
-  - title: Parsing/Printing
-    url: docs/parsing_printing.html
+  - title: Optics API
+    url: docs/optics.html
+
+  - title: Cookbook
+    url: docs/cookbook.html
+
+  - title: Parsing
+    url: docs/parsing.html
+
+  - title: Printing
+    url: docs/printing.html
 
   - title: Namespaces
     url: docs/namespaces.html

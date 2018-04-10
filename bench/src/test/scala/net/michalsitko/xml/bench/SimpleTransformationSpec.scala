@@ -1,8 +1,7 @@
-package net.michalsitko.xml.bench
+package pl.msitko.xml.bench
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.{FlatSpec, Matchers}
-
 
 class SimpleTransformationSpec extends FlatSpec with Matchers with TypeCheckedTripleEquals {
   import SimpleTransformation._

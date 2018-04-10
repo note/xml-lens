@@ -1,7 +1,7 @@
 ---
 layout: docs
 title:  "Namespaces"
-position: 4
+position: 6
 ---
 
 ## Namespaces
@@ -21,7 +21,7 @@ Due to the fact the the same prefixes may refer to different namespaces, `xml-le
 it relies on namespace's URL. Thus, to create a namespace it suffices to:
 
 ```tut:book
-import net.michalsitko.xml.optics.Namespace
+import pl.msitko.xml.optics.Namespace
 
 val a = Namespace("http://a.com")
 ```
@@ -37,7 +37,7 @@ a.name("elementLabel")
 To see working with namespace in action, let's consider following XML:
 
 ```tut:silent
-import net.michalsitko.xml.parsing.XmlParser
+import pl.msitko.xml.parsing.XmlParser
 
 val input =
     """<?xml version="1.0" encoding="UTF-8"?>
@@ -58,10 +58,10 @@ For sake of this example, we define helper method `withCriteria`:
 
 ```tut
 import monocle.Traversal
-import net.michalsitko.xml.entities.{Element, LabeledElement}
-import net.michalsitko.xml.optics.LabeledElementOptics._
-import net.michalsitko.xml.optics.ElementOptics._
-import net.michalsitko.xml.optics.XmlDocumentOptics._
+import pl.msitko.xml.entities.{Element, LabeledElement}
+import pl.msitko.xml.optics.LabeledElementOptics._
+import pl.msitko.xml.optics.ElementOptics._
+import pl.msitko.xml.optics.XmlDocumentOptics._
 
 def withCriteria(criteria: Traversal[Element, Element]) = {
   rootLens.composeTraversal(deep("c1").composeTraversal(criteria).composeOptional(hasTextOnly))
@@ -142,8 +142,8 @@ Let's move to the example that will explain aforementioned considerations. Follo
 given attribute value or adding attribute if it's not present: 
 
 ```tut:silent
-import net.michalsitko.xml.syntax.OpticsBuilder._
-import net.michalsitko.xml.optics.PrefixedNamespace
+import pl.msitko.xml.dsl._
+import pl.msitko.xml.optics.PrefixedNamespace
 
 val traversal = (root \ "c1" \ "f")
 
@@ -170,7 +170,7 @@ val xml = XmlParser.parse(input).right.get
 Take a look at printed XML:
 
 ```tut:book
-import net.michalsitko.xml.printing.XmlPrinter
+import pl.msitko.xml.printing.XmlPrinter
 
 XmlPrinter.print(replaceOrAddAttr(xml))
 ```

@@ -1,7 +1,7 @@
 ---
 layout: docs
 title:  "Modularity"
-position: 2
+position: 1
 ---
 
 ## Modularity
@@ -16,3 +16,17 @@ independent
 platform independent
 * `io` - module containing parser and printer implementations. It is platform dependent. As of now implementations
 for JVM and scala.js exist
+
+### AST
+
+All types that comprise `AST` are in package `pl.msitko.xml.entities`.
+ 
+### optics
+
+This module has two-level APIs: low-level and high-level. Low level contains mostly Monocle instances of optics for XML.
+This API is more powerful than high-level but requires some knowledge about Monocle and optics in general. High-level
+API contains combinators built on top of low-level optics. Thus, it provide API easier to use but more constrained. 
+
+### io
+
+`io` serves for [parsing](parsing.html) and [printing](printing.html).
