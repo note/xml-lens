@@ -3,6 +3,7 @@ import Common._
 import Dependencies._
 // shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
 import sbtcrossproject.{crossProject, CrossType}
+import ReleaseTransformations._
 
 organization in ThisBuild := "pl.msitko"
 
