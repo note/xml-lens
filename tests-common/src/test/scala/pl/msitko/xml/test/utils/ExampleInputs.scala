@@ -2,7 +2,7 @@ package pl.msitko.xml.test.utils
 
 import pl.msitko.xml.entities.{LabeledElement, _}
 
-case class Example(stringRepr: String, document: XmlDocument)
+final case class Example(stringRepr: String, document: XmlDocument)
 
 object Example {
   val defaultDecl = XmlDeclaration("1.0", Some("UTF-8"))

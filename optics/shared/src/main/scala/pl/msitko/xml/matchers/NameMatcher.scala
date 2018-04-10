@@ -2,7 +2,6 @@ package pl.msitko.xml.matchers
 
 import pl.msitko.xml.entities.ResolvedName
 
-// TODO: should be sealed?
 trait NameMatcher {
   def matches(resolvedName: ResolvedName): Boolean
 }
@@ -11,16 +10,13 @@ trait ToResolvedName {
   def toResolvedName: ResolvedName
 }
 
-// TODO: should be package-private?
 object NameMatcher {
-  // TODO: probably no longer needed?
   def fromString(matcher: String): IgnoreNamespaceMatcher = {
     IgnoreNamespaceMatcher(matcher)
   }
 }
 
-// TODO: think about making it package-private
-final case class IgnoreNamespaceMatcher(localName: String) extends NameMatcher with ToResolvedName {
+private[xml] final case class IgnoreNamespaceMatcher(localName: String) extends NameMatcher with ToResolvedName {
   override def matches(resolvedName: ResolvedName): Boolean =
     localName == resolvedName.localName
 
@@ -32,8 +28,7 @@ final case class IgnoreNamespaceMatcher(localName: String) extends NameMatcher w
     ResolvedName.unprefixed(localName)
 }
 
-// TODO: probably should be package-private
-final case class ResolvedNameMatcher(uri: String, localName: String) extends NameMatcher {
+private[xml] final case class ResolvedNameMatcher(uri: String, localName: String) extends NameMatcher {
   // TODO: implement according to https://www.w3.org/TR/xml-names11/#NSNameComparison and
   // https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
   override def matches(resolvedName: ResolvedName): Boolean =
@@ -50,8 +45,7 @@ object Namespace {
     Namespace("")
 }
 
-// TODO: probably should be package-private
-final case class PrefixedResolvedNameMatcher(prefix: String, uri: String, localName: String) extends NameMatcher with ToResolvedName {
+private[xml] final case class PrefixedResolvedNameMatcher(prefix: String, uri: String, localName: String) extends NameMatcher with ToResolvedName {
   // TODO: implement according to https://www.w3.org/TR/xml-names11/#NSNameComparison and
   // https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
   override def matches(resolvedName: ResolvedName): Boolean =

@@ -31,7 +31,7 @@ private [parsing] object BlankingResolver extends XMLResolver {
   }
 }
 
-case class ParserConfig(replaceEntityReferences: Boolean)
+final case class ParserConfig(replaceEntityReferences: Boolean)
 
 object ParserConfig {
   val Default = ParserConfig(replaceEntityReferences = false)

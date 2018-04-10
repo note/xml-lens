@@ -72,7 +72,7 @@ object JsParser {
   }
 }
 
-case class JsParserOptions(
+final case class JsParserOptions(
   trim: Option[Boolean] = None,
   normalize: Option[Boolean] = None,
   lowercase: Option[Boolean] = None,

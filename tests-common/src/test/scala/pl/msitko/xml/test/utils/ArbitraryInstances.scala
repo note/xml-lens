@@ -5,7 +5,7 @@ import org.scalacheck.Gen
 
 import scala.collection.JavaConverters._
 
-case class ArbitraryElementConfig(minDepth: Int, maxDepth: Int, label: Option[String], attributeKey: Option[String])
+final case class ArbitraryElementConfig(minDepth: Int, maxDepth: Int, label: Option[String], attributeKey: Option[String])
 
 trait ArbitraryInstances {
   private val maxNumberOfAttributes = 3

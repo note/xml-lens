@@ -27,7 +27,7 @@ class RootBuilder extends AnyRef with ElementOps {
 
 }
 
-case class DeepBuilder(current: Traversal[XmlDocument, Element]) extends AnyRef with ElementOps {
+final case class DeepBuilder(current: Traversal[XmlDocument, Element]) extends AnyRef with ElementOps {
   def \ (nameMatcher: String): DeepBuilder = {
     \ (NameMatcher.fromString(nameMatcher))
   }
@@ -103,7 +103,7 @@ object DeepBuilder {
     builder.current
 }
 
-case class DeepBuilderOptional(currentOptional: Optional[XmlDocument, Element]) extends AnyRef with ElementOps {
+final case class DeepBuilderOptional(currentOptional: Optional[XmlDocument, Element]) extends AnyRef with ElementOps {
   override val current = currentOptional.asTraversal
 
   def \ (nameMatcher: String): DeepBuilder = {
@@ -127,14 +127,14 @@ object DeepBuilderOptional {
     builder.currentOptional
 }
 
-case class TextBuilder(current: Traversal[XmlDocument, String])
+final case class TextBuilder(current: Traversal[XmlDocument, String])
 
 object TextBuilder {
   implicit def toTraversal(builder: TextBuilder): Traversal[XmlDocument, String] =
     builder.current
 }
 
-case class AttributesBuilder(current: Traversal[XmlDocument, Seq[Attribute]])
+final case class AttributesBuilder(current: Traversal[XmlDocument, Seq[Attribute]])
 
 object AttributesBuilder {
   implicit def toTraversal(builder: AttributesBuilder): Traversal[XmlDocument, Seq[Attribute]] =
