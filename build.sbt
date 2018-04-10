@@ -128,6 +128,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "xml-lens"
   )
+  .settings(noPublishSettings)
   .aggregate(astJVM, astJS, ioJVM, ioJS, opticsJVM, opticsJS)
 
 
