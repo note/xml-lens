@@ -181,6 +181,13 @@ lazy val credentialSettings = Seq(
 )
 
 lazy val noPublishSettings = Seq(
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (isSnapshot.value)
+      Some("Snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("Releases" at nexus + "service/local/staging/deploy/maven2")
+  },
   publish := {},
   publishLocal := {},
   publishArtifact := false
