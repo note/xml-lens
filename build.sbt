@@ -11,6 +11,7 @@ lazy val ast = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) 
   .settings(
     name := "xml-lens-ast"
   )
+  .settings(publishSettings)
 
 lazy val astJVM = ast.jvm
 lazy val astJS  = ast.js
@@ -31,6 +32,7 @@ lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) i
   .settings(
     name := "xml-lens-io"
   )
+  .settings(publishSettings)
   .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin))
   .jsSettings(
     npmDependencies in Compile ++= Seq(
@@ -52,6 +54,7 @@ lazy val optics = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Ful
     name := "xml-lens-optics",
     libraryDependencies ++= Seq(monocleCore.value, monocleLaw.value)
   )
+  .settings(publishSettings)
   .jsConfigure(_.enablePlugins(ScalaJSBundlerPlugin))
   .jsSettings(
     coverageEnabled := false
@@ -68,6 +71,7 @@ lazy val bench = (project in file("bench"))
     libraryDependencies ++= Seq(scalaXml, scalaTest.value),
     scalacOptions += "-Xlint:_,-missing-interpolator"
   )
+  .settings(noPublishSettings)
   .enablePlugins(JmhPlugin)
   .dependsOn(opticsJVM, ioJVM)
 
@@ -78,6 +82,7 @@ lazy val examples = (project in file("examples"))
     libraryDependencies ++= Seq(scalaXml, scalaTest.value),
     scalacOptions += "-Xlint:_,-missing-interpolator"
   )
+  .settings(noPublishSettings)
   .enablePlugins(JmhPlugin)
   .dependsOn(opticsJVM, ioJVM)
 
@@ -111,6 +116,7 @@ lazy val docs = (project in file("docs"))
     name := "xml-lens-docs"
   )
   .settings(docSettings)
+  .settings(noPublishSettings)
   .settings(scalacOptions in Tut := (scalacOptions in Tut).value.filterNot(Set("-Ywarn-unused-import", "-Xfatal-warnings", "-Xlint")))
   .enablePlugins(GhpagesPlugin)
   .enablePlugins(MicrositesPlugin)
@@ -123,3 +129,44 @@ lazy val root = (project in file("."))
     name := "xml-lens"
   )
   .aggregate(astJVM, astJS, ioJVM, ioJS, opticsJVM, opticsJS)
+
+
+lazy val publishSettings = Seq(
+  releaseCrossBuild := true,
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  homepage := Some(url("https://github.com/note/xml-lens")),
+  licenses := Seq("MIT" -> url("http://opensource.org/licenses/MIT")),
+  scmInfo := Some(ScmInfo(url("https://github.com/note/xml-lens"), "scm:git:git@github.com:note/xml-lens.git")),
+  publishMavenStyle := true,
+  publishArtifact in Test := false,
+  pomIncludeRepository := { _ => false },
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (isSnapshot.value)
+      Some("Snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("Releases" at nexus + "service/local/staging/deploy/maven2")
+  },
+  pomExtra := (
+    <developers>
+      <developer>
+        <id>note</id>
+        <name>Michał Sitko</name>
+        <url>https://github.com/note/</url>
+      </developer>
+    </developers>
+  )
+) ++ credentialSettings
+
+lazy val credentialSettings = Seq(
+  credentials ++= (for {
+    username <- Option(System.getenv().get("SONATYPE_USERNAME"))
+    password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
+  } yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)).toSeq
+)
+
+lazy val noPublishSettings = Seq(
+  publish := {},
+  publishLocal := {},
+  publishArtifact := false
+)
