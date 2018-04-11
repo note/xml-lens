@@ -149,19 +149,20 @@ lazy val publishSettings = Seq(
     else
       Some("Releases" at nexus + "service/local/staging/deploy/maven2")
   },
-  // as suggested here: https://github.com/sbt/sbt-release/issues/184
-//  releaseProcess := Seq[ReleaseStep](
-//    checkSnapshotDependencies,
-//    inquireVersions,
-//    runClean,
-//    runTest,
-//    setReleaseVersion,
-//    commitReleaseVersion,
-//    tagRelease,
-//    releaseStepCommandAndRemaining("publish"),
-//    setNextVersion,
-//    commitNextVersion,
-//    pushChanges),
+  releaseProcess := Seq[ReleaseStep](
+    checkSnapshotDependencies,
+    inquireVersions,
+    runClean,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    tagRelease,
+    releaseStepCommandAndRemaining("+publishSigned"),
+    setNextVersion,
+    commitNextVersion,
+    releaseStepCommand("sonatypeReleaseAll"),
+    pushChanges
+  ),
   pomExtra := (
     <developers>
       <developer>
