@@ -142,6 +142,7 @@ lazy val publishSettings = Seq(
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
+  useGpg := true,
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
