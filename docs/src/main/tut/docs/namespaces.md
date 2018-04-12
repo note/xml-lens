@@ -21,7 +21,7 @@ Due to the fact the the same prefixes may refer to different namespaces, `xml-le
 it relies on namespace's URL. Thus, to create a namespace it suffices to:
 
 ```tut:book
-import pl.msitko.xml.optics.Namespace
+import pl.msitko.xml.matchers.Namespace
 
 val a = Namespace("http://a.com")
 ```
@@ -143,7 +143,7 @@ given attribute value or adding attribute if it's not present:
 
 ```tut:silent
 import pl.msitko.xml.dsl._
-import pl.msitko.xml.optics.PrefixedNamespace
+import pl.msitko.xml.matchers.PrefixedNamespace
 
 val traversal = (root \ "c1" \ "f")
 
