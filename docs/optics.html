@@ -1,0 +1,155 @@
+<html><head><title>xml-lens</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="pl.msitko" /><meta name="description" content="XML Optics library for Scala" /><meta name="og:image" content="/xml-lens/img/poster.png" /><meta name="og:title" content="xml-lens" /><meta name="og:site_name" content="xml-lens" /><meta name="og:url" content="http://note.github.io/xml-lens" /><meta name="og:type" content="website" /><meta name="og:description" content="XML Optics library for Scala" /><link rel="icon" type="image/png" href="/xml-lens/img/favicon.png" /><meta name="twitter:title" content="xml-lens" /><meta name="twitter:image" content="http://note.github.io/xml-lensimg/poster.png" /><meta name="twitter:description" content="XML Optics library for Scala" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/xml-lens/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/xml-lens/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/xml-lens/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/xml-lens/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/xml-lens/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/xml-lens/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/xml-lens/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/xml-lens/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/xml-lens/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/xml-lens/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/xml-lens/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/xml-lens/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/xml-lens/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/xml-lens/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/xml-lens/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/xml-lens/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/xml-lens/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/xml-lens/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/xml-lens/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/xml-lens/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/xml-lens/highlight/styles/default.css" /><link rel="stylesheet" href="/xml-lens/css/style.css" /><link rel="stylesheet" href="/xml-lens/css/palette.css" /><link rel="stylesheet" href="/xml-lens/css/codemirror.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><ul id="sidebar" class="sidebar-nav"><li class="sidebar-brand"><a href="/xml-lens/" class="brand"><div class="brand-wrapper"><span>xml-lens</span></div></a></li> <li><a href="/xml-lens/index.html#quick_start" class="">Quick start</a></li> <li><a href="/xml-lens/docs/modularity.html" class="">Modularity</a></li> <li><a href="/xml-lens/docs/optics.html" class=" active ">Optics API</a></li> <li><a href="/xml-lens/docs/cookbook.html" class="">Cookbook</a></li> <li><a href="/xml-lens/docs/parsing.html" class="">Parsing</a></li> <li><a href="/xml-lens/docs/printing.html" class="">Printing</a></li> <li><a href="/xml-lens/docs/namespaces.html" class="">Namespaces</a></li></ul></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li id="gh-eyes-item" class="hidden-xs"><a href="https://github.com/note/xml-lens"><i class="fa fa-eye"></i><span>WATCH<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs"><a href="https://github.com/note/xml-lens"><i class="fa fa-star-o"></i><span>STARS<span id="stars" class="label label-default">--</span></span></a></li><li><a href="#" onclick="shareSiteTwitter('xml-lens XML Optics library for Scala');"><i class="fa fa-twitter"></i></a></li><li><a href="#" onclick="shareSiteFacebook('xml-lens XML Optics library for Scala');"><i class="fa fa-facebook"></i></a></li><li><a href="#" onclick="shareSiteGoogle();"><i class="fa fa-google-plus"></i></a></li></ul></div></div></div></div><div id="content" data-github-owner="note" data-github-repo="xml-lens"><div class="content-wrapper"><section><p>The most interesting part of <code class="highlighter-rouge">xml-lens</code> is API for XML transformations. It’s divided into two layers:
+Optics API (also called low-level API) and DSL (also called high-level API).</p>
+
+<h2 id="optics-api-low-level-api">Optics API (low-level API)</h2>
+
+<h3 id="purpose-of-optics-api">Purpose of Optics API</h3>
+
+<p>Optics API is the heart of <code class="highlighter-rouge">xml-lens</code>. Optics offers way of constructing immutable, principled APIs on any ADTs. 
+Therefore, they promise a good solution for operating on XML. <a href="https://github.com/circe/circe/blob/master/docs/src/main/tut/optics.md">circe-optics</a>
+was also an inspiration for such solution.</p>
+
+<p>The main purpose of Optics API is to provide set of lawful Optics to modify and traverse <code class="highlighter-rouge">xml-lens</code> AST.
+The focus of that API is more on completeness rather than on ease of use.</p>
+
+<h3 id="when-to-use-optics-api">When to use Optics API</h3>
+
+<p>You should use Optics API if high-level API does not provide functionality you need. Otherwise use high-level API
+which is easier to use.</p>
+
+<p>When utilizing Optics API you will operate directly on <code class="highlighter-rouge">Monocle</code> types. There is some theory behind them and therefore 
+some basic knowledge of it is neccessary to comfortably use this kind of API. Understanding what is <code class="highlighter-rouge">Lens</code>, <code class="highlighter-rouge">Prism</code> and 
+<code class="highlighter-rouge">Traversal</code> will be particularly helpful. If you don’t now where to start educating about Optics you may find
+section <a href="#resources-on-optics">resources</a> relevant.</p>
+
+<h3 id="how-to-use-optics-api">How to use Optics API</h3>
+
+<p>In order to explain how to use Optics API it will be presented some motivational example, followed by 
+analysis how it works and suggestions how to explore Optics API by yourself.</p>
+
+<h4 id="exemplary-usage-">Exemplary usage <a name="exemplary-usage-optics-api"></a></h4>
+
+<p>In this example we will modify all text nodes in path <code class="highlighter-rouge">b/c</code>:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.optics.ElementOptics._</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.optics.LabeledElementOptics._</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.optics.XmlDocumentOptics._</span>
+
+<span class="k">val</span> <span class="n">exampleXml</span> <span class="k">=</span> <span class="s">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;a&gt;
+   &lt;b&gt;
+      &lt;c&gt;item1&lt;/c&gt;
+      &lt;d&gt;item2&lt;/d&gt;
+   &lt;/b&gt;
+   &lt;b&gt;
+      &lt;c&gt;item1&lt;/c&gt;
+      &lt;e&gt;item2&lt;/e&gt;
+      &lt;c&gt;item3&lt;/c&gt;
+   &lt;/b&gt;
+&lt;/a&gt;"""</span>
+
+<span class="k">val</span> <span class="n">parsed</span> <span class="k">=</span> <span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">exampleXml</span><span class="o">).</span><span class="n">right</span><span class="o">.</span><span class="n">get</span>
+
+<span class="k">val</span> <span class="n">traversal</span> <span class="k">=</span> <span class="n">rootLens</span><span class="o">.</span><span class="n">composeTraversal</span><span class="o">(</span><span class="n">deep</span><span class="o">(</span><span class="s">"b"</span><span class="o">).</span><span class="n">composeTraversal</span><span class="o">(</span><span class="n">deeper</span><span class="o">(</span><span class="s">"c"</span><span class="o">)).</span><span class="n">composeOptional</span><span class="o">(</span><span class="n">hasTextOnly</span><span class="o">))</span>
+
+<span class="k">val</span> <span class="n">res</span> <span class="k">=</span> <span class="n">traversal</span><span class="o">.</span><span class="n">modify</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">toUpperCase</span><span class="o">)(</span><span class="n">parsed</span><span class="o">)</span>
+</code></pre></div></div>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">res</span><span class="o">)</span>
+<span class="c1">// res4: String =
+// &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+// &lt;a&gt;
+//    &lt;b&gt;
+//       &lt;c&gt;ITEM1&lt;/c&gt;
+//       &lt;d&gt;item2&lt;/d&gt;
+//    &lt;/b&gt;
+//    &lt;b&gt;
+//       &lt;c&gt;ITEM1&lt;/c&gt;
+//       &lt;e&gt;item2&lt;/e&gt;
+//       &lt;c&gt;ITEM3&lt;/c&gt;
+//    &lt;/b&gt;
+// &lt;/a&gt;
+</span></code></pre></div></div>
+
+<p>You can find DSL equivalent <a href="#exemplary-usage-dsl">here</a>. The result is as expected, now let’s analyze API more deeply.</p>
+
+<p>Usually you’ll start constructing any transformation with:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.optics.XmlDocumentOptics</span>
+<span class="c1">// import pl.msitko.xml.optics.XmlDocumentOptics
+</span>
+<span class="nc">XmlDocumentOptics</span><span class="o">.</span><span class="n">rootLens</span>
+<span class="c1">// res5: monocle.Lens[pl.msitko.xml.entities.XmlDocument,pl.msitko.xml.entities.LabeledElement] = monocle.PLens$$anon$7@6ad5001
+</span></code></pre></div></div>
+
+<p>which as you see is simply <code class="highlighter-rouge">monocle.Lens</code>. Then to compose it with other optics you can use its <code class="highlighter-rouge">compose...</code> methods.</p>
+
+<p>You man wonder how can you know what to import from <code class="highlighter-rouge">import pl.msitko.xml.optics</code>. The general rule is that optics
+which source is of type <code class="highlighter-rouge">A</code> are defined in <code class="highlighter-rouge">pl.msitko.xml.optics.A</code></p>
+
+<p><strong>Example:</strong> You started defining definition with <code class="highlighter-rouge">rootLens</code> of type <code class="highlighter-rouge">Lens[XmlDocument, LabeledElement]</code>. Now you need to
+compose it with optics which source type is <code class="highlighter-rouge">LabeledElement</code>. Then you need to <code class="highlighter-rouge">import pl.msitko.xml.optics.LabeledElement</code>.</p>
+
+<p>Unfortunately <code class="highlighter-rouge">xml-lens</code> cannot define package object that would define all optics and would let you to include all optics
+with one import. The reason for that is that some names of optics are the same between different source type, e.g.
+<code class="highlighter-rouge">LabeledElementOptics.children</code> and <code class="highlighter-rouge">ElementOptics.children</code>.</p>
+
+<h3 id="resources-on-optics">Resources on Optics</h3>
+
+<h2 id="dsl-high-level-api">DSL (high-level API)</h2>
+
+<h3 id="purpose-of-dsl">Purpose of DSL</h3>
+
+<h3 id="how-to-use-dsl">How to use DSL</h3>
+
+<h4 id="exemplary-usage--1">Exemplary usage <a name="exemplary-usage-dsl"></a></h4>
+
+<p>We’ll rewrite the same transformation as described <a href="#exemplary-usage-optics-api">here</a>, this time with DSL.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.dsl._</span>
+
+
+<span class="k">val</span> <span class="n">exampleXml</span> <span class="k">=</span> <span class="s">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;a&gt;
+   &lt;b&gt;
+      &lt;c&gt;item1&lt;/c&gt;
+      &lt;d&gt;item2&lt;/d&gt;
+   &lt;/b&gt;
+   &lt;b&gt;
+      &lt;c&gt;item1&lt;/c&gt;
+      &lt;e&gt;item2&lt;/e&gt;
+      &lt;c&gt;item3&lt;/c&gt;
+   &lt;/b&gt;
+&lt;/a&gt;"""</span>
+
+<span class="k">val</span> <span class="n">parsed</span> <span class="k">=</span> <span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">exampleXml</span><span class="o">).</span><span class="n">right</span><span class="o">.</span><span class="n">get</span>
+
+<span class="k">val</span> <span class="n">transformation</span> <span class="k">=</span> <span class="o">(</span><span class="n">root</span> <span class="o">\</span> <span class="s">"b"</span> <span class="o">\</span> <span class="s">"c"</span><span class="o">).</span><span class="n">hasTextOnly</span><span class="o">.</span><span class="n">modify</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">toUpperCase</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="n">res</span> <span class="k">=</span> <span class="n">transformation</span><span class="o">(</span><span class="n">parsed</span><span class="o">)</span>
+</code></pre></div></div>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">res</span><span class="o">)</span>
+<span class="c1">// res11: String =
+// &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+// &lt;a&gt;
+//    &lt;b&gt;
+//       &lt;c&gt;ITEM1&lt;/c&gt;
+//       &lt;d&gt;item2&lt;/d&gt;
+//    &lt;/b&gt;
+//    &lt;b&gt;
+//       &lt;c&gt;ITEM1&lt;/c&gt;
+//       &lt;e&gt;item2&lt;/e&gt;
+//       &lt;c&gt;ITEM3&lt;/c&gt;
+//    &lt;/b&gt;
+// &lt;/a&gt;
+</span></code></pre></div></div>
+</section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/xml-lens/highlight/highlight.pack.js"></script><script>hljs.configure({
+languages:['scala','java','bash']
+});
+hljs.initHighlighting();
+             </script><script src="/xml-lens/js/main.js"></script></body></html>

@@ -1,0 +1,134 @@
+<html><head><title>xml-lens</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="pl.msitko" /><meta name="description" content="XML Optics library for Scala" /><meta name="og:image" content="/xml-lens/img/poster.png" /><meta name="og:title" content="xml-lens" /><meta name="og:site_name" content="xml-lens" /><meta name="og:url" content="http://note.github.io/xml-lens" /><meta name="og:type" content="website" /><meta name="og:description" content="XML Optics library for Scala" /><link rel="icon" type="image/png" href="/xml-lens/img/favicon.png" /><meta name="twitter:title" content="xml-lens" /><meta name="twitter:image" content="http://note.github.io/xml-lensimg/poster.png" /><meta name="twitter:description" content="XML Optics library for Scala" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/xml-lens/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/xml-lens/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/xml-lens/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/xml-lens/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/xml-lens/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/xml-lens/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/xml-lens/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/xml-lens/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/xml-lens/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/xml-lens/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/xml-lens/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/xml-lens/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/xml-lens/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/xml-lens/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/xml-lens/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/xml-lens/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/xml-lens/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/xml-lens/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/xml-lens/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/xml-lens/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/xml-lens/highlight/styles/default.css" /><link rel="stylesheet" href="/xml-lens/css/style.css" /><link rel="stylesheet" href="/xml-lens/css/palette.css" /><link rel="stylesheet" href="/xml-lens/css/codemirror.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><ul id="sidebar" class="sidebar-nav"><li class="sidebar-brand"><a href="/xml-lens/" class="brand"><div class="brand-wrapper"><span>xml-lens</span></div></a></li> <li><a href="/xml-lens/index.html#quick_start" class="">Quick start</a></li> <li><a href="/xml-lens/docs/modularity.html" class="">Modularity</a></li> <li><a href="/xml-lens/docs/optics.html" class="">Optics API</a></li> <li><a href="/xml-lens/docs/cookbook.html" class="">Cookbook</a></li> <li><a href="/xml-lens/docs/parsing.html" class="">Parsing</a></li> <li><a href="/xml-lens/docs/printing.html" class=" active ">Printing</a></li> <li><a href="/xml-lens/docs/namespaces.html" class="">Namespaces</a></li></ul></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li id="gh-eyes-item" class="hidden-xs"><a href="https://github.com/note/xml-lens"><i class="fa fa-eye"></i><span>WATCH<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs"><a href="https://github.com/note/xml-lens"><i class="fa fa-star-o"></i><span>STARS<span id="stars" class="label label-default">--</span></span></a></li><li><a href="#" onclick="shareSiteTwitter('xml-lens XML Optics library for Scala');"><i class="fa fa-twitter"></i></a></li><li><a href="#" onclick="shareSiteFacebook('xml-lens XML Optics library for Scala');"><i class="fa fa-facebook"></i></a></li><li><a href="#" onclick="shareSiteGoogle();"><i class="fa fa-google-plus"></i></a></li></ul></div></div></div></div><div id="content" data-github-owner="note" data-github-repo="xml-lens"><div class="content-wrapper"><section><h2 id="printing">Printing</h2>
+
+<p>You need to have <code class="highlighter-rouge">xml-lens-io</code> included.</p>
+
+<p>To add it to your build add following to your <code class="highlighter-rouge">build.sbt</code>:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "pl.msitko" %% "xml-lens-io" % xmlLensVersion
+</code></pre></div></div>
+
+<p>Or (in case of scala.js build):</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "pl.msitko" %%% "xml-lens-io" % xmlLensVersion
+</code></pre></div></div>
+
+<p>The same printing code written in Scala is used for both JVM and JS. Thus, no differences between platforms is expected
+in terms of printing.</p>
+
+<p>To print XML:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.entities.</span><span class="o">{</span><span class="nc">LabeledElement</span><span class="o">,</span> <span class="nc">XmlDocument</span><span class="o">}</span>
+<span class="c1">// import pl.msitko.xml.entities.{LabeledElement, XmlDocument}
+</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="c1">// import pl.msitko.xml.printing.XmlPrinter
+</span>
+<span class="k">val</span> <span class="n">document</span> <span class="k">=</span> <span class="nc">XmlDocument</span><span class="o">.</span><span class="n">noProlog</span><span class="o">(</span><span class="nc">LabeledElement</span><span class="o">.</span><span class="n">unprefixed</span><span class="o">(</span><span class="s">"root"</span><span class="o">))</span>
+<span class="c1">// document: pl.msitko.xml.entities.XmlDocument = XmlDocument(Prolog(None,List(),None),LabeledElement(ResolvedName(,,root),Element(List(),List(),List())))
+</span>
+<span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">document</span><span class="o">)</span>
+<span class="c1">// res0: String = &lt;root&gt;&lt;/root&gt;
+</span></code></pre></div></div>
+
+<h3 id="printing-configuration">Printing configuration</h3>
+
+<p>Some behaviors of <code class="highlighter-rouge">XmlPrinter.print</code> can be configured with <code class="highlighter-rouge">PrinterConfig</code>. It can be passed as implicit parameter.
+When no implicit config can be found <code class="highlighter-rouge">PrinterConfig.Default</code> is used. To find out more about <code class="highlighter-rouge">PrinterConfig</code> please
+read API docs of it.</p>
+
+<h3 id="printing-cookbook">Printing cookbook</h3>
+
+<h4 id="how-to-print-back-output-which-is-possibly-the-most-similar-to-input">How to print back output which is possibly the most similar to input</h4>
+
+<p>There may be situations in which you want to introduce as few formatting changes as possible. In fact default
+configurations for both parser and printer are well suited for that purpose so the following code will do that:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
+<span class="c1">// import pl.msitko.xml.parsing.XmlParser
+</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="c1">// import pl.msitko.xml.printing.XmlPrinter
+</span>
+<span class="c1">// xml formatting is strange here, let us assume we want to keep it
+</span><span class="k">val</span> <span class="n">input</span> <span class="k">=</span> <span class="s">"""|&lt;a someAttr="someVal"&gt;
+               |       &lt;b&gt;someText  &lt;/b&gt;
+               |&lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
+<span class="c1">// input: String =
+// &lt;a someAttr="someVal"&gt;
+//        &lt;b&gt;someText  &lt;/b&gt;
+// &lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;
+</span>
+<span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input</span><span class="o">).</span><span class="n">map</span> <span class="o">{</span> <span class="n">doc</span> <span class="k">=&gt;</span>
+  <span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">doc</span><span class="o">)</span>
+<span class="o">}</span>
+<span class="c1">// res2: scala.util.Either[pl.msitko.xml.parsing.ParsingException,String] =
+// Right(&lt;a someAttr="someVal"&gt;
+//        &lt;b&gt;someText  &lt;/b&gt;
+// &lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;)
+</span></code></pre></div></div>
+
+<h4 id="how-to-pretty-print">How to pretty print</h4>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
+<span class="c1">// import pl.msitko.xml.parsing.XmlParser
+</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.</span><span class="o">{</span><span class="nc">Indent</span><span class="o">,</span> <span class="nc">PrinterConfig</span><span class="o">,</span> <span class="nc">XmlPrinter</span><span class="o">}</span>
+<span class="c1">// import pl.msitko.xml.printing.{Indent, PrinterConfig, XmlPrinter}
+</span>
+<span class="c1">// xml formatting is strange here, let us assume we want to convert to pretty formatting
+</span><span class="k">val</span> <span class="n">input</span> <span class="k">=</span> <span class="s">"""|&lt;a someAttr="someVal"&gt;
+               |       &lt;b&gt;someText  &lt;/b&gt;
+               |&lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
+<span class="c1">// input: String =
+// &lt;a someAttr="someVal"&gt;
+//        &lt;b&gt;someText  &lt;/b&gt;
+// &lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;
+</span>
+<span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input</span><span class="o">).</span><span class="n">map</span> <span class="o">{</span> <span class="n">doc</span> <span class="k">=&gt;</span>
+  <span class="k">implicit</span> <span class="k">val</span> <span class="n">printCfg</span> <span class="k">=</span> <span class="nc">PrinterConfig</span><span class="o">.</span><span class="nc">Default</span><span class="o">.</span><span class="n">copy</span><span class="o">(</span><span class="n">indent</span> <span class="k">=</span> <span class="nc">Indent</span><span class="o">.</span><span class="nc">IndentWith</span><span class="o">(</span><span class="s">"  "</span><span class="o">))</span>
+  <span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">doc</span><span class="o">)</span>
+<span class="o">}</span>
+<span class="c1">// res4: scala.util.Either[pl.msitko.xml.parsing.ParsingException,String] =
+// Right(&lt;a someAttr="someVal"&gt;
+//   &lt;b&gt;someText  &lt;/b&gt;
+//   &lt;c&gt;otherText&lt;/c&gt;
+// &lt;/a&gt;)
+</span></code></pre></div></div>
+
+<h4 id="how-to-print-minimized-xml">How to print minimized XML</h4>
+
+<p><code class="highlighter-rouge">xml-lens</code> takes a little bit unusual approach to minimization and considers it not a property of printing but a 
+transformation performed on document structure (i.e. AST). It does so partially because XML is in theory whitespace
+sensitive and thus treating whitespaces as printing details does not seem appropriate.</p>
+
+<p>In short to parse XML, minimize it and print it back you need to:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="c1">// import pl.msitko.xml.printing.XmlPrinter
+</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="c1">// import pl.msitko.xml.printing.XmlPrinter
+</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.dsl._</span>
+<span class="c1">// import pl.msitko.xml.dsl._
+</span>
+<span class="c1">// xml formatting is strange here, let us assume we don't care about it and want to have some minimized output
+</span><span class="k">val</span> <span class="n">input</span> <span class="k">=</span> <span class="s">"""|&lt;a someAttr="someVal"&gt;
+               |       &lt;b&gt;someText  &lt;/b&gt;
+               |&lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
+<span class="c1">// input: String =
+// &lt;a someAttr="someVal"&gt;
+//        &lt;b&gt;someText  &lt;/b&gt;
+// &lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;
+</span>
+<span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input</span><span class="o">).</span><span class="n">map</span> <span class="o">{</span> <span class="n">doc</span> <span class="k">=&gt;</span>
+  <span class="k">val</span> <span class="n">minimized</span> <span class="k">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">minimize</span>
+  <span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">minimized</span><span class="o">)</span>
+<span class="o">}</span>
+<span class="c1">// res6: scala.util.Either[pl.msitko.xml.parsing.ParsingException,String] = Right(&lt;a someAttr="someVal"&gt;&lt;b&gt;someText  &lt;/b&gt;&lt;c&gt;otherText&lt;/c&gt;&lt;/a&gt;)
+</span></code></pre></div></div>
+</section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/xml-lens/highlight/highlight.pack.js"></script><script>hljs.configure({
+languages:['scala','java','bash']
+});
+hljs.initHighlighting();
+             </script><script src="/xml-lens/js/main.js"></script></body></html>
