@@ -19,7 +19,7 @@ which is easier to use.</p>
 
 <p>When utilizing Optics API you will operate directly on <code class="highlighter-rouge">Monocle</code> types. There is some theory behind them and therefore 
 some basic knowledge of it is neccessary to comfortably use this kind of API. Understanding what is <code class="highlighter-rouge">Lens</code>, <code class="highlighter-rouge">Prism</code> and 
-<code class="highlighter-rouge">Traversal</code> will be particularly helpful. If you don’t now where to start educating about Optics you may find
+<code class="highlighter-rouge">Traversal</code> will be particularly helpful. If you don’t know where to start educating about Optics you may find
 section <a href="#resources-on-optics">resources</a> relevant.</p>
 
 <h3 id="how-to-use-optics-api">How to use Optics API</h3>
@@ -81,7 +81,7 @@ analysis how it works and suggestions how to explore Optics API by yourself.</p>
 <span class="c1">// import pl.msitko.xml.optics.XmlDocumentOptics
 </span>
 <span class="nc">XmlDocumentOptics</span><span class="o">.</span><span class="n">rootLens</span>
-<span class="c1">// res5: monocle.Lens[pl.msitko.xml.entities.XmlDocument,pl.msitko.xml.entities.LabeledElement] = monocle.PLens$$anon$7@6ad5001
+<span class="c1">// res5: monocle.Lens[pl.msitko.xml.entities.XmlDocument,pl.msitko.xml.entities.LabeledElement] = monocle.PLens$$anon$7@1adc33fa
 </span></code></pre></div></div>
 
 <p>which as you see is simply <code class="highlighter-rouge">monocle.Lens</code>. Then to compose it with other optics you can use its <code class="highlighter-rouge">compose...</code> methods.</p>
@@ -96,17 +96,21 @@ compose it with optics which source type is <code class="highlighter-rouge">Labe
 with one import. The reason for that is that some names of optics are the same between different source type, e.g.
 <code class="highlighter-rouge">LabeledElementOptics.children</code> and <code class="highlighter-rouge">ElementOptics.children</code>.</p>
 
-<h3 id="resources-on-optics">Resources on Optics</h3>
-
 <h2 id="dsl-high-level-api">DSL (high-level API)</h2>
 
 <h3 id="purpose-of-dsl">Purpose of DSL</h3>
 
+<p>The goal of DSL is to provide a set of convenient combinators for the most common operations.
+Those combinators are implemented on top of Optics API.</p>
+
 <h3 id="how-to-use-dsl">How to use DSL</h3>
+
+<p>Firstly you need to <code class="highlighter-rouge">import pl.msitko.xml.dsl._</code>. It will bring <code class="highlighter-rouge">root</code> into scope. <code class="highlighter-rouge">root</code> represents
+the root element of XML document. Therefore, it serves as starting point for defining any transformations.</p>
 
 <h4 id="exemplary-usage--1">Exemplary usage <a name="exemplary-usage-dsl"></a></h4>
 
-<p>We’ll rewrite the same transformation as described <a href="#exemplary-usage-optics-api">here</a>, this time with DSL.</p>
+<p>We will rewrite the same transformation as described <a href="#exemplary-usage-optics-api">here</a>, this time with DSL.</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
 <span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
@@ -148,6 +152,32 @@ with one import. The reason for that is that some names of optics are the same b
 //    &lt;/b&gt;
 // &lt;/a&gt;
 </span></code></pre></div></div>
+
+<h3 id="resources-on-optics">Resources on Optics</h3>
+
+<h4 id="articles">Articles</h4>
+
+<ul>
+  <li>A presentation of the most important types of optics: <a href="https://blog.scalac.io/optics-beyond-lenses-with-monocle.html">link</a></li>
+  <li>Monocle <a href="http://julien-truffaut.github.io/Monocle/">documentation</a></li>
+  <li><a href="http://julien-truffaut.github.io/Monocle/learning_resources.html">List of references</a> from Monocle documentation</li>
+  <li>Scala Exercises <a href="https://www.scala-exercises.org/monocle/iso">page</a></li>
+</ul>
+
+<h4 id="talks">Talks</h4>
+
+<ul>
+  <li>Ilan Godik’s <a href="https://www.youtube.com/watch?v=NvCcNM2vp3k">talk</a> - great introductory talk into Optics in Scala using Monocle
+by one of its maintainers. Short and does not require any specific knowledge upfront. Also introduces <a href="https://youtu.be/NvCcNM2vp3k?t=18m40s">Van Laarhoven Lenses</a></li>
+  <li>Julien Truffaut’s <a href="https://www.youtube.com/watch?v=6nyGVgGEKdA">talk</a> - Julien is an author of Monocle, in this talk he
+provides great overview and intuitions about various types of Optics</li>
+  <li>another <a href="https://skillsmatter.com/skillscasts/8969-jsonpath-type-safe-query-dsl-using-optics">talk</a> by Julien Truffaut - this
+one is about <code class="highlighter-rouge">JsonPath</code> - concept already mentioned in this article in <a href="#circe">section</a> covering <code class="highlighter-rouge">circe-optics</code></li>
+  <li>Brian McKenna’s <a href="https://www.youtube.com/watch?v=H01dw-BMmlE">talk</a> - Brian goes through Optics libraries in a few different
+languages: PureScript, Haskell, Scala and Java. Mentions nice examples of applications including <a href="https://youtu.be/H01dw-BMmlE?t=4m21s">representing</a>
+web pages as Optics which allows to navigate between state and UI in <a href="https://github.com/slamdata/purescript-halogen">Halogen</a>, <a href="https://youtu.be/H01dw-BMmlE?t=6m49s">working with Kinesis records</a>
+in Haskell, <a href="https://youtu.be/H01dw-BMmlE?t=13m20s">handling errors</a> with Prisms in Scala</li>
+</ul>
 </section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/xml-lens/highlight/highlight.pack.js"></script><script>hljs.configure({
 languages:['scala','java','bash']
 });

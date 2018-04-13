@@ -11,35 +11,64 @@ you need to work with XML. <code class="highlighter-rouge">xml-optics</code> is 
 really good at. To make those operations easy to express the concept of <code class="highlighter-rouge">Optics</code> has been used. 
 <a href="http://julien-truffaut.github.io/Monocle/">Monocle</a> has been used as an implementation of <code class="highlighter-rouge">Optics</code>.</p>
 
-<h2 id="quick-start"><a name="quick_start"></a>Quick start</h2>
-
 <p><code class="highlighter-rouge">xml-lens</code> is available for both Scala 2.11 and 2.12. It’s cross published for both JVM and Scala.js.</p>
 
-<p>TODO: add lines needed in <code class="highlighter-rouge">build.sbt</code> as soon as library is published.</p>
+<h2 id="quick-start"><a name="quick_start"></a>Quick start</h2>
 
-<p>Let’s say we want to transform <code class="highlighter-rouge">f</code> node in the following XML in such way that its text value will be converted to 
-upper case:</p>
+<p>In this section there is a simple case presented in copy-paste ready form. In the next section it’s
+explained more deeply.</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="n">input</span> <span class="k">=</span>
-      <span class="s">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-        |&lt;a&gt;
-        |  &lt;e&gt;item&lt;/e&gt;
-        |  &lt;f&gt;item&lt;/f&gt;
-        |  &lt;g&gt;item&lt;/g&gt;
-        |&lt;/a&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
+<p>Add following lines to your <code class="highlighter-rouge">build.sbt</code>:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies ++= Seq(
+	"pl.msitko" %% "xml-lens-io"     % "0.1.0-RC1",
+	"pl.msitko" %% "xml-lens-optics" % "0.1.0-RC1"
+)
 </code></pre></div></div>
 
-<p>We can define transformation in the following way:</p>
+<p>Then in your Scala code you can:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
+<span class="k">import</span> <span class="nn">pl.msitko.xml.dsl._</span>
+
+<span class="c1">// some XML input
+</span><span class="k">val</span> <span class="n">input</span> <span class="k">=</span>
+    <span class="s">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+      |&lt;a&gt;
+      |  &lt;e&gt;item&lt;/e&gt;
+      |  &lt;f&gt;item&lt;/f&gt;
+      |  &lt;g&gt;item&lt;/g&gt;
+      |&lt;/a&gt;"""</span><span class="o">.</span><span class="n">stripMargin</span>
+
+<span class="c1">// turn `f` node to upper case - define transformation
+</span><span class="k">val</span> <span class="n">modify</span> <span class="k">=</span> <span class="o">(</span><span class="n">root</span> <span class="o">\</span> <span class="s">"f"</span><span class="o">).</span><span class="n">hasTextOnly</span><span class="o">.</span><span class="n">modify</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">toUpperCase</span><span class="o">)</span>
+
+<span class="c1">// parse XML
+</span><span class="k">val</span> <span class="n">parsed</span> <span class="k">=</span> <span class="nc">XmlParser</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">input</span><span class="o">).</span><span class="n">right</span><span class="o">.</span><span class="n">get</span>
+
+<span class="c1">// apply transformation
+</span><span class="k">val</span> <span class="n">res</span> <span class="k">=</span> <span class="n">modify</span><span class="o">(</span><span class="n">parsed</span><span class="o">)</span>
+
+<span class="n">println</span><span class="o">(</span><span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">res</span><span class="o">))</span>
+</code></pre></div></div>
+
+<h2 id="quick-start---explained"><a name="quick_start"></a>Quick start - explained</h2>
+
+<p>The whole example is about transforming one path of XML to be in upper case.</p>
+
+<p>Firstly, we define the transformation in the following way:</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.dsl._</span>
 <span class="c1">// import pl.msitko.xml.dsl._
 </span>
 <span class="k">val</span> <span class="n">modify</span> <span class="k">=</span> <span class="o">(</span><span class="n">root</span> <span class="o">\</span> <span class="s">"f"</span><span class="o">).</span><span class="n">hasTextOnly</span><span class="o">.</span><span class="n">modify</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">toUpperCase</span><span class="o">)</span>
-<span class="c1">// modify: pl.msitko.xml.entities.XmlDocument =&gt; pl.msitko.xml.entities.XmlDocument = monocle.PTraversal$$Lambda$11639/1902493902@59567f06
+<span class="c1">// modify: pl.msitko.xml.entities.XmlDocument =&gt; pl.msitko.xml.entities.XmlDocument = monocle.PTraversal$$Lambda$5554/1976770450@23fad4e2
 </span></code></pre></div></div>
 
-<p><code class="highlighter-rouge">root</code> stands for root element of XML document. Every XML document should contain exactly one root element. In case
-of our example <code class="highlighter-rouge">&lt;a&gt;</code> is a root element.</p>
+<p><code class="highlighter-rouge">root</code> is available thanks to <code class="highlighter-rouge">import pl.msitko.xml.dsl._</code>. <code class="highlighter-rouge">root</code> stands for root element of XML
+document. Every XML document should contain exactly one root element. In caseof our example <code class="highlighter-rouge">&lt;a&gt;</code>
+is a root element.</p>
 
 <p>Then we can navigate deeper using <code class="highlighter-rouge">\</code> operator. It takes a <code class="highlighter-rouge">String</code> argument which is a label of direct children we want to 
 “zoom into”. There’s an overloaded <code class="highlighter-rouge">\</code> operator which takes <code class="highlighter-rouge">NameMatcher</code> instead of <code class="highlighter-rouge">String</code> which allows you to specify 
@@ -52,7 +81,7 @@ will match all nodes that have specified label.</p>
 which takes a function from <code class="highlighter-rouge">String</code> to <code class="highlighter-rouge">String</code>.</p>
 
 <p>Now, when we have <code class="highlighter-rouge">modify</code> function declared we can use it on parsed XML. The code which parses input and
-run <code class="highlighter-rouge">modify</code> tranformation on it looks like this:</p>
+run <code class="highlighter-rouge">modify</code> transformation on it looks like this:</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">pl.msitko.xml.parsing.XmlParser</span>
 <span class="k">import</span> <span class="nn">pl.msitko.xml.printing.XmlPrinter</span>
@@ -65,7 +94,7 @@ run <code class="highlighter-rouge">modify</code> tranformation on it looks like
 <p>Finally, we can print the result back to verify it:</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">XmlPrinter</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">res</span><span class="o">)</span>
-<span class="c1">// res2: String =
+<span class="c1">// res12: String =
 // &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 // &lt;a&gt;
 //   &lt;e&gt;item&lt;/e&gt;
