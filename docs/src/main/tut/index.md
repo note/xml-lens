@@ -15,28 +15,57 @@ you need to work with XML. `xml-optics` is an attempt to make this experience as
   
 Main focus of `xml-optics` is traversing and transforming XML trees - something `scala-xml` is not 
 really good at. To make those operations easy to express the concept of `Optics` has been used. 
-[Monocle](http://julien-truffaut.github.io/Monocle/) has been used as an implementation of `Optics`. 
-
-## <a name="quick_start"></a>Quick start
+[Monocle](http://julien-truffaut.github.io/Monocle/) has been used as an implementation of `Optics`.
 
 `xml-lens` is available for both Scala 2.11 and 2.12. It's cross published for both JVM and Scala.js.
 
-TODO: add lines needed in `build.sbt` as soon as library is published.
+## <a name="quick_start"></a>Quick start
 
-Let's say we want to transform `f` node in the following XML in such way that its text value will be converted to 
-upper case:
+In this section there is a simple case presented in copy-paste ready form. In the next section it's
+explained more deeply.
 
-```tut:silent
-val input =
-      """<?xml version="1.0" encoding="UTF-8"?>
-        |<a>
-        |  <e>item</e>
-        |  <f>item</f>
-        |  <g>item</g>
-        |</a>""".stripMargin
+Add following lines to your `build.sbt`:
+
+```
+libraryDependencies ++= Seq(
+	"pl.msitko" %% "xml-lens-io"     % "0.1.0-RC1",
+	"pl.msitko" %% "xml-lens-optics" % "0.1.0-RC1"
+)
 ```
 
-We can define transformation in the following way: 
+Then in your Scala code you can:
+
+```tut:silent
+import pl.msitko.xml.parsing.XmlParser
+import pl.msitko.xml.printing.XmlPrinter
+import pl.msitko.xml.dsl._
+
+// some XML input
+val input =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<a>
+      |  <e>item</e>
+      |  <f>item</f>
+      |  <g>item</g>
+      |</a>""".stripMargin
+
+// turn `f` node to upper case - define transformation
+val modify = (root \ "f").hasTextOnly.modify(_.toUpperCase)
+
+// parse XML
+val parsed = XmlParser.parse(input).right.get
+
+// apply transformation
+val res = modify(parsed)
+
+println(XmlPrinter.print(res))
+```
+
+## <a name="quick_start"></a>Quick start - explained
+
+The whole example is about transforming one path of XML to be in upper case.
+
+Firstly, we define the transformation in the following way:
 
 ```tut:book
 import pl.msitko.xml.dsl._
@@ -44,8 +73,9 @@ import pl.msitko.xml.dsl._
 val modify = (root \ "f").hasTextOnly.modify(_.toUpperCase)
 ```
 
-`root` stands for root element of XML document. Every XML document should contain exactly one root element. In case
-of our example `<a>` is a root element. 
+`root` is available thanks to `import pl.msitko.xml.dsl._`. `root` stands for root element of XML
+document. Every XML document should contain exactly one root element. In caseof our example `<a>`
+is a root element.
 
 Then we can navigate deeper using `\` operator. It takes a `String` argument which is a label of direct children we want to 
 "zoom into". There's an overloaded `\` operator which takes `NameMatcher` instead of `String` which allows you to specify 
@@ -58,7 +88,7 @@ After we specified what we want to modify, we can define what it should be modif
 which takes a function from `String` to `String`.
 
 Now, when we have `modify` function declared we can use it on parsed XML. The code which parses input and
-run `modify` tranformation on it looks like this:
+run `modify` transformation on it looks like this:
 
 ```tut:silent
 import pl.msitko.xml.parsing.XmlParser

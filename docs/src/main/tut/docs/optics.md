@@ -25,7 +25,7 @@ which is easier to use.
 
 When utilizing Optics API you will operate directly on `Monocle` types. There is some theory behind them and therefore 
 some basic knowledge of it is neccessary to comfortably use this kind of API. Understanding what is `Lens`, `Prism` and 
-`Traversal` will be particularly helpful. If you don't now where to start educating about Optics you may find
+`Traversal` will be particularly helpful. If you don't know where to start educating about Optics you may find
 section [resources](#resources-on-optics) relevant.
 
 ### How to use Optics API
@@ -90,17 +90,21 @@ Unfortunately `xml-lens` cannot define package object that would define all opti
 with one import. The reason for that is that some names of optics are the same between different source type, e.g.
 `LabeledElementOptics.children` and `ElementOptics.children`.
 
-### Resources on Optics
-
 ## DSL (high-level API)
 
 ### Purpose of DSL
 
+The goal of DSL is to provide a set of convenient combinators for the most common operations.
+Those combinators are implemented on top of Optics API.
+
 ### How to use DSL
+
+Firstly you need to `import pl.msitko.xml.dsl._`. It will bring `root` into scope. `root` represents
+the root element of XML document. Therefore, it serves as starting point for defining any transformations.
 
 #### Exemplary usage <a name="exemplary-usage-dsl"></a>
 
-We'll rewrite the same transformation as described [here](#exemplary-usage-optics-api), this time with DSL.
+We will rewrite the same transformation as described [here](#exemplary-usage-optics-api), this time with DSL.
 
 ```tut:silent
 import pl.msitko.xml.parsing.XmlParser
@@ -131,3 +135,25 @@ val res = transformation(parsed)
 ```tut:book
 XmlPrinter.print(res)
 ```
+
+### Resources on Optics
+
+#### Articles
+
+* A presentation of the most important types of optics: [link](https://blog.scalac.io/optics-beyond-lenses-with-monocle.html)
+* Monocle [documentation](http://julien-truffaut.github.io/Monocle/)
+* [List of references](http://julien-truffaut.github.io/Monocle/learning_resources.html) from Monocle documentation
+* Scala Exercises [page](https://www.scala-exercises.org/monocle/iso)
+
+#### Talks
+
+* Ilan Godik's [talk](https://www.youtube.com/watch?v=NvCcNM2vp3k) - great introductory talk into Optics in Scala using Monocle
+by one of its maintainers. Short and does not require any specific knowledge upfront. Also introduces [Van Laarhoven Lenses](https://youtu.be/NvCcNM2vp3k?t=18m40s)
+* Julien Truffaut's [talk](https://www.youtube.com/watch?v=6nyGVgGEKdA) - Julien is an author of Monocle, in this talk he
+provides great overview and intuitions about various types of Optics
+* another [talk](https://skillsmatter.com/skillscasts/8969-jsonpath-type-safe-query-dsl-using-optics) by Julien Truffaut - this
+one is about `JsonPath` - concept already mentioned in this article in [section](#circe) covering `circe-optics`
+* Brian McKenna's [talk](https://www.youtube.com/watch?v=H01dw-BMmlE) - Brian goes through Optics libraries in a few different
+languages: PureScript, Haskell, Scala and Java. Mentions nice examples of applications including [representing](https://youtu.be/H01dw-BMmlE?t=4m21s)
+web pages as Optics which allows to navigate between state and UI in [Halogen](https://github.com/slamdata/purescript-halogen), [working with Kinesis records](https://youtu.be/H01dw-BMmlE?t=6m49s)
+in Haskell, [handling errors](https://youtu.be/H01dw-BMmlE?t=13m20s) with Prisms in Scala
