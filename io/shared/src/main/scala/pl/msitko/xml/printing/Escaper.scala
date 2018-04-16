@@ -1,5 +1,7 @@
 package pl.msitko.xml.printing
 
+import Syntax._
+
 // https://stackoverflow.com/questions/1091945/what-characters-do-i-need-to-escape-in-xml-documents
 private [printing] object Escaper {
   // instead of simplistic `.replace("&", "&amp;")` which is incorrect as will do substitution even
@@ -10,18 +12,45 @@ private [printing] object Escaper {
   // I noticed javax.xml.stream.XMLStreamWriter does the same naive thing Escaper does here so
   // probably it's not that bad
 
-  def escapeAttributeValue(value: String): String = {
-    value
-      .replace("&", "&amp;") // It's crucial for correctness that replacing `&` is the first replacement we perform
-      .replace("<", "&lt;")
-      .replace(">", "&gt;")
-      .replace("\"", "&quot;")
+  def escapeAttributeValue[M : InternalMonoid](value: String)(writer: M): M = {
+    value.foldLeft(writer) { (acc, ch) =>
+      ch match {
+        case '&'    => writer.combine("&amp;")
+        case '<'    => writer.combine("&lt;")
+        case '>'    => writer.combine("&gt;")
+        case '\"'   => writer.combine("&quot;")
+        case ch     => writer.combine(ch)
+      }
+    }
+//    value
+//      .replace("&", "&amp;") // It's crucial for correctness that replacing `&` is the first replacement we perform
+//      .replace("<", "&lt;")
+//      .replace(">", "&gt;")
+//      .replace("\"", "&quot;")
   }
 
-  def escapeText(text: String): String = {
-    text
-      .replace("&", "&amp;") // It's crucial for correctness that replacing `&` is the first replacement we perform
-      .replace("<", "&lt;")
-      .replace(">", "&gt;")
+  def escapeText[M : InternalMonoid](text: String)(writer: M): M = {
+    val needEscaping = text.exists {
+      case '&' | '<' | '>' => true
+      case _ => false
+    }
+
+    if (needEscaping) {
+      text.foldLeft(writer) { (acc, ch) =>
+        ch match {
+          case '&'    => writer.combine("&amp;")
+          case '<'    => writer.combine("&lt;")
+          case '>'    => writer.combine("&gt;")
+          case ch     => writer.combine(ch)
+        }
+      }
+    } else {
+      writer.combine(text)
+    }
+
+//    text
+//      .replace("&", "&amp;") // It's crucial for correctness that replacing `&` is the first replacement we perform
+//      .replace("<", "&lt;")
+//      .replace(">", "&gt;")
   }
 }

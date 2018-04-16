@@ -7,7 +7,7 @@ object XmlPrinter extends CommonXmlPrinter {
   override def print(doc: XmlDocument)(implicit cfg: PrinterConfig): String = {
     import InternalMonoid._
 
-    var writer = CommonXmlWriter.writeProlog[String](doc.prolog, cfg.eolAfterXmlDecl)(InternalMonoid[String].zero)
+    var writer = CommonXmlWriter.writeProlog[StringBuilder](doc.prolog, cfg.eolAfterXmlDecl)(InternalMonoid[StringBuilder].zero)
 
     var toVisit = List[Node](doc.root)
     var toEnd = List.empty[LabeledElement]
@@ -44,6 +44,6 @@ object XmlPrinter extends CommonXmlPrinter {
       }
     }
 
-    writer
+    writer.toString
   }
 }

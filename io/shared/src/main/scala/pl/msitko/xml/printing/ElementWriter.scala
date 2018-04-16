@@ -1,45 +1,65 @@
 package pl.msitko.xml.printing
 
-import pl.msitko.xml.entities.{Attribute, Element, LabeledElement, NamespaceDeclaration}
+import pl.msitko.xml.entities.{Attribute, LabeledElement, NamespaceDeclaration}
+import pl.msitko.xml.printing.Syntax._
 
 trait ElementWriter extends Resolver {
   def writeElement[M : InternalMonoid](element: LabeledElement, level: Int)(writer: M): M
 
   def writeEndElement[M : InternalMonoid](element: LabeledElement, level: Int)(writer: M): M
 
-  protected def writeElementBase(element: LabeledElement): String = {
-    def singleNsStr(ns: NamespaceDeclaration): String =
+  protected def writeElementBase[M : InternalMonoid](element: LabeledElement)(writer: M): M = {
+    def singleNsStr(ns: NamespaceDeclaration)(writer: M): M =
       if(ns.prefix.isEmpty) {
-        s"""xmlns="${Escaper.escapeAttributeValue(ns.uri)}""""
+        val t1 = writer
+          .combine("xmlns=\"")
+        Escaper.escapeAttributeValue(ns.uri)(t1).combine("\"")
       } else {
-        s"""xmlns:${ns.prefix}="${Escaper.escapeAttributeValue(ns.uri)}""""
+        val t1 = writer
+          .combine("xmlns")
+          .combine(ns.prefix)
+          .combine("=\"")
+        Escaper.escapeAttributeValue(ns.uri)(t1).combine("\"")
       }
 
-    def singleAttrStr(attr: Attribute): String =
-      s"""${resolve(attr.key)}="${Escaper.escapeAttributeValue(attr.value)}""""
+    def singleAttrStr(attr: Attribute)(writer: M): M = {
+      val t1 = writer
+        .combine(resolve(attr.key))
+        .combine("=\"")
+      Escaper.escapeAttributeValue(attr.value)(t1).combine("\"")
+    }
 
-    val nsStr = {
-      val tmp = element.element.namespaceDeclarations.map(singleNsStr).mkString(" ")
-      if (tmp.nonEmpty) {
-        " " + tmp
+    val tmp = writer
+      .combine("<")
+      .combine(resolve(element.label))
+
+    val withNs =
+      if(element.element.namespaceDeclarations.nonEmpty) {
+        element.element.namespaceDeclarations.foldLeft(tmp.combine(" ")) { (acc, ns) =>
+          singleNsStr(ns)(acc)
+        }
       } else {
         tmp
       }
-    }
-    val attrStr = {
-      val tmp = element.element.attributes.map(singleAttrStr).mkString(" ")
-      if (tmp.nonEmpty) {
-        " " + tmp
-      } else {
-        tmp
-      }
-    }
 
-    s"<${resolve(element.label)}$nsStr$attrStr>"
+    val w =
+      if(element.element.attributes.nonEmpty) {
+        element.element.attributes.foldLeft(withNs) { (acc, attr) =>
+          val tmp = acc.combine(" ")
+          singleAttrStr(attr)(tmp)
+        }
+      } else {
+        withNs
+      }
+
+    w.combine(">")
   }
 
-  protected def writeEndElementBase(element: LabeledElement): String = {
-    s"</${resolve(element.label)}>"
+  protected def writeEndElementBase[M : InternalMonoid](element: LabeledElement)(writer: M): M = {
+    writer
+      .combine("</")
+      .combine(resolve(element.label))
+      .combine(">")
   }
 }
 
@@ -53,46 +73,50 @@ object ElementWriter {
 
 class SimpleElementWriter extends ElementWriter {
   override def writeElement[M: InternalMonoid](element: LabeledElement, level: Int)(writer: M) = {
-    InternalMonoid[M].combine(writer, writeElementBase(element))
+    writeElementBase(element)(writer)
   }
 
   override def writeEndElement[M : InternalMonoid](element: LabeledElement, level: Int)(writer: M): M =
-    InternalMonoid[M].combine(writer, writeEndElementBase(element))
+    writeEndElementBase(element)(writer)
 }
 
 class PrettyElementWriter(singleIndent: String) extends ElementWriter {
   val systemEol = System.getProperty("line.separator")
 
   override def writeElement[M: InternalMonoid](element: LabeledElement, level: Int)(writer: M) = {
-    val indent = singleIndent * level
-    val fullIndent =
-      if(level > 0) {
-        systemEol + indent
-      } else {
-        indent
-      }
+//    val indent = singleIndent * level
+//    val fullIndent =
+//      if(level > 0) {
+//        systemEol + indent
+//      } else {
+//        indent
+//      }
+//
+//    val elStr = s"$fullIndent${writeElementBase(element)}"
+//    InternalMonoid[M].combine(writer, elStr)
 
-    val elStr = s"$fullIndent${writeElementBase(element)}"
-    InternalMonoid[M].combine(writer, elStr)
+    ???
   }
 
   override def writeEndElement[M : InternalMonoid](element: LabeledElement, level: Int)(writer: M): M = {
-    val indent =
-      if(hasChildren(element.element)) {
-        systemEol + singleIndent * (level - 1)
-      } else {
-        ""
-      }
+//    val indent =
+//      if(hasChildren(element.element)) {
+//        systemEol + singleIndent * (level - 1)
+//      } else {
+//        ""
+//      }
+//
+//    val endStr = s"$indent${writeEndElementBase(element)}"
+//    InternalMonoid[M].combine(writer, endStr)
 
-    val endStr = s"$indent${writeEndElementBase(element)}"
-    InternalMonoid[M].combine(writer, endStr)
+    ???
   }
 
-  private def hasChildren(element: Element): Boolean =
-    element.children.exists {
-      case el: LabeledElement =>
-        true
-      case _ =>
-        false
-    }
+//  private def hasChildren(element: Element): Boolean =
+//    element.children.exists {
+//      case el: LabeledElement =>
+//        true
+//      case _ =>
+//        false
+//    }
 }
