@@ -82,15 +82,11 @@ object CommonXmlWriter extends Resolver {
 
 }
 
-// just not to make io module depending on cats/scalaz
+// mostly not to make io module depending on cats/scalaz
 trait InternalMonoid [T] {
   def combine(a: T, b: String): T
   def combine(a: T, ch: Char): T
   def zero: T
-}
-
-object InternalMonoidJvm {
-  def apply[T : InternalMonoid]: InternalMonoid[T] = implicitly[InternalMonoid[T]]
 }
 
 object InternalMonoid {
