@@ -21,8 +21,8 @@ object Common {
     "-Xlint"
   )
 
-  val commonScalaVersion =  "2.12.2"
-  val commonCrossScalaVersions = Seq("2.12.4", "2.11.12")
+  val commonScalaVersion =  "2.12.6"
+  val commonCrossScalaVersions = Seq("2.12.6", "2.11.12")
 
   implicit class CrossProjectFrom(project: CrossProject) {
     def commonSettings: CrossProject = project.settings(_commonSettings)

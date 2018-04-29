@@ -13,6 +13,9 @@ lazy val ast = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) 
     name := "xml-lens-ast"
   )
   .settings(publishSettings)
+  .jsSettings(
+    coverageEnabled := false
+  )
 
 lazy val astJVM = ast.jvm
 lazy val astJS  = ast.js
@@ -44,7 +47,7 @@ lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) i
     libraryDependencies += "com.lihaoyi" %%% "fastparse" % "1.0.0",
     coverageEnabled := false
   )
-  .dependsOn(ast, testsCommon % "test->test")
+  .dependsOn(ast, testsCommon % "test-internal->test")
 
 lazy val ioJVM = io.jvm
 lazy val ioJS  = io.js
@@ -60,7 +63,7 @@ lazy val optics = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Ful
   .jsSettings(
     coverageEnabled := false
   )
-  .dependsOn(ast, testsCommon % "test->test", io % "test->test")
+  .dependsOn(ast, testsCommon % "test-internal->test", io % "test-internal->test")
 
 lazy val opticsJVM = optics.jvm
 lazy val opticsJS  = optics.js
