@@ -13,6 +13,9 @@ lazy val ast = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) 
     name := "xml-lens-ast"
   )
   .settings(publishSettings)
+  .jsSettings(
+    coverageEnabled := false
+  )
 
 lazy val astJVM = ast.jvm
 lazy val astJS  = ast.js

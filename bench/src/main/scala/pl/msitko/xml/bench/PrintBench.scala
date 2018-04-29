@@ -1,6 +1,5 @@
 package pl.msitko.xml.bench
 
-//import java.io.StringWriter
 import java.io.StringWriter
 import java.util.concurrent.TimeUnit
 
@@ -29,9 +28,9 @@ class PrintBench {
     XmlPrinter.print(lensElement)
   }
 
-//  @Benchmark def prettyPrintWithLens: String = {
-//    XmlPrinter.print(lensElement)
-//  }
+  @Benchmark def prettyPrintWithLens: String = {
+    XmlPrinter.print(lensElement)
+  }
 
   @Benchmark def prettyPrintWithStd: String = {
     val writer = new StringWriter
