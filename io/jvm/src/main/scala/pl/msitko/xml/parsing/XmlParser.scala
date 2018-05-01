@@ -2,6 +2,7 @@ package pl.msitko.xml.parsing
 
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.{Charset, StandardCharsets}
+import java.nio.file.{Files, Path}
 import javax.xml.stream.XMLStreamConstants._
 import javax.xml.stream.{XMLInputFactory, XMLResolver, XMLStreamReader}
 
@@ -9,7 +10,7 @@ import pl.msitko.xml.entities._
 import pl.msitko.xml.parsing.utils.TryOps._
 
 import scala.collection.mutable.ArrayBuffer
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
 private [parsing] class LabeledElementBuilder(label: ResolvedName, attributes: Seq[Attribute], namespaceDeclarations: Seq[NamespaceDeclaration]) {
@@ -48,6 +49,12 @@ object XmlParser {
     Try(read(inputStream, config)).asEither.left.map {
       case e: ParsingException  => e
       case NonFatal(e)          => ParsingException(s"Cannot parse XML: ${e.getMessage}", e)
+    }
+
+  def parsePath(path: Path)(implicit config: ParserConfig = ParserConfig.Default): Either[XmlException, XmlDocument] =
+    Try(Files.newInputStream(path)) match {
+      case Success(is) => parseStream(is)
+      case Failure(e)  => Left(PathException(s"Error occured when opening $path: ${e.getMessage}", e))
     }
 
   private def read(inputStream: InputStream, config: ParserConfig): XmlDocument = {

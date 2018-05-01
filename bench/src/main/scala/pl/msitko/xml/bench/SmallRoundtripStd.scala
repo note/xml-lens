@@ -4,7 +4,7 @@ import java.io.StringWriter
 
 import scala.xml.XML
 
-object RoundtripStd extends Roundtrip {
+object SmallRoundtripStd extends SmallRoundtrip {
   override def roundtrip(input: String): String = {
     val xml = XML.loadString(input)
 

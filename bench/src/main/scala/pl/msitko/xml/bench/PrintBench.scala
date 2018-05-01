@@ -12,10 +12,10 @@ import scala.xml.{Elem, XML}
 
 object PrintBenchParams {
   val lensElement: XmlDocument =
-    XmlParser.parse(Roundtrip.example.input).right.get
+    XmlParser.parse(SmallRoundtrip.example.input).right.get
 
   val stdElement: Elem =
-    XML.loadString(Roundtrip.example.input)
+    XML.loadString(SmallRoundtrip.example.input)
 }
 
 @BenchmarkMode(Array(Mode.AverageTime))
