@@ -4,11 +4,11 @@ import pl.msitko.xml.entities._
 import pl.msitko.xml.printing.Indent.IndentWith
 import Syntax._
 
-trait CommonXmlPrinter {
+private [printing] trait CommonXmlPrinter {
   def print(doc: XmlDocument)(implicit cfg: PrinterConfig = PrinterConfig.Default): String
 }
 
-object CommonXmlWriter extends Resolver {
+private [printing] object CommonXmlWriter extends Resolver {
   val systemEol = System.getProperty("line.separator")
 
   def writeProlog[M : InternalMonoid](prolog: Prolog, eolAfterXmlDecl: Boolean)(writer: M): M = {
@@ -81,37 +81,3 @@ object CommonXmlWriter extends Resolver {
       .combine("-->")
 
 }
-
-// mostly not to make io module depending on cats/scalaz
-trait InternalMonoid [T] {
-  def combine(a: T, b: String): T
-  def combine(a: T, ch: Char): T
-  def zero: T
-}
-
-object InternalMonoid {
-  def apply[T : InternalMonoid]: InternalMonoid[T] = implicitly[InternalMonoid[T]]
-
-  implicit val stringMonoidInstance = new InternalMonoid[String] {
-    override def combine(a: String, b: String) = a + b
-    override def combine(a: String, ch: Char) = a + ch
-
-    override def zero = ""
-  }
-
-  implicit val stringBuilderMonoidInstance = new InternalMonoid[StringBuilder] {
-    override def combine(a: StringBuilder, b: String) = a.append(b)
-    override def combine(a: StringBuilder, ch: Char) = a.append(ch)
-
-    override def zero = new StringBuilder
-  }
-}
-
-object Syntax {
-  implicit class InternalMonoidWithCombine[M : InternalMonoid](m: M) {
-    def combine(b: String) = InternalMonoid[M].combine(m, b)
-    def combine(ch: Char)  = InternalMonoid[M].combine(m, ch)
-  }
-}
-
-

@@ -1,7 +1,7 @@
 ---
 layout: docs
 title:  "Parsing"
-position: 4
+position: 5
 ---
 
 ## Parsing
@@ -36,7 +36,7 @@ XmlParser.parse(input)
 
 #### Parsing entity references
 
-On JVM following input:
+On the JVM for the following input:
 
 ```tut:silent
 val input =
@@ -49,16 +49,18 @@ val input =
       |]><html><body><p>abc &test-entity; def</p></body></html>""".stripMargin
 ```
 
-After parsing, element `p` will have 3 children: 
+Element `p` will have 3 children:
 
 ```(Text("abc "), EntityReference("test-entity", "This <em>is</em> an entity."), Text(" def"))```
 
-As you can see parser created `EntityReference` which holds both name of the entity and the replacement. This is the default
-behavior as it does not lose any information which is especially useful if you want to make non-intrusive changes
-and print back document as similar to original as it's possible. Read more about configuring this behavior at 
+With scala-js for the same input `p` will also have 3 children but the content of the second child differs:
+
+```(Text("abc "), EntityReference("test-entity"), Text(" def"))```
+
+This behavior can be configured further on JVM. Read more about configuring this behavior at
 [parsing configuration](#parsing-configuration).
 
-### Parsing configuration 
+### Parsing configuration
 
 *At the moment only JVM parser is configurable.* Configuration is done by passing implicit parameter of type
 `ParserConfig` to `XmlParser.parse` method. If no configuration is accessible in scope `ParserConfig.Default` is used.

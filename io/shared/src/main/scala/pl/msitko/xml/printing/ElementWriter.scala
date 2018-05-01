@@ -3,7 +3,7 @@ package pl.msitko.xml.printing
 import pl.msitko.xml.entities.{Attribute, Element, LabeledElement, NamespaceDeclaration}
 import pl.msitko.xml.printing.Syntax._
 
-trait ElementWriter extends Resolver {
+private [printing] trait ElementWriter extends Resolver {
   def writeElement[M : InternalMonoid](element: LabeledElement, level: Int)(writer: M): M
 
   def writeEndElement[M : InternalMonoid](element: LabeledElement, level: Int)(writer: M): M
@@ -64,7 +64,7 @@ object ElementWriter {
     }
 }
 
-class SimpleElementWriter extends ElementWriter {
+private [printing] class SimpleElementWriter extends ElementWriter {
   override def writeElement[M: InternalMonoid](element: LabeledElement, level: Int)(writer: M) = {
     writeElementBase(element)(writer)
   }
@@ -73,7 +73,7 @@ class SimpleElementWriter extends ElementWriter {
     writeEndElementBase(element)(writer)
 }
 
-class PrettyElementWriter(singleIndent: String) extends ElementWriter {
+private [printing] class PrettyElementWriter(singleIndent: String) extends ElementWriter {
   val systemEol = System.getProperty("line.separator")
 
   override def writeElement[M: InternalMonoid](element: LabeledElement, level: Int)(writer: M): M = {
@@ -103,7 +103,7 @@ class PrettyElementWriter(singleIndent: String) extends ElementWriter {
 
   private def hasChildren(element: Element): Boolean =
     element.children.exists {
-      case el: LabeledElement =>
+      case _: LabeledElement =>
         true
       case _ =>
         false

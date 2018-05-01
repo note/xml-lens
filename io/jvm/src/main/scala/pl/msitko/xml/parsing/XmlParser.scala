@@ -25,7 +25,11 @@ private [parsing] class LabeledElementBuilder(label: ResolvedName, attributes: S
   }
 }
 
-// TODO: document it
+/**
+  * Prevent XML processor from fetching anything from the internet
+  *
+  * see at https://stackoverflow.com/questions/5883542/disable-xml-validation-based-on-external-dtd-xsd
+  */
 private [parsing] object BlankingResolver extends XMLResolver {
   override def resolveEntity(publicID: String, systemID: String, baseURI: String, namespace: String): AnyRef = {
     new ByteArrayInputStream("".getBytes)
@@ -62,7 +66,6 @@ object XmlParser {
       val xmlFactory = XMLInputFactory.newInstance()
 
       // see more at https://docs.oracle.com/javase/7/docs/api/javax/xml/stream/XMLInputFactory.html
-      // TODO: do we really need to set those properties? Understand them better and either remove or document it better here
       xmlFactory.setProperty("javax.xml.stream.isReplacingEntityReferences", config.replaceEntityReferences)
       xmlFactory.setProperty("javax.xml.stream.isValidating", false)
       xmlFactory.setXMLResolver(BlankingResolver)
@@ -88,8 +91,8 @@ object XmlParser {
 
       val xmlDeclaration = getDeclaration(reader)
 
-      var f1 = Vector.empty[Misc]
-      var f2 = Vector.empty[Misc]
+      var misc1 = Vector.empty[Misc]
+      var misc2 = Vector.empty[Misc]
       var doctypeDecl = Option.empty[DoctypeDeclaration]
 
       // TODO: test it thoroughly
@@ -99,18 +102,18 @@ object XmlParser {
             val comment = Comment(reader.getText())
             doctypeDecl match {
               case None =>
-                f1 = f1 :+ comment
+                misc1 = misc1 :+ comment
               case Some(_) =>
-                f2 = f2 :+ comment
+                misc2 = misc2 :+ comment
             }
 
           case PROCESSING_INSTRUCTION =>
             val pi = ProcessingInstruction(reader.getPITarget(), reader.getPIData())
             doctypeDecl match {
               case None =>
-                f1 = f1 :+ pi
+                misc1 = misc1 :+ pi
               case Some(_) =>
-                f2 = f2 :+ pi
+                misc2 = misc2 :+ pi
             }
 
           case DTD =>
@@ -120,7 +123,7 @@ object XmlParser {
         curr = if (reader.hasNext) reader.next else null
       }
 
-      val prolog = Prolog(xmlDeclaration, f1, doctypeDecl.map(decl => (decl, f2)))
+      val prolog = Prolog(xmlDeclaration, misc1, doctypeDecl.map(decl => (decl, misc2)))
 
       if (curr == null) {
         (prolog, None)

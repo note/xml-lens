@@ -9,17 +9,27 @@ object SimpleTransformation {
     val input =
       """<?xml version="1.0" encoding="UTF-8"?>
         |<a>
-        |  <e>item</e>
-        |  <f>item</f>
-        |  <g>item</g>
+        |  <boring>
+        |    <special>text</special>
+        |  </boring>
+        |  <interesting>
+        |    <special>text</special>
+        |    <boring>text</boring>
+        |  </interesting>
+        |  <special>text</special>
         |</a>""".stripMargin
 
     val output =
       """<?xml version="1.0" encoding="UTF-8"?>
         |<a>
-        |  <e>item</e>
-        |  <f>ITEM</f>
-        |  <g>item</g>
+        |  <boring>
+        |    <special>text</special>
+        |  </boring>
+        |  <interesting>
+        |    <special>TEXT</special>
+        |    <boring>text</boring>
+        |  </interesting>
+        |  <special>text</special>
         |</a>""".stripMargin
 
     Example(input, output)

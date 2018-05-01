@@ -22,12 +22,13 @@ class XmlDeclarationParserSpec extends BaseSpec {
       parse("""    version = '1.1'   """) should === (Some(XmlDeclaration("1.1", None)))
     }
 
-    // TODO: include other whitespaces like tabs
     "ignore whitespaces" in {
       parse("""version="1.0"   encoding = "UTF-8"""") should === (Some(XmlDeclaration("1.0", Some("UTF-8"))))
       parse("""     version="1.0" encoding="UTF-8"""") should === (Some(XmlDeclaration("1.0", Some("UTF-8"))))
       parse("""     version = "1.0"    encoding  = "UTF-8"   """) should === (Some(XmlDeclaration("1.0", Some("UTF-8"))))
       parse("""version  =   "1.0" encoding="UTF-8"""") should === (Some(XmlDeclaration("1.0", Some("UTF-8"))))
+      parse("version  =   \"1.0\" \n encoding=\"UTF-8\"") should === (Some(XmlDeclaration("1.0", Some("UTF-8"))))
+      parse("version  =   \"1.0\"\tencoding=\"UTF-8\"") should === (Some(XmlDeclaration("1.0", Some("UTF-8"))))
     }
 
     "fail" in {

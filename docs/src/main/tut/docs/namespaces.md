@@ -1,7 +1,7 @@
 ---
 layout: docs
 title:  "Namespaces"
-position: 6
+position: 7
 ---
 
 ## Namespaces

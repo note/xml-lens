@@ -1,7 +1,7 @@
 ---
 layout: docs
 title:  "Optics API"
-position: 2
+position: 3
 ---
 
 The most interesting part of `xml-lens` is API for XML transformations. It's divided into two layers:

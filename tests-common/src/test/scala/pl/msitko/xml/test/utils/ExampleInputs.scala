@@ -74,8 +74,8 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
   )
 
   val namespaceXmlStringExample = {
-    val defaultNs = "http://www.develop.com/student"
-    val anotherNs = "http://www.example.com"
+    val defaultNs = NamespaceDeclaration("", "http://www.develop.com/student")
+    val anotherNs = NamespaceDeclaration("xyz", "http://www.example.com")
 
     Example(
       """<?xml version="1.0" encoding="UTF-8"?>
@@ -88,32 +88,31 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
         |      <f>item1</f>
         |      <xyz:h>item2</xyz:h>
         |   </c1>
-        |</a>
-      """.stripMargin,
-      LabeledElement(ResolvedName("", defaultNs, "a"),
+        |</a>""".stripMargin,
+      LabeledElement(defaultNs.resolvedName("a"),
         Element(
           attributes = List(Attribute(ResolvedName.unprefixed("XMLNS"), "http://a.com")),
           children = List(
             indent(1),
-            LabeledElement(ResolvedName("", defaultNs, "c1"), element(
+            LabeledElement(defaultNs.resolvedName("c1"), element(
               indent(2),
-              LabeledElement(ResolvedName("", defaultNs, "f"), element(Text("item1"))),
+              LabeledElement(defaultNs.resolvedName("f"), element(Text("item1"))),
               indent(2),
-              LabeledElement(ResolvedName("", defaultNs, "g"), element(Text("item2"))),
+              LabeledElement(defaultNs.resolvedName("g"), element(Text("item2"))),
               indent(1)
             )),
             indent(1),
-            LabeledElement(ResolvedName("", defaultNs, "c1"), element(
+            LabeledElement(defaultNs.resolvedName("c1"), element(
               indent(2),
-              LabeledElement(ResolvedName("", defaultNs, "f"), element(Text("item1"))),
+              LabeledElement(defaultNs.resolvedName("f"), element(Text("item1"))),
               indent(2),
-              LabeledElement(ResolvedName("xyz", anotherNs, "h"), element(Text("item2"))),
+              LabeledElement(anotherNs.resolvedName("h"), element(Text("item2"))),
               indent(1)
             )),
             Text(lineBreak)
           ),
           namespaceDeclarations =
-            List(NamespaceDeclaration("", "http://www.develop.com/student"), NamespaceDeclaration("xyz", "http://www.example.com"))))
+            List(defaultNs, anotherNs)))
     )
   }
 
@@ -232,24 +231,24 @@ trait ExampleInputs extends AnyRef with ExampleBuilderHelper {
   }
 
   val attributesWithNsXmlStringExample = {
-    val defaultNs = "http://www.a.com"
-    val bNs = "http://www.b.com"
+    val defaultNs = NamespaceDeclaration("", "http://www.a.com")
+    val bNs = NamespaceDeclaration("b", "http://www.b.com")
 
     // https://stackoverflow.com/questions/41561/xml-namespaces-and-attributes
-    val fAttributes = List(Attribute.unprefixed("name", "abc"), Attribute(ResolvedName("b", bNs, "attr"), "attr1"))
-    val gAttributes = List(Attribute(ResolvedName("b", bNs, "name"), "def"))
+    val fAttributes = List(Attribute.unprefixed("name", "abc"), Attribute(bNs.resolvedName("attr"), "attr1"))
+    val gAttributes = List(Attribute(bNs.resolvedName("name"), "def"))
     val hAttributes = List(Attribute.unprefixed("name", "ghi"))
 
     Example(
       """<?xml version="1.0" encoding="UTF-8"?>
         |<a xmlns="http://www.a.com" xmlns:b="http://www.b.com"><c1><f name="abc" b:attr="attr1">item1</f><g b:name="def">item2</g><b:h name="ghi">item3</b:h></c1></a>""".stripMargin,
-      LabeledElement(ResolvedName("", defaultNs, "a"), Element(Seq.empty, List(
-        LabeledElement(ResolvedName("", defaultNs, "c1"), element(
-          LabeledElement(ResolvedName("", defaultNs, "f"), Element(fAttributes, List(Text("item1")))),
-          LabeledElement(ResolvedName("", defaultNs, "g"), Element(gAttributes, List(Text("item2")))),
-          LabeledElement(ResolvedName("b", bNs, "h"), Element(hAttributes, List(Text("item3"))))
+      LabeledElement(defaultNs.resolvedName("a"), Element(Seq.empty, List(
+        LabeledElement(defaultNs.resolvedName("c1"), element(
+          LabeledElement(defaultNs.resolvedName("f"), Element(fAttributes, List(Text("item1")))),
+          LabeledElement(defaultNs.resolvedName("g"), Element(gAttributes, List(Text("item2")))),
+          LabeledElement(bNs.resolvedName("h"), Element(hAttributes, List(Text("item3"))))
         ))
-      ), List(NamespaceDeclaration("", "http://www.a.com"), NamespaceDeclaration("b", "http://www.b.com"))))
+      ), List(defaultNs, bNs)))
     )
   }
 

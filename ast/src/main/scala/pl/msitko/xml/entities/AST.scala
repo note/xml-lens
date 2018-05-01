@@ -1,12 +1,19 @@
 package pl.msitko.xml.entities
 
-// content according to https://www.w3.org/TR/xml/#NT-content
+/**
+  * As documented here: https://www.w3.org/TR/xml/#NT-content
+  */
 sealed trait Node
 
-// as defined here https://www.w3.org/TR/xml/#NT-Misc it is:
-// Misc	   ::=   	Comment | PI | S
-// In this implementation have only two subtypes of Misc (Comment and processing instruction)
-// that means that we do not preserve whitespaces at top level of XML document
+/**
+  * According to https://www.w3.org/TR/xml/#NT-Misc it is:
+  * Misc	   ::=   	Comment | PI | S
+  *
+  * For sake of simplicity xml-lens defines it as:
+  * Misc	   ::=   	Comment | PI
+  *
+  * That means that we do not preserve whitespaces outside of root element
+  */
 sealed trait Misc
 
 /** First - why we need different entities than plain scala-xml ones?
@@ -32,39 +39,45 @@ object LabeledElement {
     LabeledElement.unprefixed(localName, Element())
 }
 
-// CharData according to https://www.w3.org/TR/xml/#NT-CharData
+/**
+  * As documented here: https://www.w3.org/TR/xml/#NT-CharData
+  */
 final case class Text(text: String) extends Node
 
-// Processing instruction according to https://www.w3.org/TR/xml/#NT-PI
+/**
+  * As documented here: https://www.w3.org/TR/xml/#NT-PI
+  */
 final case class ProcessingInstruction(target: String, data: String) extends Node with Misc
 
-// TDSect according to https://www.w3.org/TR/xml/#NT-CDSect
+/**
+  * As documented here: https://www.w3.org/TR/xml/#NT-CDSect
+  */
 final case class CData(text: String) extends Node
 
 final case class EntityReference(name: String, replacement: String) extends Node
 
-// Comment according to https://www.w3.org/TR/xml/#NT-Comment
+/**
+  * As documented here: https://www.w3.org/TR/xml/#NT-Comment
+  */
 final case class Comment(comment: String) extends Node with Misc
 
-// TODO: think if Seq[Attribute] is a good choice taking into account that attribute names have to be unique within
-// single element and printing with XmlStreamWriter a non-unique Attribute will throw an exception
 final case class Element(attributes: Seq[Attribute] = Seq.empty, children: Seq[Node] = Seq.empty, namespaceDeclarations: Seq[NamespaceDeclaration] = Seq.empty)
 
-// when no prefix in XML then: prefix == ""
-// take a look at: https://www.w3.org/TR/xml/#NT-AttValue
-final case class Attribute(key: ResolvedName, value: String) {
-  // TODO: should it stay here?
-  def sameKey(anotherKey: ResolvedName): Boolean = {
-    (key.prefix == anotherKey.prefix) && (key.localName == anotherKey.localName)
-  }
-}
+final case class Attribute(key: ResolvedName, value: String)
 
 object Attribute {
   def unprefixed(key: String, value: String): Attribute =
     Attribute(ResolvedName.unprefixed(key), value)
 }
 
-// TODO: should prefix and/or uri be optional? The same question applies to Attribute
+/**
+  * empty prefix is encoded as "" (empty string)
+  * empty uri is encoded as "" (empty string)
+  *
+  * Such encoding was used instead of Option[String] because with Option encoding there will be 2 encodings
+  * (i.e. None and "") for the same situations. I was also a bit scared of performance penalty but haven't
+  * really checked that
+  */
 final case class ResolvedName(prefix: String, uri: String, localName: String) {
   def hasPrefix: Boolean = prefix.nonEmpty
 }
@@ -76,21 +89,38 @@ object ResolvedName {
 
 // https://www.w3.org/TR/xml-names/#ns-decl
 // `prefix` is empty for default namespace
-final case class NamespaceDeclaration(prefix: String, uri: String)
+final case class NamespaceDeclaration(prefix: String, uri: String) {
+  def resolvedName(localName: String): ResolvedName = ResolvedName(prefix, uri, localName)
+}
 
-// https://www.w3.org/TR/xml/#NT-prolog
+/**
+  * As documented here: https://www.w3.org/TR/xml/#NT-prolog
+  */
 final case class Prolog(xmlDeclaration: Option[XmlDeclaration], miscs: Seq[Misc], doctypeDeclaration: Option[(DoctypeDeclaration, Seq[Misc])])
 
-// https://www.w3.org/TR/xml/#NT-XMLDecl
+/**
+  * As documented here: https://www.w3.org/TR/xml/#NT-XMLDecl
+  */
 final case class XmlDeclaration(version: String, encoding: Option[String])
 
-// Document type declaration according to https://www.w3.org/TR/xml/#NT-doctypedecl
+/**
+  * As documented here: https://www.w3.org/TR/xml/#NT-doctypedecl
+  */
 final case class DoctypeDeclaration(text: String)
 
-
-// TODO: make it clear in docs that we don't support Misc as it goes here:
-// document	   ::=   	prolog element Misc*
-// (according to https://www.w3.org/TR/xml/#sec-well-formed)
+/**
+  * According to https://www.w3.org/TR/xml/#sec-well-formed document is:
+  * document	   ::=   	prolog element Misc*
+  *
+  * But for sake of simplicity xml-lens defines it rather as:
+  *
+  * document     ::=    prolog element
+  *
+  * That means that comments and processing instructions that are placed after the root element cannot be
+  * expressed using xml-lens AST. Mind that it does not apply to comments and processing instructions which
+  * are places outside of root element but before it. Those items can be expressed in terms of xml-lens AST
+  * as part of Prolog.
+  */
 final case class XmlDocument(prolog: Prolog, root: LabeledElement)
 
 object XmlDocument {

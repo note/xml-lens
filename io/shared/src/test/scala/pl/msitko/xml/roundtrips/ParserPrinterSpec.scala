@@ -167,7 +167,6 @@ trait ParserPrinterSpec extends BasicSpec with ExampleInputs {
       |    <!ENTITY test-entity "This <em>is</em> an entity.">
       |]><note></note>""".stripMargin
 
-  // TODO: would fail if we add new lines between top-level Processing instructions
   val exampleWithPI =
     """<?xml version="1.0" encoding="UTF-8"?>
       |<?xml-stylesheet type="text/xsl" href="style.xsl"?><?welcome to pg = 10 of tutorials point?><?welcome ?><note>something<?mso-application progid="Excel.Sheet"?>else</note>""".stripMargin
