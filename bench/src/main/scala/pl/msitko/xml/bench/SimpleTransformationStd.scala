@@ -2,22 +2,20 @@ package pl.msitko.xml.bench
 
 import java.io.StringWriter
 
-import scala.xml.{Elem, Node, Text, XML}
+import scala.xml.{Elem, Text, XML}
 
 object SimpleTransformationStd extends SimpleTransformation {
-  val doTransform: PartialFunction[Node, Node] = {
-    case el: Elem if el.label == "f" =>
-      if(el.child.size == 1) {
-        val replaceWith = el.child.head match {
-          case t: Text =>
-            Text(t.text.toUpperCase)
-          case a => a
-        }
-        el.copy(child = List(replaceWith))
-      } else {
-        el
+  def transform(el: Elem): Elem = {
+    if(el.child.size == 1) {
+      val replaceWith = el.child.head match {
+        case t: Text =>
+          Text(t.text.toUpperCase)
+        case a => a
       }
-    case a => a
+      el.copy(child = List(replaceWith))
+    } else {
+      el
+    }
   }
 
   override def transform(input: String): String = {
@@ -25,8 +23,14 @@ object SimpleTransformationStd extends SimpleTransformation {
 
     val transformed = xml.map {
       case el: Elem if el.label == "a" =>
-        el.copy(child = el.child.flatMap { el =>
-          doTransform(el)
+        el.copy(child = el.child.flatMap {
+          case el: Elem if el.label == "interesting" =>
+            el.copy(child = el.child.flatMap {
+              case el: Elem if el.label == "special" =>
+                transform(el)
+              case a => a
+            })
+          case a => a
         })
       case a => a
     }

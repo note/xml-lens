@@ -1,7 +1,7 @@
 options:
 
-  - title: Quick start
-    url: index.html#quick_start
+  - title: Quickstart
+    url: docs/quickstart.html
 
   - title: Modularity
     url: docs/modularity.html

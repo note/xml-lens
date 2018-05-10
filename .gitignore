@@ -5,3 +5,4 @@
 target/
 /.idea
 .DS_Store
+bench/src/main/resources/enwiki-20180420-pages-articles26.xml

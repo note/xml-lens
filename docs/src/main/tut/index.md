@@ -19,91 +19,147 @@ really good at. To make those operations easy to express the concept of `Optics`
 
 `xml-lens` is available for both Scala 2.11 and 2.12. It's cross published for both JVM and Scala.js.
 
-## <a name="quick_start"></a>Quick start
+## How to read this document
 
-In this section there is a simple case presented in copy-paste ready form. In the next section it's
-explained more deeply.
+If you're interested what is xml-lens and when it may be useful to you go [ahead](#goals-and-non-goals-of-the-project)
+with reading current page.
 
-Add following lines to your `build.sbt`:
+If you're already convinced that you want to use it start by reading [quickstart](docs/quickstart.html).
 
+## Goals and non-goals of the project
+
+Goals of the project:
+
+* provide optics API for transforming XML. It should be stressed out here: while `scala-xml` provides
+ API sufficient for many operations it's designed mostly with `read-transform-write` scenario in mind.
+* provide easy to use API built on top of optics API
+* reasonable performance (should not be much slower than e.g. `scala-xml`)
+* scala.js support (differences between platform should be limited as far as it is possible)
+* good documentation
+* serve as experimentation field of what can be achieved with optics in regards of XML transformations.
+There is nothing fancy in current implementation but there are many interesting direction for future
+development.
+
+Non-goals of the project:
+
+* provide state of the art performance
+* be DTD-aware
+* be XSD Schema-aware
+
+### Motivational example
+
+Let's assume that you need to transform text node `a/interesting/special` in the following XML to be
+formatted with upper case.
+
+```tut:silent
+val motivationalExample =
+      """<?xml version="1.0" encoding="UTF-8"?>
+        |<a>
+        |  <boring>
+        |    <special>text</special>
+        |  </boring>
+        |  <interesting>
+        |    <special>text</special>
+        |    <boring>text</boring>
+        |  </interesting>
+        |  <special>text</special>
+        |</a>""".stripMargin
 ```
-libraryDependencies ++= Seq(
-	"pl.msitko" %% "xml-lens-io"     % "0.1.0-RC1",
-	"pl.msitko" %% "xml-lens-optics" % "0.1.0-RC1"
-)
-```
 
-Then in your Scala code you can:
+Instead of presenting you reference implementation in `scala-xml` first, we will start by taking
+a look at solution with `xml-lens`. Such order will make it easier to understand the problem.
+
+It will be easier to start with solution to motivational problem written with `xml-lens`.
+
+With `xml-lens` you can solve motivational problem with:
 
 ```tut:silent
 import pl.msitko.xml.parsing.XmlParser
 import pl.msitko.xml.printing.XmlPrinter
-import pl.msitko.xml.dsl._
+import pl.msitko.xml.dsl.OpticsBuilder.root
 
-// some XML input
-val input =
-    """<?xml version="1.0" encoding="UTF-8"?>
-      |<a>
-      |  <e>item</e>
-      |  <f>item</f>
-      |  <g>item</g>
-      |</a>""".stripMargin
+val parsed = XmlParser.parse(motivationalExample).right.get
 
-// turn `f` node to upper case - define transformation
-val modify = (root \ "f").hasTextOnly.modify(_.toUpperCase)
-
-// parse XML
-val parsed = XmlParser.parse(input).right.get
-
-// apply transformation
+val modify = (root \ "interesting" \ "special").hasTextOnly.modify(_.toUpperCase)
 val res = modify(parsed)
 
-println(XmlPrinter.print(res))
-```
-
-## <a name="quick_start"></a>Quick start - explained
-
-The whole example is about transforming one path of XML to be in upper case.
-
-Firstly, we define the transformation in the following way:
-
-```tut:book
-import pl.msitko.xml.dsl._
-
-val modify = (root \ "f").hasTextOnly.modify(_.toUpperCase)
-```
-
-`root` is available thanks to `import pl.msitko.xml.dsl._`. `root` stands for root element of XML
-document. Every XML document should contain exactly one root element. In caseof our example `<a>`
-is a root element.
-
-Then we can navigate deeper using `\` operator. It takes a `String` argument which is a label of direct children we want to 
-"zoom into". There's an overloaded `\` operator which takes `NameMatcher` instead of `String` which allows you to specify 
-namespace. You can read more about it in section [Namespaces](docs/namespaces.html). `\` taking `String` ignores namespaces - 
-will match all nodes that have specified label. 
-
-Next, we narrow down our selection specifically to `f` nodes having only a text child. We do this by calling `hasTextOnly`.
-
-After we specified what we want to modify, we can define what it should be modified to. We do this by using `modify`,
-which takes a function from `String` to `String`.
-
-Now, when we have `modify` function declared we can use it on parsed XML. The code which parses input and
-run `modify` transformation on it looks like this:
-
-```tut:silent
-import pl.msitko.xml.parsing.XmlParser
-import pl.msitko.xml.printing.XmlPrinter
-
-val parsed = XmlParser.parse(input).right.get
-
-val res = modify(parsed)
-```
-
-Finally, we can print the result back to verify it:
-
-```tut:book
 XmlPrinter.print(res)
 ```
+
+The code is straightforward and declarative.
+
+Actually it's quite difficult to write the same logic with `scala-xml`. There is `scala.xml.transform`
+API but it focuses on global transformation and here we want to transform just specific `special` node.
+You can access that specific node with `"interesting" \ "special"` syntax in `scala-xml` too but as soon
+as you do that you "lost" the rest of the document - in our case we want to return the whole XML document
+with remaining nodes untouched.
+
+Therefore you end up manipulating AST directly which is very cumbersome and error-prone:
+
+```tut:silent
+import java.io.StringWriter
+import scala.xml.{Elem, Text, XML}
+
+def transform(el: Elem): Elem = {
+    if(el.child.size == 1) {
+      val replaceWith = el.child.head match {
+        case t: Text =>
+          Text(t.text.toUpperCase)
+        case a => a
+      }
+      el.copy(child = List(replaceWith))
+    } else {
+      el
+    }
+  }
+
+val xml = XML.loadString(motivationalExample)
+
+val transformed = xml.map {
+  case el: Elem if el.label == "a" =>
+    el.copy(child = el.child.flatMap {
+      case el: Elem if el.label == "interesting" =>
+        el.copy(child = el.child.flatMap {
+          case el: Elem if el.label == "special" =>
+            transform(el)
+          case a => a
+        })
+      case a => a
+    })
+  case a => a
+}
+
+val writer = new StringWriter
+
+XML.write(writer, transformed.head, "UTF-8", true, null)
+writer.toString
+```
+
+As you can see it is really convoluted way of transforming XML. Of course, that code has a lot of
+repetition and can probably be written more concisely with additional custom abstractions but the
+point here is that `scala-xml` does not provide anything outside of the box.
+
+
+## Peculiarities
+
+### Ignoring comments and processing instructions following root element
+
+According to [specs](https://www.w3.org/TR/xml/#sec-well-formed) XML document is:
+
+```
+document  ::=  prolog element Misc*
+```
+
+But for sake of simplicity xml-lens defines it rather as:
+
+```
+document  ::=  prolog element
+```
+
+That means that comments and processing instructions that are placed after the root element cannot be
+expressed using `xml-lens` AST. Mind that it does not apply to comments and processing instructions which
+are places outside of root element but before it. Those items can be expressed in terms of `xml-lens` AST
+as part of Prolog.
 
 ## License
 

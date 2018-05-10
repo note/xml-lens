@@ -75,9 +75,7 @@ trait XmlPrinterSpec extends BasicSpec with ExampleInputs with XmlGenerator with
   def check(specificExample: Example): Unit = {
     val res = print(specificExample.document)
 
-    // TODO: we don't guarantee preserving whitespace outside of root element
-    // decide if it's a good decision
-    res.trim should ===(specificExample.stringRepr.trim)
+    res should ===(specificExample.stringRepr)
   }
 
 }

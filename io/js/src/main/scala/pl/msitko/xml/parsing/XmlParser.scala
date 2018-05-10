@@ -8,14 +8,13 @@ object XmlParser {
   def parse(input: String): Either[ParsingException, XmlDocument] = {
     val options = JsParserOptions(xmlns = Some(true))
 
-    // TODO: read more about strict, with strict=true test "preserve entities" fails because of parsing error
     val parser = JsParser.apply(strict = true, options = options)
 
     var root = Option.empty[LabeledElementBuilder]
     var xmlDeclaration = Option.empty[XmlDeclaration]
     var doctypeDeclaration = Option.empty[DoctypeDeclaration]
-    var f1 = Vector.empty[Misc]
-    var f2 = Vector.empty[Misc]
+    var misc1 = Vector.empty[Misc]
+    var misc2 = Vector.empty[Misc]
 
     var elementStack = List.empty[LabeledElementBuilder]
 
@@ -39,9 +38,9 @@ object XmlParser {
             case None =>
               doctypeDeclaration match {
                 case Some(decl) =>
-                  f2 = f2 :+ processingInstruction
+                  misc2 = misc2 :+ processingInstruction
                 case None =>
-                  f1 = f1 :+ processingInstruction
+                  misc1 = misc1 :+ processingInstruction
               }
           }
         }
@@ -77,7 +76,6 @@ object XmlParser {
       }
 
       parser.onentityreference = { name: String =>
-        // TODO: document in user docs that `EntityReference.replacement` is always "" in js!
         elementStack.headOption.foreach(_.addChild(EntityReference(name, "")))
       }
 
@@ -87,9 +85,9 @@ object XmlParser {
           case None =>
             doctypeDeclaration match {
               case Some(decl) =>
-                f2 = f2 :+ Comment(txt)
+                misc2 = misc2 :+ Comment(txt)
               case None =>
-                f1 = f1 :+ Comment(txt)
+                misc1 = misc1 :+ Comment(txt)
             }
         }
       }
@@ -99,10 +97,9 @@ object XmlParser {
       }
 
       parser.write(input).close()
-      Prolog(xmlDeclaration, f1, doctypeDeclaration.map(v => (v, f2)))
+      Prolog(xmlDeclaration, misc1, doctypeDeclaration.map(v => (v, misc2)))
     }
 
-    // TODO: refactor this
     (root, prolog) match {
       case (Some(r), Success(prolog)) =>
         Right(XmlDocument(prolog, r.build))
@@ -113,7 +110,7 @@ object XmlParser {
       case (_, Failure(e: scala.scalajs.js.JavaScriptException)) =>
         Left(ParsingException(e.getMessage(), e))
       case (_, Failure(e)) =>
-        throw e
+        throw e // TODO: rethink it
     }
 
   }
@@ -136,7 +133,7 @@ object XmlParser {
 
     val name = fromNode(node)
 
-    // we're not using node.ns for namespaces as JsNode.ns does not contain namespace declarations but namespaces
+    // we're not using `node.ns` for namespaces as JsNode.ns does not contain namespace declarations but namespaces
     // available in current scope which is useless for our purposes
     val (nsDeclarations, attrs) = node.attributes.values.partition { attr =>
       // attributes (and xmlns) are case sensitive (that's why we don't `toLowerCase`)

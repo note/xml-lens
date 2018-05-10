@@ -8,7 +8,7 @@ class SimpleTransformationSpec extends FlatSpec with Matchers with TypeCheckedTr
 
   "SimpleTransformation" should "work" in {
     val withLens = transformWith(SimpleTransformationLens)
-    val withStd  = transformWith(SimpleTransformationStd).replace(''', '"')
+    val withStd  = transformWith(SimpleTransformationStd).replace('\'', '"')
 
     withLens should === (example.output)
     withLens should === (withStd)

@@ -1,7 +1,7 @@
 ---
 layout: docs
 title:  "Modularity"
-position: 1
+position: 2
 ---
 
 ## Modularity

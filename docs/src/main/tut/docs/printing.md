@@ -1,7 +1,7 @@
 ---
 layout: docs
 title:  "Printing"
-position: 5
+position: 6
 ---
 
 ## Printing

@@ -11,7 +11,7 @@ import scala.xml.XML
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Benchmark)
 class ParseBench {
-  @Benchmark def parseWithLens = XmlParser.parse(Roundtrip.example.input).right.get
+  @Benchmark def parseWithLens = XmlParser.parse(SmallRoundtrip.example.input).right.get
 
-  @Benchmark def parseWithStd = XML.loadString(Roundtrip.example.input)
+  @Benchmark def parseWithStd = XML.loadString(SmallRoundtrip.example.input)
 }

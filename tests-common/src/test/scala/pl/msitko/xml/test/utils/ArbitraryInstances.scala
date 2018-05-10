@@ -5,6 +5,8 @@ import org.scalacheck.Gen
 
 import scala.collection.JavaConverters._
 
+import AttributeHelpers._
+
 final case class ArbitraryElementConfig(minDepth: Int, maxDepth: Int, label: Option[String], attributeKey: Option[String])
 
 trait ArbitraryInstances {
@@ -93,4 +95,12 @@ trait ArbitraryInstances {
     } yield Element(attrs, children, Seq.empty)
   }
 
+}
+
+object AttributeHelpers {
+  implicit class AttributeWithSameKey(attr: Attribute) {
+    def sameKey(anotherKey: ResolvedName): Boolean = {
+      (attr.key.prefix == anotherKey.prefix) && (attr.key.localName == anotherKey.localName)
+    }
+  }
 }

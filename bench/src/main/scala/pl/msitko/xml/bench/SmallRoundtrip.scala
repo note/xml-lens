@@ -1,10 +1,10 @@
 package pl.msitko.xml.bench
 
-trait Roundtrip {
+trait SmallRoundtrip {
   def roundtrip(input: String): String
 }
 
-object Roundtrip {
+object SmallRoundtrip {
   def example = {
     Example(SomeXml.someXml, SomeXml.someXml)
   }

@@ -29,7 +29,15 @@ object XmlDeclarationParser {
     }
     import wsMatters._
 
-    val ws = P(CharIn(" \t").rep(min = 1))
+    /* According to https://www.w3.org/TR/xml/#NT-S White space is defined as:
+     *
+     * 	S	   ::=   	(#x20 | #x9 | #xD | #xA)+
+     */
+    val ws = {
+      val whiteSpaces = List(0x20, 0x9, 0xD, 0xA).map(_.toChar)
+
+      P(CharIn(whiteSpaces).rep(min = 1))
+    }
 
     P ( (ws.rep ~ versionInfo ~ ws.rep ~ End).map(v => (v, Option.empty[String])) | (ws.rep ~ versionInfo ~ ws.rep(min = 1) ~ encodingDecl ~ ws.rep ~ End).map(t => (t._1, Some(t._2))) )
   }
