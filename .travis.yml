@@ -22,4 +22,4 @@ install:
   - pip install --user codecov
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport && codecov;
+  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport coverageAggregate && codecov;
