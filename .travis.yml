@@ -3,8 +3,8 @@ language: scala
 jdk: oraclejdk8
 
 scala:
-  - 2.11.11
-  - 2.12.2
+  - 2.11.12
+  - 2.12.6
 
 sudo: false
 
@@ -19,7 +19,4 @@ before_cache:
   - find $HOME/.sbt -name "*.lock" -delete
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport coverageAggregate coveralls
