@@ -49,7 +49,7 @@ object Common {
     scalaVersion := commonScalaVersion,
     crossScalaVersions := commonCrossScalaVersions,
     coverageHighlighting := true,
-    coverageScalacPluginVersion := "1.3.0"
+    coverageScalacPluginVersion := "1.3.1"
   )
 
 }

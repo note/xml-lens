@@ -1,12 +1,12 @@
 language: scala
+sudo: required
+dist: trusty
 
 jdk: oraclejdk8
 
 scala:
-  - 2.11.11
-  - 2.12.2
-
-sudo: false
+  - 2.11.12
+  - 2.12.6
 
 cache:
   directories:
@@ -18,8 +18,8 @@ before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
   - find $HOME/.sbt -name "*.lock" -delete
 
-script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
+install:
+  - pip install --user codecov
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport && codecov;
