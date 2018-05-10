@@ -76,7 +76,7 @@ With `xml-lens` you can solve motivational problem with:
 ```tut:silent
 import pl.msitko.xml.parsing.XmlParser
 import pl.msitko.xml.printing.XmlPrinter
-import pl.msitko.xml.dsl.OpticsBuilder.root
+import pl.msitko.xml.dsl._
 
 val parsed = XmlParser.parse(motivationalExample).right.get
 
@@ -159,8 +159,13 @@ document  ::=  prolog element
 That means that comments and processing instructions that are placed after the root element cannot be
 expressed using `xml-lens` AST. Mind that it does not apply to comments and processing instructions which
 are places outside of root element but before it. Those items can be expressed in terms of `xml-lens` AST
-as part of Prolog.
+as part of `Prolog`.
 
 ## License
 
 All code is available to you under the MIT license, available [here](https://github.com/note/xml-lens/blob/master/LICENSE).
+
+
+## Acknowledgements
+
+Early development of `xml-lens` was funded by [scalac](https://scalac.io/).

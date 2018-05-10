@@ -17,7 +17,14 @@ import pl.msitko.xml.printing.XmlPrinter
 import pl.msitko.xml.dsl._
 ```
 
-### How to perform a few transformations on the same XML document
+## Table of contents
+
+* [How to perform a few transformations on the same XML document](#few)
+* [How to access n-th item of current focus](#nth-item)
+* [How to deepen focus to all n-th children of current focus](#nth-child)
+* [Transformation in scope of whole document](#scope)
+
+### <a name="few"></a>How to perform a few transformations on the same XML document
 
 In most of examples in that documentation only one transformation to XML document was done. But since transformations
 are plain function `XmlDocument => XmlDocument` you can compose them with `andThen` combinator. Example:
@@ -52,7 +59,7 @@ The result:
 XmlPrinter.print(modifiedDoc)
 ```
 
-### How to access n-th item of current focus
+### <a name="nth-item"></a>How to access n-th item of current focus
 
 In the following XML you're interested only in the second `<f>` element (i.e. one containing `item2`):
 
@@ -87,7 +94,7 @@ XmlPrinter.print(res)
 Crucial observation here is that we have not created a new focus (e.g. one going deeper) but just chosen
 one item of current focus.
 
-### How to deepen focus to n-th elements of current focus
+### <a name="nth-child"></a>How to deepen focus to all n-th children of current focus
 
 In the following XML you're interested only in the second `<f>` element (i.e. one containing `item2`):
 
@@ -124,7 +131,7 @@ val res = secondChildren.hasTextOnly.modify(_.toUpperCase)(parsed)
 XmlPrinter.print(res)
 ```
 
-### Transformation in scope of whole document
+### <a name="scope"></a>Transformation in scope of whole document
 
 In previous examples we were always performing transformations on given path. In case when you need to do some modification
 in scope of whole document `monocle.function.Plated` may be useful. `xml-lens` defined instances of `Plated` for its types in

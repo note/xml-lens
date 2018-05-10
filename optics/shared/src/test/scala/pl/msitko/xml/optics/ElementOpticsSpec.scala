@@ -27,7 +27,10 @@ class ElementOpticsSpec extends BaseSpec with ExampleBuilderHelper {
 
   "indexElementOptional" should {
     "work" in {
-      indexElementOptional(1).getOption(input.element) should === (Some(third))
+      val optional = indexElementOptional(1)
+      // due to hacky implementation we call it twice
+      optional.getOption(input.element) should === (Some(third))
+      optional.getOption(input.element) should === (Some(third))
     }
 
     "return None if element with given index does not exist" in {

@@ -6,5 +6,3 @@ trait ToDocumentOps {
   implicit def toDocumentOps(xmlDocument: XmlDocument): XmlDocumentOps =
     new XmlDocumentOps(xmlDocument)
 }
-
-object document extends ToDocumentOps

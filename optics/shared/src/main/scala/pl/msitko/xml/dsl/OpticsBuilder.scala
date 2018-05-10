@@ -7,10 +7,6 @@ import pl.msitko.xml.optics._
 
 import scalaz.Applicative
 
-object OpticsBuilder {
-  def root = new RootBuilder
-}
-
 class RootBuilder extends AnyRef with ElementOps {
   import pl.msitko.xml.optics.XmlDocumentOptics._
   import pl.msitko.xml.optics.LabeledElementOptics._
@@ -60,16 +56,6 @@ final case class DeepBuilder(current: Traversal[XmlDocument, Element]) extends A
       current.modify(new Indexed(n, updatedElem))(root)
     }
     DeepBuilderOptional(optional)
-  }
-
-  def childAt(n: Int): DeepBuilder = {
-    val index = ElementOptics.index
-    val optional: Optional[Element, Node] = index.index(n)
-    val newTraversal = current
-      .composeOptional(optional)
-      .composePrism(NodeOptics.isLabeledElement)
-      .composeLens(LabeledElementOptics.element)
-    DeepBuilder(newTraversal)
   }
 
   val children = current.composeLens(ElementOptics.children)

@@ -2,7 +2,7 @@ package pl.msitko.xml.bench
 
 import pl.msitko.xml.parsing.XmlParser
 import pl.msitko.xml.printing.XmlPrinter
-import pl.msitko.xml.dsl.OpticsBuilder.root
+import pl.msitko.xml.dsl._
 
 object SimpleTransformationLens extends SimpleTransformation {
   override def transform(input: String): String = {

@@ -6,5 +6,3 @@ trait ToNodeOps {
   implicit def toNodeOps(node: LabeledElement): NodeOps =
     new NodeOps(node)
 }
-
-object node extends ToNodeOps

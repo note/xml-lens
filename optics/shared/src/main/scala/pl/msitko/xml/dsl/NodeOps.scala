@@ -4,8 +4,8 @@ import monocle.function.Plated
 import pl.msitko.xml.entities.{LabeledElement, Node, Text}
 import pl.msitko.xml.optics.{LabeledElementOptics, OpticsInstances}
 
-final class NodeOps (root: LabeledElement) {
-  import OpticsInstances._
+final class NodeOps (val root: LabeledElement) extends AnyVal {
+  import NodeOps._
 
   def minimize: LabeledElement = {
     val withDeepChanges = minimizeTransformation(root).asInstanceOf[LabeledElement]
@@ -15,6 +15,10 @@ final class NodeOps (root: LabeledElement) {
     // therefore we need following line:
     removeNonSignificantTexts(withDeepChanges)
   }
+}
+
+object NodeOps {
+  import OpticsInstances._
 
   private val minimizeTransformation = Plated.transform[Node]{
     case element: LabeledElement =>
@@ -30,4 +34,3 @@ final class NodeOps (root: LabeledElement) {
     case _ => false
   }
 }
-
