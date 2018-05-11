@@ -45,3 +45,12 @@ Example:
 ```
 bench/jmh:run -i 10 -wi 10 -f1 -t1 -prof gc .*Roundtrip*.
 ```
+
+## License
+
+All code is available to you under the MIT license, available [here](https://github.com/note/xml-lens/blob/master/LICENSE).
+
+
+## Acknowledgements
+
+Early development of `xml-lens` was funded by [scalac](https://scalac.io/).

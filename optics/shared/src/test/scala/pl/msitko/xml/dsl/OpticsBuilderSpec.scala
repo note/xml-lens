@@ -182,11 +182,15 @@ trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       print(res) should === (example17("ITEM"))
     }
 
-    // TODO: add info to cookbook, comment difference with another index methods (in optics)
     "index" in {
       val parsed = parse(example17("item"))
 
-      val res = (root \ "c1" \ "f").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
+      val modification = (root \ "c1" \ "f").index(1).hasTextOnly.modify(_.toUpperCase)
+
+      // because of hacky implementation, we check if calling modification a few times before does not affect results
+      modification(parsed)
+      modification(parsed)
+      val res = modification(parsed)
 
       print(res) should === (example17("ITEM"))
     }
@@ -197,16 +201,6 @@ trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       val res = ((root \ "c1" \ "f").index(1) \ "h" \ "i").index(1).hasTextOnly.modify(_.toUpperCase)(parsed)
 
       print(res) should === (example19("ITEM"))
-    }
-
-    "childAt" in {
-      // we need to minimize as unneccessary Text nodes (caused just by the fact that input string is formatted)
-      // would interfere with `childAt`
-      val parsed = parse(example18("item")).minimize
-
-      val res = (root \ "c1" \ "f").childAt(1).hasTextOnly.modify(_.toUpperCase)(parsed)
-
-      print(res)(PrinterConfig(Indent.IndentWith("  "), true)) should === (example18("ITEM"))
     }
 
     "elementAt" in {

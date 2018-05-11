@@ -55,7 +55,10 @@ Element `p` will have 3 children:
 
 With scala-js for the same input `p` will also have 3 children but the content of the second child differs:
 
-```(Text("abc "), EntityReference("test-entity"), Text(" def"))```
+```(Text("abc "), EntityReference("test-entity", ""), Text(" def"))```
+
+As you can see with scala-js `EntityReference`'s second field (namely `replacement`) is not being
+filled. That's due to the fact that JS parser does not read entities declarations.
 
 This behavior can be configured further on JVM. Read more about configuring this behavior at
 [parsing configuration](#parsing-configuration).
