@@ -161,8 +161,7 @@ lazy val publishSettings = Seq(
     releaseStepCommandAndRemaining("+publishSigned"),
     setNextVersion,
     commitNextVersion,
-    releaseStepCommand("sonatypeReleaseAll"),
-    pushChanges
+    releaseStepCommand("sonatypeReleaseAll")
   ),
   pomExtra := (
     <developers>
