@@ -7,6 +7,8 @@ import ReleaseTransformations._
 
 organization in ThisBuild := "pl.msitko"
 
+releaseCrossBuild in ThisBuild := true
+
 lazy val ast = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) in file("ast"))
   .commonSettings
   .settings(
