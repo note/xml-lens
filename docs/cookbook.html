@@ -10,7 +10,16 @@ covered in example code:</p>
 <span class="k">import</span> <span class="nn">pl.msitko.xml.dsl._</span>
 </code></pre></div></div>
 
-<h3 id="how-to-perform-a-few-transformations-on-the-same-xml-document">How to perform a few transformations on the same XML document</h3>
+<h2 id="table-of-contents">Table of contents</h2>
+
+<ul>
+  <li><a href="#few">How to perform a few transformations on the same XML document</a></li>
+  <li><a href="#nth-item">How to access n-th item of current focus</a></li>
+  <li><a href="#nth-child">How to deepen focus to all n-th children of current focus</a></li>
+  <li><a href="#scope">Transformation in scope of whole document</a></li>
+</ul>
+
+<h3 id="how-to-perform-a-few-transformations-on-the-same-xml-document"><a name="few"></a>How to perform a few transformations on the same XML document</h3>
 
 <p>In most of examples in that documentation only one transformation to XML document was done. But since transformations
 are plain function <code class="highlighter-rouge">XmlDocument =&gt; XmlDocument</code> you can compose them with <code class="highlighter-rouge">andThen</code> combinator. Example:</p>
@@ -49,7 +58,7 @@ those two transformation with <code class="highlighter-rouge">andThen</code> and
 // &lt;/a&gt;
 </span></code></pre></div></div>
 
-<h3 id="how-to-access-n-th-item-of-current-focus">How to access n-th item of current focus</h3>
+<h3 id="how-to-access-n-th-item-of-current-focus"><a name="nth-item"></a>How to access n-th item of current focus</h3>
 
 <p>In the following XML you’re interested only in the second <code class="highlighter-rouge">&lt;f&gt;</code> element (i.e. one containing <code class="highlighter-rouge">item2</code>):</p>
 
@@ -88,7 +97,7 @@ those two transformation with <code class="highlighter-rouge">andThen</code> and
 Crucial observation here is that we have not created a new focus (e.g. one going deeper) but just chosen
 one item of current focus.</p>
 
-<h3 id="how-to-deepen-focus-to-n-th-elements-of-current-focus">How to deepen focus to n-th elements of current focus</h3>
+<h3 id="how-to-deepen-focus-to-all-n-th-children-of-current-focus"><a name="nth-child"></a>How to deepen focus to all n-th children of current focus</h3>
 
 <p>In the following XML you’re interested only in the second <code class="highlighter-rouge">&lt;f&gt;</code> element (i.e. one containing <code class="highlighter-rouge">item2</code>):</p>
 
@@ -135,7 +144,7 @@ one item of current focus.</p>
 // &lt;/a&gt;
 </span></code></pre></div></div>
 
-<h3 id="transformation-in-scope-of-whole-document">Transformation in scope of whole document</h3>
+<h3 id="transformation-in-scope-of-whole-document"><a name="scope"></a>Transformation in scope of whole document</h3>
 
 <p>In previous examples we were always performing transformations on given path. In case when you need to do some modification
 in scope of whole document <code class="highlighter-rouge">monocle.function.Plated</code> may be useful. <code class="highlighter-rouge">xml-lens</code> defined instances of <code class="highlighter-rouge">Plated</code> for its types in

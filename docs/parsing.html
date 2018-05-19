@@ -48,7 +48,10 @@ in your build add the following to your <code class="highlighter-rouge">build.sb
 
 <p>With scala-js for the same input <code class="highlighter-rouge">p</code> will also have 3 children but the content of the second child differs:</p>
 
-<p><code class="highlighter-rouge">(Text("abc "), EntityReference("test-entity"), Text(" def"))</code></p>
+<p><code class="highlighter-rouge">(Text("abc "), EntityReference("test-entity", ""), Text(" def"))</code></p>
+
+<p>As you can see with scala-js <code class="highlighter-rouge">EntityReference</code>’s second field (namely <code class="highlighter-rouge">replacement</code>) is not being
+filled. That’s due to the fact that JS parser does not read entities declarations.</p>
 
 <p>This behavior can be configured further on JVM. Read more about configuring this behavior at
 <a href="#parsing-configuration">parsing configuration</a>.</p>
