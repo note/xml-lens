@@ -168,4 +168,4 @@ All code is available to you under the MIT license, available [here](https://git
 
 ## Acknowledgements
 
-Early development of `xml-lens` was funded by [scalac](https://scalac.io/).
+Many thanks to [scalac](https://scalac.io/) that funded early development of `xml-lens`.

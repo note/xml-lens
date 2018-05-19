@@ -11,7 +11,10 @@ Of course, JSON is much more popular and XML at the same time is regarded as a l
 
 ## Status of project
 
-Library is in an early state of initial development.
+Some early versions of the project has been released. It's definitely not very mature yet.
+In next releases I would like to focus on DSL and optics aspects as suprisingly in the first release
+a lot of time was spent on io module. Don't expect rapid development as it's just side project
+made in my free time.
 
 ## Various
 
@@ -46,6 +49,11 @@ Example:
 bench/jmh:run -i 10 -wi 10 -f1 -t1 -prof gc .*Roundtrip*.
 ```
 
+## Contributing
+
+Contributions are very welcome. All code or documentation that is provided must be licensed with
+the same license `xml-lens` is licensed with (MIT license, available [here](https://github.com/note/xml-lens/blob/master/LICENSE).
+
 ## License
 
 All code is available to you under the MIT license, available [here](https://github.com/note/xml-lens/blob/master/LICENSE).
@@ -53,4 +61,4 @@ All code is available to you under the MIT license, available [here](https://git
 
 ## Acknowledgements
 
-Early development of `xml-lens` was funded by [scalac](https://scalac.io/).
+Many thanks to [scalac](https://scalac.io/) that funded early development of `xml-lens`.
