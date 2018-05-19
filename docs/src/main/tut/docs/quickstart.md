@@ -13,10 +13,14 @@ Add following lines to your `build.sbt`:
 
 ```
 libraryDependencies ++= Seq(
-	"pl.msitko" %% "xml-lens-io"     % "0.1.0-RC1",
-	"pl.msitko" %% "xml-lens-optics" % "0.1.0-RC1"
+	"pl.msitko" %% "xml-lens-io"     % "0.1.0-RC6",
+	"pl.msitko" %% "xml-lens-optics" % "0.1.0-RC6"
 )
 ```
+
+In scala-js you basically need to replace `%%` with `%%%`. Because scala-js builds tend to be tricky
+due to various bundlers, there's a [sample project](https://github.com/note/xml-lens-scala-js-example)
+available.
 
 Then in your Scala code you can:
 
