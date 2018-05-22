@@ -13,8 +13,8 @@ Add following lines to your `build.sbt`:
 
 ```
 libraryDependencies ++= Seq(
-	"pl.msitko" %% "xml-lens-io"     % "0.1.0-RC6",
-	"pl.msitko" %% "xml-lens-optics" % "0.1.0-RC6"
+	"pl.msitko" %% "xml-lens-io"     % "0.1.0",
+	"pl.msitko" %% "xml-lens-optics" % "0.1.0"
 )
 ```
 
