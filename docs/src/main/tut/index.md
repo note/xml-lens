@@ -158,7 +158,7 @@ document  ::=  prolog element
 
 That means that comments and processing instructions that are placed after the root element cannot be
 expressed using `xml-lens` AST. Mind that it does not apply to comments and processing instructions which
-are places outside of root element but before it. Those items can be expressed in terms of `xml-lens` AST
+are placed outside of root element but before it. Those items can be expressed in terms of `xml-lens` AST
 as part of `Prolog`.
 
 ## License
