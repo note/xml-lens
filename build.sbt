@@ -2,7 +2,7 @@ import sbt.Keys.{libraryDependencies, scalacOptions, _}
 import Common._
 import Dependencies._
 // shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
-import sbtcrossproject.{crossProject, CrossType}
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import ReleaseTransformations._
 
 organization in ThisBuild := "pl.msitko"
@@ -44,7 +44,7 @@ lazy val io = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full) i
     ),
     // with `-Ywarn-dead-code` enabled `var onerror: js.Function1[js.Any, Unit] = js.native` fails
     scalacOptions  -= "-Ywarn-dead-code",
-    libraryDependencies += "com.lihaoyi" %%% "fastparse" % "1.0.0",
+    libraryDependencies += "com.lihaoyi" %%% "fastparse" % "2.0.4",
     coverageEnabled := false
   )
   .dependsOn(ast, testsCommon % "test-internal->test")
