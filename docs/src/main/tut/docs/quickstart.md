@@ -100,7 +100,7 @@ XmlPrinter.print(res)
 
 ### Where should I go from here
 
-Recommended next reading is [chapter](docs/modularity.html) on modularity and [chapter](docs/optics.html)
+Recommended next reading is [chapter](modularity.html) on modularity and [chapter](optics.html)
 covering Optics API. Those chapters will help you understanding how `xml-lens` API is structured.
 
 In case of specific questions take a look at other chapters of this docs.
