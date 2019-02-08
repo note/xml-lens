@@ -24,6 +24,7 @@ trait ElementOptics {
 
   def being(predicate: Element => Boolean): Prism[Element, Element] =
     Prism[Element, Element]{ el =>
+      println("here!!!")
       if (predicate(el)) {
         Some(el)
       } else {

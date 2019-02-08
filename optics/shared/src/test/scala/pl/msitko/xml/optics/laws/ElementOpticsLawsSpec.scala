@@ -1,10 +1,9 @@
 package pl.msitko.xml.optics.laws
 
-import monocle.law.discipline.{LensTests, OptionalTests, TraversalTests}
+import monocle.law.discipline.{LensTests, OptionalTests, PrismTests, TraversalTests}
 import org.scalacheck.Arbitrary
 import org.scalatest.Matchers
 import pl.msitko.xml.entities.Node
-import pl.msitko.xml.optics.ElementOptics
 import pl.msitko.xml.test.utils.{ArbitraryElementConfig, ArbitraryInstances, CogenInstances}
 
 class ElementOpticsLawsSpec extends LawsSpec with Matchers with ArbitraryInstances with CogenInstances {
@@ -13,11 +12,21 @@ class ElementOpticsLawsSpec extends LawsSpec with Matchers with ArbitraryInstanc
 
   import scalaz.std.string._
 
-  implicit val arbLabeledElem = Arbitrary(labeledElementGen(ArbitraryElementConfig(4, 4, Some("abc"), None)))
-  implicit val arbNode = Arbitrary(arbLabeledElem.arbitrary.map(_.asInstanceOf[Node]))
-  implicit val arbElem =
-    Arbitrary(labeledElementGen(ArbitraryElementConfig(1, 2, None, Some("someAttr"))).map(_.element))
+  val cfg = ArbitraryElementConfig(1, 4, Some("abc"), Some("someAttr"))
+
+  val commonGen = labeledElementGen(cfg)
+  implicit val arbLabeledElem = Arbitrary(commonGen)
+  implicit val arbNode = Arbitrary(commonGen.map(l => l : Node))
+  implicit val arbElem = Arbitrary(commonGen.map(_.element))
   implicit val arbAttr = Arbitrary(attributeGen(Some("someAttr")))
+
+
+//  for {
+//    _ <- 0 until 15
+////    _ = println(arbElem.arbitrary.sample.get)
+//    _ = println(arbElem.arbitrary.sample.get.attributes.map(_.key.localName).contains("someAttr"))
+//  } yield ()
+
 
   val deeperTest              = TraversalTests(deeper("abc"))
   val allLabeledElementsTest  = TraversalTests(allLabeledElements)
@@ -25,15 +34,17 @@ class ElementOpticsLawsSpec extends LawsSpec with Matchers with ArbitraryInstanc
   val attributeTest           = OptionalTests(attribute("someAttr"))
   val hasOneChildTest         = OptionalTests(hasOneChild)
   val attributesTest          = LensTests(attributes)
-  val childrenTest            = LensTests(ElementOptics.children)
+  val childrenTest            = LensTests(children)
+  val beingTest               = PrismTests(being(_.attributes.map(_.key.localName).contains("someAttr")))
 
-  checkLaws("deeper Traversal", deeperTest)
-  checkLaws("allLabeledElements Traversal", allLabeledElementsTest)
-  checkLaws("hasTextOnly Optional", hasTextOnlyTest)
-  checkLaws("attribute Optional", attributeTest)
-  checkLaws("hasOneChild Optional", hasOneChildTest)
-  checkLaws("attributes Lens", attributesTest)
+  checkLaws("Traversal laws for deeper", deeperTest)
+  checkLaws("Traversal laws for allLabeledElements", allLabeledElementsTest)
+  checkLaws("Optional laws for hasTextOnly", hasTextOnlyTest)
+  checkLaws("Optional laws for attribute", attributeTest)
+  checkLaws("Optional laws for hasOneChild", hasOneChildTest)
+  checkLaws("Lens laws for attributes", attributesTest)
   // TODO: investigate why tests are slow with default value for maxSize
-  checkLaws("children Lens", childrenTest, 8)
+  checkLaws("Lens laws for children", childrenTest, 8)
+  checkLaws("Prism laws for being", beingTest)
 }
 

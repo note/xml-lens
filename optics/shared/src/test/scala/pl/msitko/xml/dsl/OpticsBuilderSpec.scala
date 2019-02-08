@@ -64,6 +64,12 @@ trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
 
       val traversal = (root \ "c1" \ "f")
 
+//      val havingAttrValPredicate = ElementOptics.being(el => ElementOptics.attribute("example")
+//        .getOption(el)
+//        .exists(_ == "2"))
+//      val fetch = (root \ "b" \ "c").composePrism(havingAttrValPredicate)
+//      fetch.getAll()
+
       val res = traversal.replaceOrAddAttr("someKey", "newValue")(parsed)
 
       print(res) should === (expectedRes4)
