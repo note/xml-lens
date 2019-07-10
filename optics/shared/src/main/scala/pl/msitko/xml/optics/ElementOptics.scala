@@ -1,10 +1,9 @@
 package pl.msitko.xml.optics
 
 import monocle.function.Index
-import monocle.{Lens, Optional, Traversal}
+import monocle.{Lens, Optional, Prism, Traversal}
 import pl.msitko.xml.entities._
 import pl.msitko.xml.matchers.NameMatcher
-
 import scalaz.Applicative
 import scalaz.std.list._
 import scalaz.syntax.traverse._
@@ -22,6 +21,15 @@ trait ElementOptics {
 
   def deeper(label: String): Traversal[Element, Element] =
     deeper(NameMatcher.fromString(label))
+
+  def being(predicate: Element => Boolean): Prism[Element, Element] =
+    Prism[Element, Element]{ el =>
+      if (predicate(el)) {
+        Some(el)
+      } else {
+        None
+      }
+    }(identity)
 
   val hasOneChild: Optional[Element, Node] = Optional[Element, Node]{ el =>
     onlyChild(el)
