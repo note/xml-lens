@@ -32,6 +32,29 @@ final case class DeepBuilder(current: Traversal[XmlDocument, Element]) extends A
     current.composeTraversal(ElementOptics.deeper(nameMatcher))
   )
 
+  def withAttr(name: String, valueOpt: Option[String] = None): DeepBuilder = {
+    def hasAttr(attrs:Seq[Attribute]): Boolean = {
+      valueOpt match {
+        case None =>
+          attrs.exists(a => a.key.localName == name)
+        case Some(value) =>
+          attrs.exists(a => a.key.localName == name && a.value == value)
+      }
+    }
+    val traversal = new Traversal[Element, Element] {
+      override final def modifyF[F[_]: Applicative](f: (Element) => F[Element])(from: Element): F[Element] = {
+        if(hasAttr(from.attributes)) {
+          f(from)
+        } else {
+          Applicative[F].pure(from)
+        }
+      }
+    }
+
+    val composed: Traversal[XmlDocument, Element] = current.composeTraversal(traversal)
+    DeepBuilder(composed)
+  }
+
   def having(predicate: Node => Boolean): DeepBuilder = {
     // TODO: extract it to optics
     val traversal = new Traversal[Element, Element] {
