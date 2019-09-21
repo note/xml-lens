@@ -182,6 +182,30 @@ trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       print(res) should === (example17("ITEM"))
     }
 
+    "withAttr" in {
+      val parsed = parse(example22("item"))
+
+      val firstNode = (root \ "c1").withAttr("name", Some("attrName"))
+      val secondNode = (firstNode \ "g").withAttr("someKey", Some("item"))
+
+      val modification = secondNode.attr("someKey").set("ITEM")
+
+      val res = modification(parsed)
+      print(res) should === (example22("ITEM"))
+    }
+
+    "withAttr2" in {
+      val parsed = parse(example22("item"))
+
+      val firstNode = (root \ "c1").withAttr("name")
+      val secondNode = (firstNode \ "g").withAttr("someKey", Some("item"))
+
+      val modification = secondNode.attr("someKey").set("ITEM")
+
+      val res = modification(parsed)
+      print(res) should === (example22("ITEM"))
+    }
+
     "index" in {
       val parsed = parse(example17("item"))
 
@@ -509,6 +533,19 @@ trait OpticsBuilderSpec extends BasicSpec with ExampleInputs {
       |    </f>
       |  </c1>
       |</a>""".stripMargin
+
+  def example22(toReplaceAttr: String) =
+    s"""<?xml version="1.0" encoding="UTF-8"?>
+       |<a>
+       |   <c1>
+       |      <f>item</f>
+       |      <g>item</g>
+       |   </c1>
+       |   <c1 name="attrName">
+       |      <f></f>
+       |      <g someKey="$toReplaceAttr">item</g>
+       |   </c1>
+       |</a>""".stripMargin
 
   val input =
     s"""<?xml version="1.0" encoding="UTF-8"?>
